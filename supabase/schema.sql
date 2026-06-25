@@ -21,3 +21,18 @@ create policy "public read"
 create policy "public insert"
   on public.invitations for insert
   with check (true);
+
+-- ───────── 사진 업로드용 Storage ─────────
+-- 공개 버킷 'photos' 생성 (이미 있으면 무시)
+insert into storage.buckets (id, name, public)
+  values ('photos', 'photos', true)
+  on conflict (id) do nothing;
+
+-- 누구나 사진 업로드(insert) / 조회(select) 가능. 수정·삭제는 막아둠.
+create policy "photos public upload"
+  on storage.objects for insert
+  with check (bucket_id = 'photos');
+
+create policy "photos public read"
+  on storage.objects for select
+  using (bucket_id = 'photos');

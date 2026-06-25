@@ -47,6 +47,35 @@ export interface Invitation {
   createdAt: string;
 }
 
+// 저장/조회 데이터에 누락 필드가 있어도 렌더링이 깨지지 않도록 안전한 빈 값으로 보정.
+// (emptyInvitation 의 샘플값이 아니라 빈 문자열/빈 배열로 채운다.)
+export const normalizeData = (
+  d: Partial<InvitationData> | null | undefined
+): InvitationData => ({
+  groomName: d?.groomName ?? "",
+  brideName: d?.brideName ?? "",
+  groomFather: d?.groomFather ?? "",
+  groomMother: d?.groomMother ?? "",
+  brideFather: d?.brideFather ?? "",
+  brideMother: d?.brideMother ?? "",
+  weddingDate: d?.weddingDate ?? "",
+  weddingTime: d?.weddingTime ?? "",
+  venueName: d?.venueName ?? "",
+  venueHall: d?.venueHall ?? "",
+  venueAddress: d?.venueAddress ?? "",
+  greetingTitle: d?.greetingTitle ?? "",
+  greetingMessage: d?.greetingMessage ?? "",
+  fontHeading: d?.fontHeading ?? "default",
+  fontBody: d?.fontBody ?? "default",
+  mainPhotoUrl: d?.mainPhotoUrl ?? "",
+  gallery: Array.isArray(d?.gallery) ? d.gallery.filter((g) => typeof g === "string") : [],
+  groomPhone: d?.groomPhone ?? "",
+  bridePhone: d?.bridePhone ?? "",
+  accounts: Array.isArray(d?.accounts)
+    ? d.accounts.filter((a) => a && typeof a === "object")
+    : [],
+});
+
 export const emptyInvitation = (): InvitationData => ({
   groomName: "김선일",
   brideName: "박은진",

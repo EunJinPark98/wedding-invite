@@ -54,9 +54,19 @@ src/
     store.ts              저장소 (Supabase ↔ 로컬 파일 폴백)
 ```
 
+## 사진 업로드
+
+대표/갤러리 사진은 업로드 시 클라이언트에서 압축된 뒤 `POST /api/upload` 로 전송되고,
+청첩장 데이터에는 **이미지 URL만** 저장됩니다.
+
+- Supabase 설정 시: Storage 공개 버킷 `photos` 에 저장 (schema.sql 실행 시 버킷·정책 자동 생성)
+- 미설정 시(개발용): `public/uploads/` 에 저장하고 `/uploads/...` 경로 사용 (git 제외)
+
+> 로컬 폴백은 개발용입니다. Vercel 등 서버리스 배포에서는 파일시스템이 임시이므로
+> 반드시 Supabase Storage(또는 외부 스토리지)를 사용하세요.
+
 ## 다음 단계 아이디어
 
-- 사진 직접 업로드(Supabase Storage)
 - 방명록 / 참석 여부(RSVP)
 - 배경 음악, 디데이 카운트다운
 - 내 청첩장 관리(로그인 + 수정/삭제)

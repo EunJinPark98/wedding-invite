@@ -1,4 +1,4 @@
-import type { InvitationData, TemplateId } from "@/lib/types";
+import { normalizeData, type InvitationData, type TemplateId } from "@/lib/types";
 import { getTheme, getFontFamily, type TemplateTheme } from "@/lib/templates";
 import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
@@ -875,7 +875,7 @@ function Footer({
 /* ════════ 엔트리 ════════ */
 export default function InvitationView({
   template,
-  data,
+  data: rawData,
   preview = false,
 }: {
   template: TemplateId;
@@ -883,6 +883,8 @@ export default function InvitationView({
   // true면 갤러리가 비어도 빈 공백 슬롯을 미리 보여줌 (에디터 미리보기 전용)
   preview?: boolean;
 }) {
+  // 누락 필드가 있어도 안전하게 렌더링 (배열/문자열 기본값 보정)
+  const data = normalizeData(rawData);
   const base = getTheme(template);
   const headFam = getFontFamily(data.fontHeading);
   const bodyFam = getFontFamily(data.fontBody);

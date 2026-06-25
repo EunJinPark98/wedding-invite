@@ -2,6 +2,7 @@ import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeData } from "./types";
 import type { Invitation, InvitationData, TemplateId } from "./types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -38,8 +39,9 @@ async function writeLocal(db: Record<string, Invitation>) {
 export async function saveInvitation(
   slug: string,
   template: TemplateId,
-  data: InvitationData
+  rawData: InvitationData
 ): Promise<Invitation> {
+  const data = normalizeData(rawData);
   const invitation: Invitation = {
     slug,
     template,

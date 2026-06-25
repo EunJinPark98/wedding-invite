@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
 import { TEMPLATES, FONTS } from "@/lib/templates";
-import { fileToCompressedDataUrl } from "@/lib/image";
+import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
   type Account,
@@ -30,10 +30,20 @@ function ImageUpload({
     if (!file) return;
     setBusy(true);
     try {
-      const url = await fileToCompressedDataUrl(file);
-      onChange(url);
-    } catch {
-      alert("이미지를 처리하지 못했습니다. 다른 파일을 시도해 주세요.");
+      // 클라이언트에서 압축 → 서버 업로드 → 저장은 URL만
+      const blob = await fileToCompressedBlob(file);
+      const form = new FormData();
+      form.append("file", blob, "photo.jpg");
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "업로드에 실패했습니다.");
+      onChange(json.url);
+    } catch (e) {
+      alert(
+        e instanceof Error
+          ? e.message
+          : "이미지를 처리하지 못했습니다. 다른 파일을 시도해 주세요."
+      );
     } finally {
       setBusy(false);
     }
