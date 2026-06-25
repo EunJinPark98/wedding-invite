@@ -1,0 +1,77 @@
+// 모바일 청첩장 데이터 모델
+
+export type TemplateId = "classic" | "modern" | "romantic" | "botanical";
+
+export interface Account {
+  side: "신랑측" | "신부측";
+  name: string;
+  bank: string;
+  number: string;
+}
+
+export interface InvitationData {
+  // 신랑/신부
+  groomName: string;
+  brideName: string;
+  // 혼주
+  groomFather: string;
+  groomMother: string;
+  brideFather: string;
+  brideMother: string;
+  // 예식 일시/장소
+  weddingDate: string; // "2026-10-10"
+  weddingTime: string; // "오후 1시"
+  venueName: string;
+  venueHall: string;
+  venueAddress: string;
+  // 인사말
+  greetingTitle: string;
+  greetingMessage: string;
+  // 글꼴 (FontId, "default"=템플릿 기본)
+  fontHeading: string; // 메인(제목·이름)
+  fontBody: string; // 서브(본문)
+  // 사진
+  mainPhotoUrl: string;
+  gallery: string[];
+  // 연락처
+  groomPhone: string;
+  bridePhone: string;
+  // 마음 전하실 곳
+  accounts: Account[];
+}
+
+export interface Invitation {
+  slug: string;
+  template: TemplateId;
+  data: InvitationData;
+  createdAt: string;
+}
+
+export const emptyInvitation = (): InvitationData => ({
+  groomName: "김선일",
+  brideName: "박은진",
+  groomFather: "김아버지",
+  groomMother: "박어머니",
+  brideFather: "박아버지",
+  brideMother: "엄어머니",
+  weddingDate: "2026-10-10",
+  weddingTime: "오후 1시",
+  venueName: "그랜드 웨딩홀",
+  venueHall: "3층 그랜드볼룸",
+  venueAddress: "서울특별시 강남구 테헤란로 123",
+  greetingTitle: "소중한 분들을 초대합니다",
+  greetingMessage:
+    "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
+  fontHeading: "default",
+  fontBody: "default",
+  // 대표 사진: 저작권 안전한 로컬 예시 이미지 (public/wedding1.jpg)
+  mainPhotoUrl: "/wedding1.jpg",
+  // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
+  gallery: ["", "", ""],
+  groomPhone: "010-1234-5678",
+  bridePhone: "010-8765-4321",
+  accounts: [
+    { side: "신랑측", name: "김선일", bank: "국민은행", number: "123-456-7890" },
+    { side: "신부측", name: "박은진", bank: "신한은행", number: "987-654-3210" },
+  ],
+});

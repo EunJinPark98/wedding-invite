@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local file store (Supabase 미설정 시 사용)
+/.data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
