@@ -184,6 +184,8 @@ export default function EditorClient() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [confirming, setConfirming] = useState(false); // 제작 전 확인 모달
+  const [showPreview, setShowPreview] = useState(false); // 모바일 전체화면 미리보기
 
   const set = <K extends keyof InvitationData>(
     key: K,
@@ -237,6 +239,7 @@ export default function EditorClient() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "저장에 실패했습니다.");
       const url = `${window.location.origin}/v/${json.slug}`;
+      setConfirming(false);
       setResult(url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "오류가 발생했습니다.");
@@ -547,17 +550,21 @@ export default function EditorClient() {
         </Group>
 
         <button
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="w-full rounded-2xl bg-gradient-to-r from-rose-400 to-rose-500 py-4 text-base font-semibold text-white shadow-lg shadow-rose-200/60 transition hover:from-rose-500 hover:to-rose-600 disabled:opacity-50"
+          onClick={() => {
+            setError(null);
+            setConfirming(true);
+          }}
+          className="w-full rounded-2xl bg-gradient-to-r from-rose-400 to-rose-500 py-4 text-base font-semibold text-white shadow-lg shadow-rose-200/60 transition hover:from-rose-500 hover:to-rose-600"
         >
-          {submitting ? "제작 중..." : "청첩장 제작하기"}
+          청첩장 제작하기
         </button>
-        {error && <p className="text-center text-sm text-red-500">{error}</p>}
+        <p className="text-center text-xs text-gray-400">
+          제작 전에 미리보기로 한 번 더 확인할 수 있어요.
+        </p>
       </div>
 
-      {/* 실시간 미리보기 */}
-      <div className="md:sticky md:top-8 md:h-[calc(100vh-4rem)]">
+      {/* 실시간 미리보기 — 데스크톱(사이드 고정) */}
+      <div className="hidden md:sticky md:top-8 md:block md:h-[calc(100vh-4rem)]">
         <p className="mb-3 text-center font-cormorant text-xs tracking-[0.35em] text-gray-400">
           LIVE PREVIEW
         </p>
@@ -566,6 +573,32 @@ export default function EditorClient() {
             <InvitationView template={template} data={data} preview />
           </div>
         </div>
+      </div>
+
+      {/* 미리보기 — 모바일(우상단 미니, 탭하면 확대) */}
+      <div
+        className="fixed right-3 top-3 z-40 overflow-hidden rounded-lg border-2 border-gray-800 bg-white shadow-lg md:hidden"
+        style={{ width: 72, height: 104 }}
+      >
+        {/* 축소된 실시간 미리보기 (클릭은 위 오버레이가 처리) */}
+        <div
+          className="pointer-events-none"
+          style={{
+            width: 390,
+            transformOrigin: "top left",
+            transform: `scale(${72 / 390})`,
+          }}
+        >
+          <InvitationView template={template} data={data} preview />
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowPreview(true)}
+          aria-label="미리보기 크게 보기"
+          className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 via-transparent to-transparent pb-0.5 text-[9px] font-medium text-white"
+        >
+          🔍 미리보기
+        </button>
       </div>
 
       {/* 완료 모달 */}
@@ -606,6 +639,69 @@ export default function EditorClient() {
             >
               닫고 계속 편집
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 모바일 전체화면 미리보기 */}
+      {showPreview && (
+        <div
+          onClick={() => setShowPreview(false)}
+          className="fixed inset-0 z-50 flex flex-col bg-black/80 p-4 md:hidden"
+        >
+          <button
+            type="button"
+            onClick={() => setShowPreview(false)}
+            aria-label="닫기"
+            className="mb-2 self-end text-3xl leading-none text-white/80"
+          >
+            ×
+          </button>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-[2rem] border-8 border-gray-800 bg-white shadow-2xl"
+          >
+            <div className="h-full overflow-y-auto">
+              <InvitationView template={template} data={data} preview />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 제작 확인 모달 (미리보기 + 한 번 더 확인) */}
+      {confirming && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-4">
+          <div className="mx-auto flex min-h-0 w-full max-w-sm flex-1 flex-col rounded-2xl bg-white p-4 shadow-2xl">
+            <h2 className="text-center text-lg font-bold text-gray-800">
+              이대로 제작할까요?
+            </h2>
+            <p className="mb-3 mt-1 text-center text-xs text-gray-500">
+              아래 미리보기를 확인하고 제작하세요.
+            </p>
+            <div className="mx-auto w-full min-h-0 max-w-[300px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
+              <div className="h-full overflow-y-auto">
+                <InvitationView template={template} data={data} preview />
+              </div>
+            </div>
+            {error && (
+              <p className="mt-2 text-center text-sm text-red-500">{error}</p>
+            )}
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => setConfirming(false)}
+                disabled={submitting}
+                className="flex-1 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-gray-700 disabled:opacity-50"
+              >
+                다시 수정할게요
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex-1 rounded-xl bg-gradient-to-r from-rose-400 to-rose-500 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {submitting ? "제작 중..." : "네, 제작할게요"}
+              </button>
+            </div>
           </div>
         </div>
       )}
