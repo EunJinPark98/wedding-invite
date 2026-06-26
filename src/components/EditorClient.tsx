@@ -7,6 +7,7 @@ import { TEMPLATES, FONTS } from "@/lib/templates";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
+  MAX_GALLERY,
   type Account,
   type InvitationData,
   type TemplateId,
@@ -216,7 +217,11 @@ export default function EditorClient() {
       gallery: d.gallery.map((g, idx) => (idx === i ? url : g)),
     }));
   const addGallery = () =>
-    setData((d) => ({ ...d, gallery: [...d.gallery, ""] }));
+    setData((d) =>
+      d.gallery.length >= MAX_GALLERY
+        ? d
+        : { ...d, gallery: [...d.gallery, ""] }
+    );
   const removeGallery = (i: number) =>
     setData((d) => ({ ...d, gallery: d.gallery.filter((_, idx) => idx !== i) }));
 
@@ -435,7 +440,10 @@ export default function EditorClient() {
           </div>
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              갤러리 사진
+              갤러리 사진{" "}
+              <span className="text-gray-400">
+                ({data.gallery.length}/{MAX_GALLERY})
+              </span>
             </span>
             <div className="grid grid-cols-3 gap-2">
               {data.gallery.map((g, i) => (
@@ -450,17 +458,20 @@ export default function EditorClient() {
                   className="h-24"
                 />
               ))}
-              <button
-                type="button"
-                onClick={addGallery}
-                className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-2xl text-gray-300 transition hover:border-rose-300 hover:text-rose-400"
-              >
-                +
-              </button>
+              {data.gallery.length < MAX_GALLERY && (
+                <button
+                  type="button"
+                  onClick={addGallery}
+                  className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-2xl text-gray-300 transition hover:border-rose-300 hover:text-rose-400"
+                >
+                  +
+                </button>
+              )}
             </div>
           </div>
           <p className="text-xs text-gray-400">
-            업로드한 사진은 자동으로 압축되어 청첩장에 저장됩니다.
+            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요. 업로드한 사진은
+            자동으로 압축되어 저장됩니다.
           </p>
         </Group>
 

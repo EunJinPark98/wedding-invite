@@ -2,6 +2,9 @@
 
 export type TemplateId = "classic" | "modern" | "romantic" | "botanical";
 
+// 갤러리 사진 최대 개수 (무료 플랜 용량 보호)
+export const MAX_GALLERY = 7;
+
 export interface Account {
   side: "신랑측" | "신부측";
   name: string;
@@ -68,7 +71,9 @@ export const normalizeData = (
   fontHeading: d?.fontHeading ?? "default",
   fontBody: d?.fontBody ?? "default",
   mainPhotoUrl: d?.mainPhotoUrl ?? "",
-  gallery: Array.isArray(d?.gallery) ? d.gallery.filter((g) => typeof g === "string") : [],
+  gallery: Array.isArray(d?.gallery)
+    ? d.gallery.filter((g) => typeof g === "string").slice(0, MAX_GALLERY)
+    : [],
   groomPhone: d?.groomPhone ?? "",
   bridePhone: d?.bridePhone ?? "",
   accounts: Array.isArray(d?.accounts)
