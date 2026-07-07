@@ -36,9 +36,19 @@ export async function GET(req: Request) {
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 
   if (!clientId || !clientSecret || !serviceKey || !supaUrl) {
-    return NextResponse.redirect(
-      new URL("/login?error=naver_config", url.origin)
+    const missing = [
+      !clientId && "id",
+      !clientSecret && "secret",
+      !serviceKey && "key",
+      !supaUrl && "url",
+    ]
+      .filter(Boolean)
+      .join(",");
+    const res = NextResponse.redirect(
+      new URL(`/login?error=naver_config&m=${missing}`, url.origin)
     );
+    res.headers.set("Cache-Control", "no-store");
+    return res;
   }
   // CSRF 검증
   if (!code || !state || !savedState || state !== savedState) {

@@ -9,10 +9,17 @@ export async function GET(req: Request) {
     rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
   const clientId = process.env.NAVER_CLIENT_ID?.trim();
-  if (!clientId || !process.env.NAVER_CLIENT_SECRET || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return NextResponse.redirect(
-      new URL("/login?error=naver_config", url.origin)
+  // 어떤 변수가 비어있는지 진단 정보 포함
+  const missing: string[] = [];
+  if (!clientId) missing.push("id");
+  if (!process.env.NAVER_CLIENT_SECRET?.trim()) missing.push("secret");
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) missing.push("key");
+  if (missing.length > 0) {
+    const res = NextResponse.redirect(
+      new URL(`/login?error=naver_config&m=${missing.join(",")}`, url.origin)
     );
+    res.headers.set("Cache-Control", "no-store");
+    return res;
   }
 
   const state = randomBytes(16).toString("hex");
@@ -23,6 +30,7 @@ export async function GET(req: Request) {
   authorize.searchParams.set("state", state);
 
   const res = NextResponse.redirect(authorize);
+  res.headers.set("Cache-Control", "no-store");
   const secure = url.protocol === "https:";
   res.cookies.set("naver_oauth_state", state, {
     httpOnly: true,

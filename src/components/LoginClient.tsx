@@ -19,7 +19,9 @@ export default function LoginClient() {
     errParam === "auth"
       ? `로그인에 실패했어요. 다시 시도해 주세요.${reason ? ` (코드: ${reason})` : ""}`
       : errParam === "naver_config"
-        ? "네이버 로그인 설정이 아직 완료되지 않았어요."
+        ? `네이버 로그인 설정이 아직 완료되지 않았어요.${
+            params.get("m") ? ` (누락: ${params.get("m")})` : " (캐시된 이전 오류일 수 있어요 — 다시 눌러보세요)"
+          }`
         : null
   );
 
@@ -54,7 +56,8 @@ export default function LoginClient() {
     setError(null);
     // 주소창에 남은 이전 에러 파라미터 제거 (뒤로가기 시 재표시 방지)
     window.history.replaceState(null, "", `/login?next=${encodeURIComponent(next)}`);
-    window.location.href = `/api/auth/naver/start?next=${encodeURIComponent(next)}`;
+    // t= 캐시버스터: 브라우저가 과거 실패 리다이렉트를 재사용하지 못하게 함
+    window.location.href = `/api/auth/naver/start?next=${encodeURIComponent(next)}&t=${Date.now()}`;
   }
 
   return (
