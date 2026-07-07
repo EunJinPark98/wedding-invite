@@ -299,14 +299,17 @@ export default function EditorClient() {
             className="flex items-center gap-2 text-sm text-gray-500 transition hover:text-rose-500"
           >
             <span aria-hidden>←</span>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-400 text-[11px] text-white">
-              ♡
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt=""
+              className="h-6 w-6 rounded-full shadow-sm"
+            />
             <span
               className="text-gray-900"
               style={{ fontFamily: "var(--font-song)" }}
             >
-              모바일 청첩장
+              별빛 초대장
             </span>
           </Link>
           <span className="hidden text-xs text-gray-400 sm:inline">

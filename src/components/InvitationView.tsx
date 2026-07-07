@@ -1097,6 +1097,12 @@ function Footer({
           {String(fp.day).padStart(2, "0")}
         </p>
       )}
+      <a
+        href="/"
+        className="mt-9 inline-block text-[10px] tracking-wider text-white/35 transition hover:text-white/60"
+      >
+        별빛 초대장 ✦ 별마마파파
+      </a>
     </footer>
   );
 }

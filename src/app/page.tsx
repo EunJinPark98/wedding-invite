@@ -13,14 +13,17 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-rose-100/70 bg-[#fbf7f3]/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-400 text-xs text-white">
-              ♡
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="별빛 초대장 로고"
+              className="h-8 w-8 rounded-full shadow-sm"
+            />
             <span
               className="text-lg text-gray-900"
               style={{ fontFamily: "var(--font-song)" }}
             >
-              모바일 청첩장
+              별빛 초대장
             </span>
           </Link>
           <Link
@@ -40,8 +43,14 @@ export default function Home() {
           <p className="font-cormorant text-sm tracking-[0.5em] text-rose-400">
             MOBILE WEDDING INVITATION
           </p>
+          <p
+            className="mt-5 text-2xl text-rose-400"
+            style={{ fontFamily: "var(--font-pen)" }}
+          >
+            우리 두 사람의 별처럼 빛나는 시작 ✦
+          </p>
           <h1
-            className="mt-6 text-[2.6rem] leading-[1.3] text-gray-900 sm:text-5xl"
+            className="mt-4 text-[2.6rem] leading-[1.3] text-gray-900 sm:text-5xl"
             style={{ fontFamily: "var(--font-song)" }}
           >
             우리의 특별한 날,
@@ -161,12 +170,28 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-gray-100 py-10 text-center">
-        <p className="font-cormorant text-xs tracking-[0.4em] text-gray-400">
-          MADE WITH LOVE
-        </p>
+      <footer className="border-t border-gray-100 py-12 text-center">
+        <div className="flex items-center justify-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt=""
+            className="h-6 w-6 rounded-full"
+          />
+          <span
+            className="text-sm text-gray-600"
+            style={{ fontFamily: "var(--font-song)" }}
+          >
+            별빛 초대장
+          </span>
+        </div>
         <p className="mt-2 text-xs text-gray-400">
-          나만의 모바일 청첩장 · 무료로 만들기
+          우리 두 사람의 별처럼 빛나는 시작
+        </p>
+        <p className="mt-5 text-xs text-gray-400">
+          © 2026{" "}
+          <span className="font-medium text-gray-500">별마마파파</span> · 결혼,
+          육아, 가족을 위한 웹서비스
         </p>
       </footer>
     </main>

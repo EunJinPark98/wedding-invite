@@ -77,9 +77,14 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "모바일 청첩장 만들기",
+  title: {
+    default: "별빛 초대장 — 우리 두 사람의 별처럼 빛나는 시작",
+    template: "%s | 별빛 초대장",
+  },
   description:
-    "템플릿을 고르고 내용을 입력해 나만의 모바일 청첩장을 만들고 링크로 공유하세요.",
+    "우리 두 사람의 별처럼 빛나는 시작, 별빛 초대장. 템플릿을 고르고 내용을 입력해 나만의 모바일 청첩장을 만들고 링크로 공유하세요. 결혼·육아·가족을 위한 웹서비스, 별마마파파.",
+  applicationName: "별빛 초대장",
+  authors: [{ name: "별마마파파" }],
 };
 
 export default function RootLayout({
