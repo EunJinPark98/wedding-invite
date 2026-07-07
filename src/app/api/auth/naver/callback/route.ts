@@ -54,7 +54,10 @@ export async function GET(req: Request) {
     tokenUrl.searchParams.set("state", state);
     const tokenRes = await fetch(tokenUrl, { cache: "no-store" });
     const token = await tokenRes.json();
-    if (!token?.access_token) return fail(url.origin, "token");
+    if (!token?.access_token) {
+      console.error("[naver-login] token response:", JSON.stringify(token));
+      return fail(url.origin, `token-${token?.error ?? "unknown"}`);
+    }
 
     // 2) 프로필 조회
     const profRes = await fetch("https://openapi.naver.com/v1/nid/me", {
