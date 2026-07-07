@@ -5,6 +5,15 @@ export type TemplateId = "classic" | "modern" | "romantic" | "botanical";
 // 갤러리 사진 최대 개수 (무료 플랜 용량 보호)
 export const MAX_GALLERY = 7;
 
+// 청첩장 운영(공개) 기간 선택지 — 개월 수
+export const PERIOD_OPTIONS = [
+  { months: 1, label: "1개월" },
+  { months: 3, label: "3개월" },
+  { months: 6, label: "6개월" },
+  { months: 12, label: "1년" },
+] as const;
+export type PeriodMonths = (typeof PERIOD_OPTIONS)[number]["months"];
+
 export interface Account {
   side: "신랑측" | "신부측";
   name: string;
@@ -48,6 +57,8 @@ export interface Invitation {
   template: TemplateId;
   data: InvitationData;
   createdAt: string;
+  // 이 시각이 지나면 발행 페이지 비공개 (null이면 무기한 — 과거 데이터 호환)
+  expiresAt: string | null;
 }
 
 // 저장/조회 데이터에 누락 필드가 있어도 렌더링이 깨지지 않도록 안전한 빈 값으로 보정.

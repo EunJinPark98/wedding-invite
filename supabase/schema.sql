@@ -5,8 +5,12 @@ create table if not exists public.invitations (
   slug text unique not null,
   template text not null,
   data jsonb not null,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  expires_at timestamptz -- 운영 기간 만료 시각 (null = 무기한)
 );
+
+-- 기존 테이블에 컬럼이 없으면 추가 (재실행해도 안전)
+alter table public.invitations add column if not exists expires_at timestamptz;
 
 create index if not exists invitations_slug_idx on public.invitations (slug);
 

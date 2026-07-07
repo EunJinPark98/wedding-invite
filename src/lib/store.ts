@@ -39,7 +39,8 @@ async function writeLocal(db: Record<string, Invitation>) {
 export async function saveInvitation(
   slug: string,
   template: TemplateId,
-  rawData: InvitationData
+  rawData: InvitationData,
+  expiresAt: string | null = null
 ): Promise<Invitation> {
   const data = normalizeData(rawData);
   const invitation: Invitation = {
@@ -47,6 +48,7 @@ export async function saveInvitation(
     template,
     data,
     createdAt: new Date().toISOString(),
+    expiresAt,
   };
 
   if (useSupabase) {
@@ -54,6 +56,7 @@ export async function saveInvitation(
       slug,
       template,
       data,
+      expires_at: expiresAt,
     });
     if (error) throw new Error(error.message);
     return invitation;
@@ -69,7 +72,7 @@ export async function getInvitation(slug: string): Promise<Invitation | null> {
   if (useSupabase) {
     const { data, error } = await supabase()
       .from("invitations")
-      .select("slug, template, data, created_at")
+      .select("slug, template, data, created_at, expires_at")
       .eq("slug", slug)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -79,11 +82,21 @@ export async function getInvitation(slug: string): Promise<Invitation | null> {
       template: data.template,
       data: data.data,
       createdAt: data.created_at,
+      expiresAt: data.expires_at ?? null,
     };
   }
 
   const db = await readLocal();
-  return db[slug] ?? null;
+  const inv = db[slug];
+  if (!inv) return null;
+  return { ...inv, expiresAt: inv.expiresAt ?? null };
+}
+
+// 만료 여부 (expiresAt이 없으면 무기한)
+export function isExpired(inv: Invitation): boolean {
+  if (!inv.expiresAt) return false;
+  const t = new Date(inv.expiresAt).getTime();
+  return !isNaN(t) && t < Date.now();
 }
 
 export const storageMode = useSupabase ? "supabase" : "local";

@@ -9,8 +9,10 @@ import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
   MAX_GALLERY,
+  PERIOD_OPTIONS,
   type Account,
   type InvitationData,
+  type PeriodMonths,
   type TemplateId,
 } from "@/lib/types";
 
@@ -112,6 +114,14 @@ function Field({
   );
 }
 
+// 만료일 표시용 (예: 2026년 9월 26일)
+const fmtDate = (iso: string) => {
+  const d = new Date(iso);
+  return isNaN(d.getTime())
+    ? ""
+    : `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+};
+
 // 공통 입력 스타일
 const INPUT_CLASS =
   "w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 text-sm text-gray-800 transition placeholder:text-gray-300 focus:border-rose-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-100";
@@ -187,6 +197,8 @@ export default function EditorClient() {
   const [copied, setCopied] = useState(false);
   const [confirming, setConfirming] = useState(false); // 제작 전 확인 모달
   const [showPreview, setShowPreview] = useState(false); // 모바일 전체화면 미리보기
+  const [period, setPeriod] = useState<PeriodMonths>(3); // 운영 기간(개월)
+  const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
 
   const set = <K extends keyof InvitationData>(
     key: K,
@@ -235,12 +247,13 @@ export default function EditorClient() {
       const res = await fetch("/api/invitations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template, data }),
+        body: JSON.stringify({ template, data, periodMonths: period }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "저장에 실패했습니다.");
       const url = `${window.location.origin}/v/${json.slug}`;
       setConfirming(false);
+      setResultExpires(json.expiresAt ?? null);
       setResult(url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "오류가 발생했습니다.");
@@ -643,6 +656,11 @@ export default function EditorClient() {
             <div className="mt-4 break-all rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700">
               {result}
             </div>
+            {resultExpires && (
+              <p className="mt-2 text-xs text-gray-400">
+                {fmtDate(resultExpires)}까지 공개 · 이후 자동 비공개
+              </p>
+            )}
             <div className="mt-4 flex gap-2">
               <button
                 onClick={copyLink}
@@ -694,21 +712,51 @@ export default function EditorClient() {
         </div>
       )}
 
-      {/* 제작 확인 모달 (미리보기 + 한 번 더 확인) */}
+      {/* 제작 확인 모달 (미리보기 + 운영 기간 + 한 번 더 확인) */}
       {confirming && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-4">
-          <div className="mx-auto flex min-h-0 w-full max-w-sm flex-1 flex-col rounded-2xl bg-white p-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-3 sm:p-5">
+          <div className="mx-auto flex min-h-0 w-full max-w-[460px] flex-1 flex-col rounded-2xl bg-white p-4 shadow-2xl sm:p-5">
             <h2 className="text-center text-lg font-bold text-gray-800">
               이대로 제작할까요?
             </h2>
             <p className="mb-3 mt-1 text-center text-xs text-gray-500">
-              아래 미리보기를 확인하고 제작하세요.
+              아래 미리보기를 확인하고 운영 기간을 선택하세요.
             </p>
-            <div className="mx-auto w-full min-h-0 max-w-[300px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
+            <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
                 <InvitationView template={template} data={data} preview />
               </div>
             </div>
+
+            {/* 운영 기간 선택 */}
+            <div className="mt-3.5">
+              <p className="mb-2 text-center text-xs font-semibold text-gray-600">
+                운영 기간
+              </p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {PERIOD_OPTIONS.map((p) => {
+                  const selected = period === p.months;
+                  return (
+                    <button
+                      key={p.months}
+                      type="button"
+                      onClick={() => setPeriod(p.months)}
+                      className={`rounded-xl border-2 py-2 text-sm font-medium transition ${
+                        selected
+                          ? "border-rose-400 bg-rose-50 text-rose-500"
+                          : "border-gray-200 text-gray-600 hover:border-gray-300"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-center text-[11px] text-gray-400">
+                기간이 지나면 청첩장 링크가 자동으로 비공개돼요.
+              </p>
+            </div>
+
             {error && (
               <p className="mt-2 text-center text-sm text-red-500">{error}</p>
             )}

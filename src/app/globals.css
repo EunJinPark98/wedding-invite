@@ -28,3 +28,58 @@ body {
 .font-cormorant {
   font-family: var(--font-cormorant), serif;
 }
+
+/* ───────── 청첩장 연출 ───────── */
+
+/* 섹션 등장 애니메이션 (스크롤 진입 시 부드럽게) */
+@keyframes inv-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-fade {
+  animation: inv-fade-up 0.8s ease-out both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 45%;
+}
+/* view() 미지원 브라우저: 로드 시 1회 재생 */
+@supports not (animation-timeline: view()) {
+  .inv-fade {
+    animation: inv-fade-up 0.8s ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-fade {
+    animation: none;
+  }
+}
+
+/* 히어로 이름 은은한 등장 */
+@keyframes inv-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    letter-spacing: 0.2em;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-hero-in {
+  animation: inv-hero-in 1.4s ease-out both;
+}
+.inv-hero-in-delay {
+  animation: inv-hero-in 1.4s ease-out 0.3s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-hero-in,
+  .inv-hero-in-delay {
+    animation: none;
+  }
+}
