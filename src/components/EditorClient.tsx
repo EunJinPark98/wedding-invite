@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
 import { TEMPLATES, FONTS } from "@/lib/templates";
@@ -256,7 +257,32 @@ export default function EditorClient() {
   }
 
   return (
-    <div className="mx-auto grid min-h-screen max-w-6xl gap-8 bg-[#faf7f4] p-4 text-gray-800 md:grid-cols-2 md:p-8">
+    <div className="min-h-screen bg-[#faf7f4] text-gray-800">
+      {/* 상단 네비 — 메인으로 돌아가기 */}
+      <header className="sticky top-0 z-40 border-b border-rose-100/70 bg-[#faf7f4]/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm text-gray-500 transition hover:text-rose-500"
+          >
+            <span aria-hidden>←</span>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-400 text-[11px] text-white">
+              ♡
+            </span>
+            <span
+              className="text-gray-900"
+              style={{ fontFamily: "var(--font-song)" }}
+            >
+              모바일 청첩장
+            </span>
+          </Link>
+          <span className="hidden text-xs text-gray-400 sm:inline">
+            저장 전까지는 자유롭게 수정할 수 있어요
+          </span>
+        </div>
+      </header>
+
+    <div className="mx-auto grid max-w-6xl gap-8 p-4 md:grid-cols-2 md:p-8">
       {/* 폼 */}
       <div className="space-y-4">
         <div className="mb-1">
@@ -577,7 +603,7 @@ export default function EditorClient() {
 
       {/* 미리보기 — 모바일(우상단 미니, 탭하면 확대) */}
       <div
-        className="fixed right-3 top-3 z-40 overflow-hidden rounded-lg border-2 border-gray-800 bg-white shadow-lg md:hidden"
+        className="fixed right-3 top-16 z-40 overflow-hidden rounded-lg border-2 border-gray-800 bg-white shadow-lg md:hidden"
         style={{ width: 72, height: 104 }}
       >
         {/* 축소된 실시간 미리보기 (클릭은 위 오버레이가 처리) */}
@@ -705,6 +731,7 @@ export default function EditorClient() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
