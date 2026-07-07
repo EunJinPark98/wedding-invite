@@ -297,22 +297,22 @@ export default function EditorClient() {
 
   return (
     <div className="min-h-screen bg-cream text-gray-800">
-      {/* 상단 네비 — 로고 배경색(딥 네이비)으로 본문과 구분 */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 backdrop-blur-md">
+      {/* 상단 네비 — 화이트 + 골드 헤어라인 */}
+      <header className="sticky top-0 z-40 border-b border-gold-200/50 bg-white/85 shadow-[0_1px_14px_rgba(198,162,63,0.10)] backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-white/60 transition hover:text-gold-300"
+            className="flex items-center gap-2 text-sm text-gray-400 transition hover:text-gold-500"
           >
             <span aria-hidden>←</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt=""
-              className="h-6 w-6 rounded-full ring-1 ring-gold-400/50"
+              className="h-6 w-6 rounded-full shadow-sm"
             />
             <span
-              className="text-white"
+              className="text-ink"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
@@ -645,7 +645,7 @@ export default function EditorClient() {
 
         <button
           onClick={openConfirm}
-          className="w-full rounded-2xl bg-gold-400 py-4 text-base font-semibold text-ink shadow-lg shadow-gold-300/50 transition hover:bg-gold-500"
+          className="w-full rounded-2xl bg-gradient-to-r from-gold-400 to-gold-500 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
         >
           청첩장 제작하기
         </button>
@@ -722,7 +722,7 @@ export default function EditorClient() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={copyLink}
-                className="flex-1 rounded-lg bg-gold-400 py-2.5 text-sm font-semibold text-ink transition hover:bg-gold-500"
+                className="flex-1 rounded-lg bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white transition hover:from-gold-500 hover:to-gold-600"
               >
                 {copied ? "복사됨!" : "링크 복사"}
               </button>
@@ -845,7 +845,7 @@ export default function EditorClient() {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex-1 rounded-xl bg-gold-400 py-2.5 text-sm font-semibold text-ink shadow-sm transition hover:bg-gold-500 disabled:opacity-50"
+                className="flex-1 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:from-gold-500 hover:to-gold-600 disabled:opacity-50"
               >
                 {submitting ? "제작 중..." : "네, 제작할게요"}
               </button>

@@ -40,12 +40,11 @@ export default function AuthStatus() {
 
   if (!authEnabled || !ready) return null;
 
-  // 네이비 헤더 위에 올라가므로 밝은 톤 사용
   if (!email && !name) {
     return (
       <Link
         href="/login"
-        className="text-sm text-white/70 transition hover:text-gold-300"
+        className="text-sm text-gray-500 transition hover:text-gold-600"
       >
         로그인
       </Link>
@@ -54,7 +53,7 @@ export default function AuthStatus() {
 
   return (
     <span className="flex items-center gap-2.5 text-sm">
-      <span className="max-w-[140px] truncate text-white/80">
+      <span className="max-w-[140px] truncate font-medium text-gray-600">
         {name ?? email}
       </span>
       <button
@@ -63,7 +62,7 @@ export default function AuthStatus() {
           await supabaseBrowser().auth.signOut();
           window.location.reload();
         }}
-        className="text-xs text-white/45 transition hover:text-gold-300"
+        className="text-xs text-gray-400 transition hover:text-gold-600"
       >
         로그아웃
       </button>

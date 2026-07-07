@@ -10,18 +10,18 @@ const SAMPLE = { ...emptyInvitation(), gallery: [], accounts: [] };
 export default function Home() {
   return (
     <main className="min-h-screen bg-cream text-gray-800">
-      {/* 상단 네비 — 로고 배경색(딥 네이비)으로 본문과 구분 */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 backdrop-blur-md">
+      {/* 상단 네비 — 화이트 + 골드 헤어라인으로 크림 본문과 구분 */}
+      <header className="sticky top-0 z-40 border-b border-gold-200/50 bg-white/85 shadow-[0_1px_14px_rgba(198,162,63,0.10)] backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt="별빛 초대장 로고"
-              className="h-8 w-8 rounded-full ring-1 ring-gold-400/50"
+              className="h-8 w-8 rounded-full shadow-sm"
             />
             <span
-              className="text-lg text-white"
+              className="text-lg text-ink"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
@@ -31,7 +31,7 @@ export default function Home() {
             <AuthStatus />
             <Link
               href="/editor"
-              className="rounded-full bg-gold-400 px-5 py-2 text-sm font-semibold text-ink shadow-sm transition hover:bg-gold-500"
+              className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600"
             >
               만들기
             </Link>
@@ -66,13 +66,13 @@ export default function Home() {
           <div className="mt-10 flex items-center justify-center gap-3">
             <Link
               href="/editor"
-              className="rounded-full bg-ink px-8 py-4 text-base font-semibold text-gold-300 shadow-lg shadow-ink/25 transition hover:bg-ink/90"
+              className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
             >
               무료로 시작하기
             </Link>
             <Link
               href="#templates"
-              className="rounded-full border border-ink/15 bg-white/70 px-7 py-4 text-base font-semibold text-ink/80 backdrop-blur transition hover:border-ink/30"
+              className="rounded-full border border-gold-300/70 bg-white/80 px-7 py-4 text-base font-semibold text-gray-600 backdrop-blur transition hover:border-gold-400 hover:text-gold-600"
             >
               템플릿 둘러보기
             </Link>
@@ -168,24 +168,28 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-ink py-14 text-center">
+      <footer className="border-t border-gold-200/50 bg-white py-14 text-center">
         <div className="flex items-center justify-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" className="h-9 w-9 rounded-full" />
+          <img src="/logo.png" alt="" className="h-9 w-9 rounded-full shadow-sm" />
           <span
-            className="text-lg text-white"
+            className="text-lg text-ink"
             style={{ fontFamily: "var(--font-song)" }}
           >
             별빛 초대장
           </span>
         </div>
-        <div className="mx-auto mt-7 h-px w-16 bg-white/15" />
-        <p className="mt-6 text-xs leading-6 text-white/45">
-          <span className="font-medium text-gold-300">별마마파파</span>
+        <div className="mx-auto mt-7 flex items-center justify-center gap-2.5">
+          <span className="h-px w-12 bg-gold-200" />
+          <span className="text-[10px] text-gold-400">✦</span>
+          <span className="h-px w-12 bg-gold-200" />
+        </div>
+        <p className="mt-6 text-xs leading-6 text-gray-400">
+          <span className="font-medium text-gold-500">별마마파파</span>
           <br />
           결혼 · 육아 · 가족을 위한 웹서비스
         </p>
-        <p className="mt-4 text-[11px] text-white/30">
+        <p className="mt-4 text-[11px] text-gray-300">
           © 2026 별마마파파. All rights reserved.
         </p>
       </footer>
