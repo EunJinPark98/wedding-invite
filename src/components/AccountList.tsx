@@ -30,30 +30,38 @@ export default function AccountList({
       {accounts.map((a, i) => (
         <div
           key={i}
-          className="flex items-center gap-3 rounded-xl px-5 py-4"
-          style={{ background: t.accentSoft }}
+          className="flex items-center gap-3 rounded-2xl border px-5 py-4"
+          style={{ background: t.accentSoft, borderColor: t.line }}
         >
           <div className="min-w-0 flex-1">
-            <p className="text-xs" style={{ color: t.accent }}>
-              {a.side}
+            <p className="flex items-center gap-1.5">
+              <span
+                className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                style={{ background: t.accent }}
+              >
+                {a.side}
+              </span>
+              <span className="text-xs" style={{ color: t.sub }}>
+                {a.name}
+              </span>
             </p>
             <p
-              className="mt-1 truncate text-sm font-medium"
+              className="mt-1.5 truncate text-[15px] font-semibold tracking-wide"
               style={{ color: t.ink }}
             >
-              {a.bank} {a.number}
+              {a.number}
             </p>
-            <p className="text-sm" style={{ color: t.sub }}>
-              예금주 {a.name}
+            <p className="mt-0.5 text-xs" style={{ color: t.sub }}>
+              {a.bank}
             </p>
           </div>
           <button
             type="button"
             onClick={() => copy(i, a)}
-            className="shrink-0 rounded-full px-4 py-2 text-xs font-medium text-white transition"
+            className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm transition"
             style={{ background: copied === i ? t.sub : t.accent }}
           >
-            {copied === i ? "복사됨" : "복사"}
+            {copied === i ? "✓ 복사됨" : "복사"}
           </button>
         </div>
       ))}

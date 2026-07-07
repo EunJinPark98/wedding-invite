@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
@@ -10,6 +10,7 @@ import {
   emptyInvitation,
   MAX_GALLERY,
   PERIOD_OPTIONS,
+  SAMPLE_MAIN_PHOTO,
   type Account,
   type InvitationData,
   type PeriodMonths,
@@ -199,6 +200,25 @@ export default function EditorClient() {
   const [showPreview, setShowPreview] = useState(false); // 모바일 전체화면 미리보기
   const [period, setPeriod] = useState<PeriodMonths>(3); // 운영 기간(개월)
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
+  const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
+  const photoSectionRef = useRef<HTMLDivElement>(null);
+
+  // 예시 사진 그대로거나 비어있으면 본인 대표 사진 등록 필요
+  const needMainPhoto =
+    !data.mainPhotoUrl || data.mainPhotoUrl === SAMPLE_MAIN_PHOTO;
+
+  function openConfirm() {
+    if (needMainPhoto) {
+      setPhotoWarn(true);
+      photoSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+    setError(null);
+    setConfirming(true);
+  }
 
   const set = <K extends keyof InvitationData>(
     key: K,
@@ -469,16 +489,32 @@ export default function EditorClient() {
         </Group>
 
         <Group title="사진" step={7}>
-          <div>
+          <div ref={photoSectionRef}>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              대표 사진
+              대표 사진 <span className="text-rose-400">*필수</span>
             </span>
-            <ImageUpload
-              value={data.mainPhotoUrl}
-              onChange={(url) => set("mainPhotoUrl", url)}
-              label="클릭해서 대표 사진 업로드"
-              className="h-52"
-            />
+            <div
+              className={
+                photoWarn && needMainPhoto
+                  ? "rounded-xl ring-2 ring-red-400 ring-offset-2"
+                  : undefined
+              }
+            >
+              <ImageUpload
+                value={needMainPhoto ? "" : data.mainPhotoUrl}
+                onChange={(url) => {
+                  set("mainPhotoUrl", url);
+                  if (url) setPhotoWarn(false);
+                }}
+                label="클릭해서 대표 사진 업로드 (필수)"
+                className="h-52"
+              />
+            </div>
+            {photoWarn && needMainPhoto && (
+              <p className="mt-1.5 text-xs font-medium text-red-500">
+                미리보기에 보이는 사진은 예시예요. 두 분의 사진을 올려 주세요.
+              </p>
+            )}
           </div>
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
@@ -589,17 +625,20 @@ export default function EditorClient() {
         </Group>
 
         <button
-          onClick={() => {
-            setError(null);
-            setConfirming(true);
-          }}
+          onClick={openConfirm}
           className="w-full rounded-2xl bg-gradient-to-r from-rose-400 to-rose-500 py-4 text-base font-semibold text-white shadow-lg shadow-rose-200/60 transition hover:from-rose-500 hover:to-rose-600"
         >
           청첩장 제작하기
         </button>
-        <p className="text-center text-xs text-gray-400">
-          제작 전에 미리보기로 한 번 더 확인할 수 있어요.
-        </p>
+        {photoWarn && needMainPhoto ? (
+          <p className="text-center text-sm font-medium text-red-500">
+            대표 사진을 등록해 주세요. 지금 보이는 사진은 예시용이에요.
+          </p>
+        ) : (
+          <p className="text-center text-xs text-gray-400">
+            제작 전에 미리보기로 한 번 더 확인할 수 있어요.
+          </p>
+        )}
       </div>
 
       {/* 실시간 미리보기 — 데스크톱(사이드 고정) */}
@@ -720,11 +759,11 @@ export default function EditorClient() {
               이대로 제작할까요?
             </h2>
             <p className="mb-3 mt-1 text-center text-xs text-gray-500">
-              아래 미리보기를 확인하고 운영 기간을 선택하세요.
+              하객에게 보이는 실제 모습이에요. 확인 후 운영 기간을 선택하세요.
             </p>
             <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
-                <InvitationView template={template} data={data} preview />
+                <InvitationView template={template} data={data} />
               </div>
             </div>
 

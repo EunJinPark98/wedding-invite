@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { customAlphabet } from "nanoid";
 import { saveInvitation } from "@/lib/store";
-import { PERIOD_OPTIONS } from "@/lib/types";
+import { PERIOD_OPTIONS, SAMPLE_MAIN_PHOTO } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
 // 공유 링크에 쓰기 좋은 짧은 slug (헷갈리는 문자 제외)
@@ -36,6 +36,13 @@ export async function POST(req: Request) {
   if (!PERIOD_OPTIONS.some((p) => p.months === months)) {
     return NextResponse.json(
       { error: "운영 기간을 선택해 주세요." },
+      { status: 400 }
+    );
+  }
+  // 예시 사진(개인 사진)은 실제 청첩장에 쓸 수 없음 — 본인 사진 필수
+  if (!data.mainPhotoUrl?.trim() || data.mainPhotoUrl === SAMPLE_MAIN_PHOTO) {
+    return NextResponse.json(
+      { error: "대표 사진을 등록해 주세요. 미리보기의 사진은 예시용이에요." },
       { status: 400 }
     );
   }

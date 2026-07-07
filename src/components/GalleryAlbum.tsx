@@ -44,7 +44,7 @@ export default function GalleryAlbum({
           <img
             src={first}
             alt="gallery-feature"
-            className={`aspect-[4/3] w-full cursor-zoom-in object-cover ${rounded}`}
+            className={`aspect-[4/3] w-full cursor-zoom-in object-cover shadow-sm ring-1 ring-black/5 ${rounded}`}
           />
         </button>
         {rest.length > 0 && (
@@ -61,7 +61,7 @@ export default function GalleryAlbum({
                 <img
                   src={url}
                   alt={`gallery-${i}`}
-                  className={`aspect-square w-full cursor-zoom-in object-cover ${rounded}`}
+                  className={`aspect-square w-full cursor-zoom-in object-cover shadow-sm ring-1 ring-black/5 ${rounded}`}
                 />
               </button>
             ))}

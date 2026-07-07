@@ -83,3 +83,54 @@ body {
     animation: none;
   }
 }
+
+/* 로맨틱: 꽃잎이 흩날리는 히어로 */
+@keyframes inv-petal-fall {
+  0% {
+    transform: translateY(-8%) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(105%) rotate(200deg);
+    opacity: 0;
+  }
+}
+.inv-petal {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  animation: inv-petal-fall linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-petal {
+    display: none;
+  }
+}
+
+/* 달력 예식일: 은은한 파동 */
+@keyframes inv-day-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--pulse-color, rgba(0, 0, 0, 0.25));
+  }
+  70% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.inv-day-pulse {
+  animation: inv-day-pulse 2.4s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-day-pulse {
+    animation: none;
+  }
+}

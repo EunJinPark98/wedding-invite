@@ -5,6 +5,9 @@ export type TemplateId = "classic" | "modern" | "romantic" | "botanical";
 // 갤러리 사진 최대 개수 (무료 플랜 용량 보호)
 export const MAX_GALLERY = 7;
 
+// 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 청첩장 제작에는 사용 불가
+export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
+
 // 청첩장 운영(공개) 기간 선택지 — 개월 수
 export const PERIOD_OPTIONS = [
   { months: 1, label: "1개월" },
@@ -109,8 +112,8 @@ export const emptyInvitation = (): InvitationData => ({
     "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
   fontHeading: "default",
   fontBody: "default",
-  // 대표 사진: 저작권 안전한 로컬 예시 이미지 (public/wedding1.jpg)
-  mainPhotoUrl: "/wedding1.jpg",
+  // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
+  mainPhotoUrl: SAMPLE_MAIN_PHOTO,
   // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
   gallery: ["", "", ""],
   groomPhone: "010-1234-5678",

@@ -88,10 +88,17 @@ function MiniCalendar({
             <div key={i} className="flex justify-center py-1">
               {c && (
                 <span
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-sm ${
+                    isDay ? "inv-day-pulse" : ""
+                  }`}
                   style={
                     isDay
-                      ? { background: t.accent, color: "#fff", fontWeight: 700 }
+                      ? ({
+                          background: t.accent,
+                          color: "#fff",
+                          fontWeight: 700,
+                          "--pulse-color": `${t.accent}40`,
+                        } as React.CSSProperties)
                       : { color: i % 7 === 0 ? t.accent : t.ink }
                   }
                 >
@@ -116,23 +123,41 @@ function ParentLine({
   father,
   mother,
   relation,
+  role,
   name,
   t,
 }: {
   father: string;
   mother: string;
   relation: string;
+  role: string;
   name: string;
   t: TemplateTheme;
 }) {
   const parents = [father, mother].map((p) => p.trim()).filter(Boolean);
   return (
-    <p>
-      {parents.length > 0 && `${parents.join(" · ")}의 ${relation} `}
-      <span className="font-medium" style={{ color: t.ink }}>
-        {name}
+    <div className="flex items-center justify-center gap-2.5">
+      <span
+        className="w-8 shrink-0 text-right text-[11px] tracking-wider"
+        style={{ color: t.accent }}
+      >
+        {role}
       </span>
-    </p>
+      <span className="text-sm" style={{ color: t.sub }}>
+        {parents.length > 0 && (
+          <>
+            {parents.join(" · ")}
+            <span className="mx-1 opacity-60">의 {relation}</span>
+          </>
+        )}
+        <span
+          className="ml-0.5 text-[15px] font-semibold"
+          style={{ color: t.ink }}
+        >
+          {name}
+        </span>
+      </span>
+    </div>
   );
 }
 
@@ -147,20 +172,30 @@ function GreetingInner({
 }) {
   return (
     <div className={align === "left" ? "text-left" : "text-center"}>
-      <h2 className="mb-6 text-lg" style={{ fontFamily: t.headingFont }}>
+      <h2
+        className="mb-7 text-xl leading-relaxed tracking-[0.02em]"
+        style={{ fontFamily: t.headingFont }}
+      >
         {data.greetingTitle}
       </h2>
       <p
-        className="whitespace-pre-line text-[15px] leading-8"
+        className="whitespace-pre-line text-[15px] leading-9"
         style={{ color: t.sub }}
       >
         {data.greetingMessage}
       </p>
-      <div className="mt-9 space-y-1.5 text-sm" style={{ color: t.sub }}>
+      {/* 혼주 소개 */}
+      <div
+        className={`mt-10 space-y-2.5 border-t pt-7 ${
+          align === "left" ? "" : "mx-auto max-w-[280px]"
+        }`}
+        style={{ borderColor: t.line }}
+      >
         <ParentLine
           father={data.groomFather}
           mother={data.groomMother}
           relation="아들"
+          role="신랑"
           name={data.groomName}
           t={t}
         />
@@ -168,6 +203,7 @@ function GreetingInner({
           father={data.brideFather}
           mother={data.brideMother}
           relation="딸"
+          role="신부"
           name={data.brideName}
           t={t}
         />
@@ -205,12 +241,23 @@ function DateInner({
       </p>
       {calendar && <MiniCalendar iso={data.weddingDate} t={t} heart={heart} />}
       {dday !== null && (
-        <p
-          className="font-cormorant mx-auto mt-6 inline-block rounded-full border px-5 py-1.5 text-sm tracking-[0.25em]"
-          style={{ borderColor: t.line, color: t.accent }}
-        >
-          {dday === 0 ? "D-DAY ♡" : `D-${dday}`}
-        </p>
+        <div className="mt-6">
+          <p
+            className="font-cormorant inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.25em] text-white"
+            style={{ background: t.accent }}
+          >
+            {dday === 0 ? "D-DAY ♡" : `D-${dday}`}
+          </p>
+          {dday > 0 && (
+            <p className="mt-2.5 text-xs" style={{ color: t.sub }}>
+              {data.groomName} · {data.brideName}의 결혼식이{" "}
+              <span className="font-semibold" style={{ color: t.accent }}>
+                {dday}일
+              </span>{" "}
+              남았습니다
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -225,13 +272,21 @@ function LocationInner({
 }) {
   return (
     <div className="text-center">
-      <p className="text-lg" style={{ fontFamily: t.headingFont }}>
+      <p
+        className="text-xl tracking-[0.02em]"
+        style={{ fontFamily: t.headingFont }}
+      >
         {data.venueName}
       </p>
-      <p className="mt-1.5 text-sm" style={{ color: t.sub }}>
-        {data.venueHall}
-      </p>
-      <p className="mt-3 text-sm" style={{ color: t.ink }}>
+      {data.venueHall && (
+        <p className="mt-1.5 text-sm" style={{ color: t.sub }}>
+          {data.venueHall}
+        </p>
+      )}
+      <p
+        className="mx-auto mt-5 max-w-[260px] rounded-xl px-4 py-3 text-sm leading-6"
+        style={{ background: t.accentSoft, color: t.ink }}
+      >
         {data.venueAddress}
       </p>
       <a
@@ -240,8 +295,11 @@ function LocationInner({
         )}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-6 inline-block rounded-full px-6 py-2.5 text-sm text-white"
-        style={{ background: t.accent }}
+        className="mt-6 inline-block rounded-full px-7 py-3 text-sm font-medium text-white transition"
+        style={{
+          background: t.accent,
+          boxShadow: `0 8px 20px -8px ${t.accent}aa`,
+        }}
       >
         카카오맵에서 길찾기
       </a>
@@ -342,21 +400,46 @@ function ContactInner({
   t: TemplateTheme;
 }) {
   return (
-    <div className="flex justify-center gap-3">
-      <a
-        href={`tel:${data.groomPhone}`}
-        className="rounded-full border px-6 py-2.5 text-sm"
-        style={{ borderColor: t.line, color: t.ink }}
-      >
-        신랑에게 연락
-      </a>
-      <a
-        href={`tel:${data.bridePhone}`}
-        className="rounded-full border px-6 py-2.5 text-sm"
-        style={{ borderColor: t.line, color: t.ink }}
-      >
-        신부에게 연락
-      </a>
+    <div className="mx-auto grid max-w-[320px] grid-cols-2 gap-3">
+      {[
+        { role: "신랑", name: data.groomName, tel: data.groomPhone },
+        { role: "신부", name: data.brideName, tel: data.bridePhone },
+      ].map((c) => (
+        <a
+          key={c.role}
+          href={`tel:${c.tel}`}
+          className="rounded-2xl border px-4 py-4 text-center transition"
+          style={{ borderColor: t.line, background: t.pageBg }}
+        >
+          <span
+            className="font-cormorant block text-[10px] tracking-[0.3em]"
+            style={{ color: t.accent }}
+          >
+            {c.role === "신랑" ? "GROOM" : "BRIDE"}
+          </span>
+          <span
+            className="mt-1 block text-[15px] font-medium"
+            style={{ color: t.ink }}
+          >
+            {c.name}
+          </span>
+          <span
+            className="mt-1.5 inline-flex items-center gap-1 text-xs"
+            style={{ color: t.sub }}
+          >
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden
+            >
+              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z" />
+            </svg>
+            전화하기
+          </span>
+        </a>
+      ))}
     </div>
   );
 }
@@ -549,6 +632,9 @@ function ClassicLayout({
       <div className="relative">
         <Photo data={data} t={t} className="h-[500px] w-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/20" />
+        {/* 스테이셔너리풍 이중 인셋 프레임 */}
+        <div className="pointer-events-none absolute inset-3 border border-white/40" />
+        <div className="pointer-events-none absolute inset-[18px] border border-white/20" />
         <div className="absolute inset-x-0 bottom-0 px-8 pb-10 text-center text-white">
           <p className="inv-hero-in font-cormorant flex items-center justify-center gap-3 text-xs tracking-[0.45em]">
             <span className="inline-block h-px w-6 bg-white/50" />
@@ -646,15 +732,36 @@ function ModernLayout({
       </header>
       <div className="px-8">
         <Photo data={data} t={t} className="aspect-[4/5] w-full rounded-sm" />
+        {/* 매거진풍 캡션 라인 */}
+        <div
+          className="flex items-center justify-between border-b pb-3 pt-3"
+          style={{ borderColor: t.line }}
+        >
+          <span
+            className="font-cormorant text-[10px] tracking-[0.3em]"
+            style={{ color: t.sub }}
+          >
+            GROOM & BRIDE
+          </span>
+          <span
+            className="font-cormorant text-[10px] tracking-[0.3em]"
+            style={{ color: t.sub }}
+          >
+            {p ? `${p.wkEn}. ${data.weddingTime}` : data.weddingTime}
+          </span>
+        </div>
       </div>
-      <div className="px-8 pb-2 pt-8 text-center">
+      <div className="px-8 pb-2 pt-9 text-center">
         <h1
-          className="text-3xl uppercase leading-tight tracking-wide"
+          className="text-[1.9rem] leading-tight tracking-[0.06em]"
           style={{ fontFamily: t.headingFont }}
         >
           {data.groomName}
-          <span className="mx-2.5 text-[0.8em]" style={{ color: t.accent }}>
-            ♡
+          <span
+            className="font-cormorant mx-3 align-middle text-[0.75em] italic"
+            style={{ color: t.accent }}
+          >
+            &
           </span>
           {data.brideName}
         </h1>
@@ -729,11 +836,37 @@ function RomanticLayout({
   return (
     <>
       <div
-        className="px-8 pt-12 text-center"
+        className="relative overflow-hidden px-8 pt-12 text-center"
         style={{
           background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 70%)`,
         }}
       >
+        {/* 흩날리는 꽃잎 */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {[
+            { left: "8%", size: 13, dur: 11, delay: 0 },
+            { left: "22%", size: 10, dur: 14, delay: 3 },
+            { left: "46%", size: 11, dur: 12, delay: 6 },
+            { left: "68%", size: 14, dur: 13, delay: 1.5 },
+            { left: "84%", size: 10, dur: 15, delay: 4.5 },
+            { left: "93%", size: 12, dur: 12, delay: 8 },
+          ].map((f, i) => (
+            <span
+              key={i}
+              className="inv-petal"
+              style={{
+                left: f.left,
+                fontSize: f.size,
+                color: t.accent,
+                opacity: 0,
+                animationDuration: `${f.dur}s`,
+                animationDelay: `${f.delay}s`,
+              }}
+            >
+              ❀
+            </span>
+          ))}
+        </div>
         <p
           className="inv-hero-in text-3xl"
           style={{ fontFamily: "var(--font-pen)", color: t.accent }}
@@ -763,9 +896,19 @@ function RomanticLayout({
           </span>
           {data.brideName}
         </h1>
+        <div
+          className="inv-hero-in-delay mx-auto mt-3 flex items-center justify-center gap-2"
+          aria-hidden
+        >
+          <span className="h-px w-8" style={{ background: t.line }} />
+          <span className="text-[9px]" style={{ color: t.accent }}>
+            ❀
+          </span>
+          <span className="h-px w-8" style={{ background: t.line }} />
+        </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2 pb-10 font-cormorant text-base tracking-[0.3em]"
+            className="inv-hero-in-delay mt-2.5 pb-10 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
@@ -822,12 +965,25 @@ function BotanicalLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const corner = (pos: string, rotate: number) => (
+    <span
+      aria-hidden
+      className={`absolute ${pos} text-lg leading-none`}
+      style={{ color: t.accent, transform: `rotate(${rotate}deg)` }}
+    >
+      ❦
+    </span>
+  );
   return (
     <div className="p-3">
       <div
-        className="border"
+        className="relative border"
         style={{ borderColor: t.line }}
       >
+        {corner("left-1.5 top-1.5", 0)}
+        {corner("right-1.5 top-1.5", 90)}
+        {corner("bottom-1.5 right-1.5", 180)}
+        {corner("bottom-1.5 left-1.5", 270)}
         <div className="px-7 pt-12 text-center">
           <div className="inv-hero-in mb-4 text-2xl" style={{ color: t.accent }}>
             ❧
