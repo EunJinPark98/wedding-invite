@@ -10,8 +10,12 @@ import { supabaseServer } from "@/lib/supabase/server";
  * → verifyOtp 로 쿠키 세션 생성.
  */
 
-function fail(origin: string) {
-  return NextResponse.redirect(new URL("/login?error=auth", origin));
+// reason: 실패 단계 식별용 (r=state|token|profile|admin|otp)
+function fail(origin: string, reason: string) {
+  console.error(`[naver-login] failed at: ${reason}`);
+  return NextResponse.redirect(
+    new URL(`/login?error=auth&r=${reason}`, origin)
+  );
 }
 
 export async function GET(req: Request) {
@@ -37,7 +41,7 @@ export async function GET(req: Request) {
   }
   // CSRF 검증
   if (!code || !state || !savedState || state !== savedState) {
-    return fail(url.origin);
+    return fail(url.origin, "state");
   }
 
   try {
@@ -50,7 +54,7 @@ export async function GET(req: Request) {
     tokenUrl.searchParams.set("state", state);
     const tokenRes = await fetch(tokenUrl, { cache: "no-store" });
     const token = await tokenRes.json();
-    if (!token?.access_token) return fail(url.origin);
+    if (!token?.access_token) return fail(url.origin, "token");
 
     // 2) 프로필 조회
     const profRes = await fetch("https://openapi.naver.com/v1/nid/me", {
@@ -60,7 +64,7 @@ export async function GET(req: Request) {
     const prof = (await profRes.json())?.response as
       | { id: string; email?: string; name?: string; nickname?: string }
       | undefined;
-    if (!prof?.id) return fail(url.origin);
+    if (!prof?.id) return fail(url.origin, "profile");
 
     // 이메일 미제공 동의 시에도 계정을 만들 수 있게 결정적 대체 이메일 사용
     const email =
@@ -83,16 +87,22 @@ export async function GET(req: Request) {
         email_confirm: true,
         user_metadata: { name, provider: "naver", naver_id: prof.id },
       });
-      if (created.error) return fail(url.origin);
+      if (created.error) {
+        console.error("[naver-login] createUser:", created.error.message);
+        return fail(url.origin, "create");
+      }
       linkRes = await admin.auth.admin.generateLink({
         type: "magiclink",
         email,
       });
-      if (linkRes.error) return fail(url.origin);
+      if (linkRes.error) {
+        console.error("[naver-login] generateLink:", linkRes.error.message);
+        return fail(url.origin, "link");
+      }
     }
 
     const tokenHash = linkRes.data.properties?.hashed_token;
-    if (!tokenHash) return fail(url.origin);
+    if (!tokenHash) return fail(url.origin, "hash");
 
     // 4) ssr 클라이언트로 세션 쿠키 생성
     const supabase = await supabaseServer();
@@ -100,13 +110,17 @@ export async function GET(req: Request) {
       type: "email",
       token_hash: tokenHash,
     });
-    if (otpError) return fail(url.origin);
+    if (otpError) {
+      console.error("[naver-login] verifyOtp:", otpError.message);
+      return fail(url.origin, "otp");
+    }
 
     const res = NextResponse.redirect(new URL(next, url.origin));
     res.cookies.delete("naver_oauth_state");
     res.cookies.delete("naver_oauth_next");
     return res;
-  } catch {
-    return fail(url.origin);
+  } catch (e) {
+    console.error("[naver-login] exception:", e);
+    return fail(url.origin, "exception");
   }
 }

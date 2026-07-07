@@ -13,10 +13,11 @@ export default function LoginClient() {
   // open-redirect 방지
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
   const errParam = params.get("error");
+  const reason = params.get("r"); // 실패 단계 (디버그용)
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(
     errParam === "auth"
-      ? "로그인에 실패했어요. 다시 시도해 주세요."
+      ? `로그인에 실패했어요. 다시 시도해 주세요.${reason ? ` (코드: ${reason})` : ""}`
       : errParam === "naver_config"
         ? "네이버 로그인 설정이 아직 완료되지 않았어요."
         : null
