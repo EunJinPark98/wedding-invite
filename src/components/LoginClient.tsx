@@ -51,6 +51,9 @@ export default function LoginClient() {
       return;
     }
     setBusy("naver");
+    setError(null);
+    // 주소창에 남은 이전 에러 파라미터 제거 (뒤로가기 시 재표시 방지)
+    window.history.replaceState(null, "", `/login?next=${encodeURIComponent(next)}`);
     window.location.href = `/api/auth/naver/start?next=${encodeURIComponent(next)}`;
   }
 

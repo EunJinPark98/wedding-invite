@@ -51,7 +51,7 @@ export default function Home() {
             className="mt-6 text-[2.6rem] leading-[1.3] text-ink sm:text-5xl"
             style={{ fontFamily: "var(--font-song)" }}
           >
-            우리의 별처럼 빛나는 시작,
+            별처럼 빛나는 시작,
             <br />
             가장 우리다운 청첩장으로
           </h1>
@@ -68,7 +68,7 @@ export default function Home() {
               href="/editor"
               className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
             >
-              무료로 시작하기
+              무료로 제작하기
             </Link>
             <Link
               href="#templates"

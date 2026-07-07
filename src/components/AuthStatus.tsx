@@ -53,8 +53,8 @@ export default function AuthStatus() {
 
   return (
     <span className="flex items-center gap-2.5 text-sm">
-      <span className="max-w-[140px] truncate font-medium text-gray-600">
-        {name ?? email}
+      <span className="max-w-[160px] truncate font-medium text-gray-600">
+        {name ? `${name}님` : email}
       </span>
       <button
         type="button"

@@ -827,7 +827,16 @@ export default function EditorClient() {
                 })}
               </div>
               <p className="mt-1.5 text-center text-[11px] text-gray-400">
-                기간이 지나면 링크가 자동 비공개 · 6개월 이상은 유료로 준비 중
+                <span className="font-medium text-gold-500">
+                  {fmtDate(
+                    (() => {
+                      const d = new Date();
+                      d.setMonth(d.getMonth() + period);
+                      return d.toISOString();
+                    })()
+                  )}
+                </span>
+                에 게시가 종료돼요 · 6개월 이상은 유료로 준비 중
               </p>
             </div>
 
