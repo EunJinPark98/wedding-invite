@@ -645,7 +645,7 @@ function ClassicLayout({
             className="inv-hero-in mt-4 text-[2rem] leading-snug tracking-wide"
             style={{ fontFamily: t.headingFont }}
           >
-            <NamesAmp data={data} t={t} heartColor="#ff8fa3" />
+            <NamesAmp data={data} t={t} heartColor="#e8c878" />
           </h1>
           {p && (
             <p className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em] text-white/90">

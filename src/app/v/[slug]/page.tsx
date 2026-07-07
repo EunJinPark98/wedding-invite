@@ -36,9 +36,9 @@ export default async function InvitationPage({
   // 운영 기간이 지난 청첩장은 배포 중단
   if (isExpired(inv)) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#faf7f4] p-6">
-        <div className="w-full max-w-sm rounded-3xl border border-rose-100 bg-white p-10 text-center shadow-sm">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-2xl">
+      <main className="flex min-h-screen items-center justify-center bg-cream p-6">
+        <div className="w-full max-w-sm rounded-3xl border border-gold-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-gold-50 text-2xl">
             💐
           </div>
           <h1 className="text-lg font-semibold text-gray-800">

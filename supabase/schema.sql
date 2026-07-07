@@ -6,13 +6,16 @@ create table if not exists public.invitations (
   template text not null,
   data jsonb not null,
   created_at timestamptz not null default now(),
-  expires_at timestamptz -- 운영 기간 만료 시각 (null = 무기한)
+  expires_at timestamptz, -- 운영 기간 만료 시각 (null = 무기한)
+  user_id uuid references auth.users (id) -- 만든 계정 (무료 1개 제한용)
 );
 
 -- 기존 테이블에 컬럼이 없으면 추가 (재실행해도 안전)
 alter table public.invitations add column if not exists expires_at timestamptz;
+alter table public.invitations add column if not exists user_id uuid references auth.users (id);
 
 create index if not exists invitations_slug_idx on public.invitations (slug);
+create index if not exists invitations_user_idx on public.invitations (user_id);
 
 -- RLS: 청첩장은 누구나 보고(조회) / 누구나 만들 수 있게(삽입) 허용.
 -- 수정/삭제는 막아둡니다. (관리 기능이 필요하면 인증을 붙이세요.)

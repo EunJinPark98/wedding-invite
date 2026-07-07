@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
+import AuthStatus from "./AuthStatus";
 import { TEMPLATES, FONTS } from "@/lib/templates";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
@@ -270,6 +271,11 @@ export default function EditorClient() {
         body: JSON.stringify({ template, data, periodMonths: period }),
       });
       const json = await res.json();
+      if (res.status === 401) {
+        // 로그인 필요 → 로그인 후 에디터로 복귀
+        window.location.href = "/login?next=/editor";
+        return;
+      }
       if (!res.ok) throw new Error(json.error || "저장에 실패했습니다.");
       const url = `${window.location.origin}/v/${json.slug}`;
       setConfirming(false);
@@ -291,30 +297,28 @@ export default function EditorClient() {
 
   return (
     <div className="min-h-screen bg-cream text-gray-800">
-      {/* 상단 네비 — 메인으로 돌아가기 */}
-      <header className="sticky top-0 z-40 border-b border-gold-100/70 bg-cream/80 backdrop-blur-md">
+      {/* 상단 네비 — 로고 배경색(딥 네이비)으로 본문과 구분 */}
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-gray-500 transition hover:text-gold-500"
+            className="flex items-center gap-2 text-sm text-white/60 transition hover:text-gold-300"
           >
             <span aria-hidden>←</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt=""
-              className="h-6 w-6 rounded-full shadow-sm"
+              className="h-6 w-6 rounded-full ring-1 ring-gold-400/50"
             />
             <span
-              className="text-gray-900"
+              className="text-white"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
             </span>
           </Link>
-          <span className="hidden text-xs text-gray-400 sm:inline">
-            저장 전까지는 자유롭게 수정할 수 있어요
-          </span>
+          <AuthStatus />
         </div>
       </header>
 
@@ -539,7 +543,7 @@ export default function EditorClient() {
                   className="h-24"
                 />
               ))}
-              {data.gallery.length < MAX_GALLERY && (
+              {data.gallery.length < MAX_GALLERY ? (
                 <button
                   type="button"
                   onClick={addGallery}
@@ -547,6 +551,18 @@ export default function EditorClient() {
                 >
                   +
                 </button>
+              ) : (
+                <div
+                  title="8장부터는 유료 플랜으로 준비 중이에요"
+                  className="flex h-24 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-gray-300"
+                >
+                  <span className="text-base">🔒</span>
+                  <span className="px-1 text-center text-[10px] leading-tight">
+                    8장부터 유료
+                    <br />
+                    (준비 중)
+                  </span>
+                </div>
               )}
             </div>
           </div>
@@ -778,6 +794,22 @@ export default function EditorClient() {
               <div className="grid grid-cols-4 gap-1.5">
                 {PERIOD_OPTIONS.map((p) => {
                   const selected = period === p.months;
+                  if (p.paid) {
+                    return (
+                      <button
+                        key={p.months}
+                        type="button"
+                        disabled
+                        title="유료 플랜으로 준비 중이에요"
+                        className="relative cursor-not-allowed rounded-xl border-2 border-gray-100 bg-gray-50 py-2 text-sm text-gray-300"
+                      >
+                        {p.label}
+                        <span className="absolute -top-2 right-1 rounded-full bg-gold-400 px-1.5 py-px text-[9px] font-bold text-ink">
+                          유료
+                        </span>
+                      </button>
+                    );
+                  }
                   return (
                     <button
                       key={p.months}
@@ -795,7 +827,7 @@ export default function EditorClient() {
                 })}
               </div>
               <p className="mt-1.5 text-center text-[11px] text-gray-400">
-                기간이 지나면 청첩장 링크가 자동으로 비공개돼요.
+                기간이 지나면 링크가 자동 비공개 · 6개월 이상은 유료로 준비 중
               </p>
             </div>
 

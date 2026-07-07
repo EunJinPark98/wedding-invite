@@ -1,0 +1,112 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
+import { supabaseServer } from "@/lib/supabase/server";
+
+/**
+ * 네이버 OAuth 콜백.
+ * Supabase는 네이버를 기본 제공하지 않으므로:
+ * 네이버 토큰 → 프로필 조회 → (admin) 유저 확보 → magiclink 토큰 발급
+ * → verifyOtp 로 쿠키 세션 생성.
+ */
+
+function fail(origin: string) {
+  return NextResponse.redirect(new URL("/login?error=auth", origin));
+}
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state");
+
+  const cookieStore = await cookies();
+  const savedState = cookieStore.get("naver_oauth_state")?.value;
+  const rawNext = cookieStore.get("naver_oauth_next")?.value ?? "/";
+  const next =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+
+  const clientId = process.env.NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (!clientId || !clientSecret || !serviceKey || !supaUrl) {
+    return NextResponse.redirect(
+      new URL("/login?error=naver_config", url.origin)
+    );
+  }
+  // CSRF 검증
+  if (!code || !state || !savedState || state !== savedState) {
+    return fail(url.origin);
+  }
+
+  try {
+    // 1) 액세스 토큰 교환
+    const tokenUrl = new URL("https://nid.naver.com/oauth2.0/token");
+    tokenUrl.searchParams.set("grant_type", "authorization_code");
+    tokenUrl.searchParams.set("client_id", clientId);
+    tokenUrl.searchParams.set("client_secret", clientSecret);
+    tokenUrl.searchParams.set("code", code);
+    tokenUrl.searchParams.set("state", state);
+    const tokenRes = await fetch(tokenUrl, { cache: "no-store" });
+    const token = await tokenRes.json();
+    if (!token?.access_token) return fail(url.origin);
+
+    // 2) 프로필 조회
+    const profRes = await fetch("https://openapi.naver.com/v1/nid/me", {
+      headers: { Authorization: `Bearer ${token.access_token}` },
+      cache: "no-store",
+    });
+    const prof = (await profRes.json())?.response as
+      | { id: string; email?: string; name?: string; nickname?: string }
+      | undefined;
+    if (!prof?.id) return fail(url.origin);
+
+    // 이메일 미제공 동의 시에도 계정을 만들 수 있게 결정적 대체 이메일 사용
+    const email =
+      prof.email ?? `naver-${prof.id}@users.noreply.starlight-invite.app`;
+    const name = prof.name ?? prof.nickname ?? "네이버 사용자";
+
+    // 3) admin 클라이언트로 유저 확보 + magiclink 토큰 발급
+    const admin = createClient(supaUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    let linkRes = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+    });
+    if (linkRes.error) {
+      // 처음 로그인 → 유저 생성 후 재시도
+      const created = await admin.auth.admin.createUser({
+        email,
+        email_confirm: true,
+        user_metadata: { name, provider: "naver", naver_id: prof.id },
+      });
+      if (created.error) return fail(url.origin);
+      linkRes = await admin.auth.admin.generateLink({
+        type: "magiclink",
+        email,
+      });
+      if (linkRes.error) return fail(url.origin);
+    }
+
+    const tokenHash = linkRes.data.properties?.hashed_token;
+    if (!tokenHash) return fail(url.origin);
+
+    // 4) ssr 클라이언트로 세션 쿠키 생성
+    const supabase = await supabaseServer();
+    const { error: otpError } = await supabase.auth.verifyOtp({
+      type: "email",
+      token_hash: tokenHash,
+    });
+    if (otpError) return fail(url.origin);
+
+    const res = NextResponse.redirect(new URL(next, url.origin));
+    res.cookies.delete("naver_oauth_state");
+    res.cookies.delete("naver_oauth_next");
+    return res;
+  } catch {
+    return fail(url.origin);
+  }
+}

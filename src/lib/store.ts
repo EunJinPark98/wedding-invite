@@ -40,7 +40,8 @@ export async function saveInvitation(
   slug: string,
   template: TemplateId,
   rawData: InvitationData,
-  expiresAt: string | null = null
+  expiresAt: string | null = null,
+  userId: string | null = null
 ): Promise<Invitation> {
   const data = normalizeData(rawData);
   const invitation: Invitation = {
@@ -57,6 +58,7 @@ export async function saveInvitation(
       template,
       data,
       expires_at: expiresAt,
+      user_id: userId,
     });
     if (error) throw new Error(error.message);
     return invitation;
@@ -97,6 +99,20 @@ export function isExpired(inv: Invitation): boolean {
   if (!inv.expiresAt) return false;
   const t = new Date(inv.expiresAt).getTime();
   return !isNaN(t) && t < Date.now();
+}
+
+// 계정이 만든 청첩장 수 (무료 플랜 제한 검사용)
+export async function countInvitationsByUser(userId: string): Promise<number> {
+  if (useSupabase) {
+    const { count, error } = await supabase()
+      .from("invitations")
+      .select("slug", { count: "exact", head: true })
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
+    return count ?? 0;
+  }
+  // 로컬 폴백은 계정 개념이 없어 항상 0 (개발용)
+  return 0;
 }
 
 export const storageMode = useSupabase ? "supabase" : "local";

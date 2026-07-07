@@ -2,18 +2,23 @@
 
 export type TemplateId = "classic" | "modern" | "romantic" | "botanical";
 
-// 갤러리 사진 최대 개수 (무료 플랜 용량 보호)
+/* ───────── 요금제 (유료 결제는 추후 도입 — 지금은 잠금만) ───────── */
+
+// 무료 갤러리 사진 수 — 8장부터 유료 예정
 export const MAX_GALLERY = 7;
+
+// 계정당 무료 청첩장 수 — 2개부터 유료 예정
+export const FREE_INVITATIONS = 1;
 
 // 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 청첩장 제작에는 사용 불가
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
 
-// 청첩장 운영(공개) 기간 선택지 — 개월 수
+// 청첩장 운영(공개) 기간 선택지 — paid=true는 유료(준비 중)
 export const PERIOD_OPTIONS = [
-  { months: 1, label: "1개월" },
-  { months: 3, label: "3개월" },
-  { months: 6, label: "6개월" },
-  { months: 12, label: "1년" },
+  { months: 1, label: "1개월", paid: false },
+  { months: 3, label: "3개월", paid: false },
+  { months: 6, label: "6개월", paid: true },
+  { months: 12, label: "1년", paid: true },
 ] as const;
 export type PeriodMonths = (typeof PERIOD_OPTIONS)[number]["months"];
 

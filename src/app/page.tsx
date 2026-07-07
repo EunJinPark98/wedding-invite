@@ -2,6 +2,7 @@ import Link from "next/link";
 import { TEMPLATES } from "@/lib/templates";
 import { emptyInvitation } from "@/lib/types";
 import InvitationView from "@/components/InvitationView";
+import AuthStatus from "@/components/AuthStatus";
 
 // 카드 미리보기용 샘플 (갤러리·계좌는 비워 히어로만 가볍게 보여줌)
 const SAMPLE = { ...emptyInvitation(), gallery: [], accounts: [] };
@@ -9,29 +10,32 @@ const SAMPLE = { ...emptyInvitation(), gallery: [], accounts: [] };
 export default function Home() {
   return (
     <main className="min-h-screen bg-cream text-gray-800">
-      {/* 상단 네비 */}
-      <header className="sticky top-0 z-40 border-b border-gold-100/70 bg-cream/80 backdrop-blur-md">
+      {/* 상단 네비 — 로고 배경색(딥 네이비)으로 본문과 구분 */}
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt="별빛 초대장 로고"
-              className="h-8 w-8 rounded-full shadow-sm"
+              className="h-8 w-8 rounded-full ring-1 ring-gold-400/50"
             />
             <span
-              className="text-lg text-ink"
+              className="text-lg text-white"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
             </span>
           </Link>
-          <Link
-            href="/editor"
-            className="rounded-full bg-gold-400 px-5 py-2 text-sm font-semibold text-ink shadow-sm transition hover:bg-gold-500"
-          >
-            만들기
-          </Link>
+          <div className="flex items-center gap-4">
+            <AuthStatus />
+            <Link
+              href="/editor"
+              className="rounded-full bg-gold-400 px-5 py-2 text-sm font-semibold text-ink shadow-sm transition hover:bg-gold-500"
+            >
+              만들기
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -43,17 +47,11 @@ export default function Home() {
           <p className="font-cormorant text-sm tracking-[0.5em] text-gold-400">
             MOBILE WEDDING INVITATION
           </p>
-          <p
-            className="mt-5 text-2xl text-gold-400"
-            style={{ fontFamily: "var(--font-pen)" }}
-          >
-            우리 두 사람의 별처럼 빛나는 시작 ✦
-          </p>
           <h1
-            className="mt-4 text-[2.6rem] leading-[1.3] text-ink sm:text-5xl"
+            className="mt-6 text-[2.6rem] leading-[1.3] text-ink sm:text-5xl"
             style={{ fontFamily: "var(--font-song)" }}
           >
-            우리의 특별한 날,
+            우리의 별처럼 빛나는 시작,
             <br />
             가장 우리다운 청첩장으로
           </h1>
@@ -61,14 +59,14 @@ export default function Home() {
             className="mx-auto mt-7 max-w-md text-base leading-7 text-gray-500"
             style={{ fontFamily: "var(--font-gowun)" }}
           >
-            마음에 드는 디자인을 고르고 내용을 채우면 끝.
+            디자인을 고르고 내용을 채우면, 하나뿐인 청첩장이 완성돼요.
             <br />
-            완성된 청첩장 링크를 카톡으로 바로 공유하세요.
+            반짝이는 시작을 카톡 링크로 바로 전하세요.
           </p>
           <div className="mt-10 flex items-center justify-center gap-3">
             <Link
               href="/editor"
-              className="rounded-full bg-gold-400 px-8 py-4 text-base font-semibold text-ink shadow-lg shadow-gold-300/50 transition hover:bg-gold-500"
+              className="rounded-full bg-ink px-8 py-4 text-base font-semibold text-gold-300 shadow-lg shadow-ink/25 transition hover:bg-ink/90"
             >
               무료로 시작하기
             </Link>
@@ -181,12 +179,6 @@ export default function Home() {
             별빛 초대장
           </span>
         </div>
-        <p
-          className="mt-3 text-sm text-gold-300"
-          style={{ fontFamily: "var(--font-pen)" }}
-        >
-          우리 두 사람의 별처럼 빛나는 시작 ✦
-        </p>
         <div className="mx-auto mt-7 h-px w-16 bg-white/15" />
         <p className="mt-6 text-xs leading-6 text-white/45">
           <span className="font-medium text-gold-300">별마마파파</span>
