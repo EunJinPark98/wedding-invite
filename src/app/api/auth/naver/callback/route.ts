@@ -29,10 +29,11 @@ export async function GET(req: Request) {
   const next =
     rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
-  const clientId = process.env.NAVER_CLIENT_ID;
-  const clientSecret = process.env.NAVER_CLIENT_SECRET;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // 복사/붙여넣기로 섞인 공백·줄바꿈 방어
+  const clientId = process.env.NAVER_CLIENT_ID?.trim();
+  const clientSecret = process.env.NAVER_CLIENT_SECRET?.trim();
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 
   if (!clientId || !clientSecret || !serviceKey || !supaUrl) {
     return NextResponse.redirect(
@@ -45,18 +46,27 @@ export async function GET(req: Request) {
   }
 
   try {
-    // 1) 액세스 토큰 교환
-    const tokenUrl = new URL("https://nid.naver.com/oauth2.0/token");
-    tokenUrl.searchParams.set("grant_type", "authorization_code");
-    tokenUrl.searchParams.set("client_id", clientId);
-    tokenUrl.searchParams.set("client_secret", clientSecret);
-    tokenUrl.searchParams.set("code", code);
-    tokenUrl.searchParams.set("state", state);
-    const tokenRes = await fetch(tokenUrl, { cache: "no-store" });
+    // 1) 액세스 토큰 교환 (표준 form POST)
+    const tokenRes = await fetch("https://nid.naver.com/oauth2.0/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        state,
+      }),
+      cache: "no-store",
+    });
     const token = await tokenRes.json();
     if (!token?.access_token) {
       console.error("[naver-login] token response:", JSON.stringify(token));
-      return fail(url.origin, `token-${token?.error ?? "unknown"}`);
+      const desc = String(token?.error_description ?? "").slice(0, 60);
+      return fail(
+        url.origin,
+        `token-${token?.error ?? "unknown"}${desc ? `-${desc}` : ""}`
+      );
     }
 
     // 2) 프로필 조회

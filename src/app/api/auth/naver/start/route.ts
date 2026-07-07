@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const next =
     rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
 
-  const clientId = process.env.NAVER_CLIENT_ID;
+  const clientId = process.env.NAVER_CLIENT_ID?.trim();
   if (!clientId || !process.env.NAVER_CLIENT_SECRET || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.redirect(
       new URL("/login?error=naver_config", url.origin)
