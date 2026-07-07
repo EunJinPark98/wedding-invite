@@ -12,9 +12,10 @@ export async function GET(req: Request) {
   // 어떤 변수가 비어있는지 진단 정보 포함
   const missing: string[] = [];
   if (!clientId) missing.push("id");
+  // (아래에서 missing 검사로 clientId 존재가 보장되지만 TS 내로잉을 위해 명시)
   if (!process.env.NAVER_CLIENT_SECRET?.trim()) missing.push("secret");
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) missing.push("key");
-  if (missing.length > 0) {
+  if (missing.length > 0 || !clientId) {
     const res = NextResponse.redirect(
       new URL(`/login?error=naver_config&m=${missing.join(",")}`, url.origin)
     );
