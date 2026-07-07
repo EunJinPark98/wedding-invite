@@ -8,9 +8,9 @@ const SAMPLE = { ...emptyInvitation(), gallery: [], accounts: [] };
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#fbf7f3] text-gray-800">
+    <main className="min-h-screen bg-cream text-gray-800">
       {/* 상단 네비 */}
-      <header className="sticky top-0 z-40 border-b border-rose-100/70 bg-[#fbf7f3]/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-gold-100/70 bg-cream/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -20,7 +20,7 @@ export default function Home() {
               className="h-8 w-8 rounded-full shadow-sm"
             />
             <span
-              className="text-lg text-gray-900"
+              className="text-lg text-ink"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
@@ -28,7 +28,7 @@ export default function Home() {
           </Link>
           <Link
             href="/editor"
-            className="rounded-full bg-rose-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-rose-600"
+            className="rounded-full bg-gold-400 px-5 py-2 text-sm font-semibold text-ink shadow-sm transition hover:bg-gold-500"
           >
             만들기
           </Link>
@@ -37,20 +37,20 @@ export default function Home() {
 
       {/* 히어로 */}
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-rose-100/50 blur-3xl" />
-        <div className="pointer-events-none absolute -left-24 top-44 h-72 w-72 rounded-full bg-amber-100/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-gold-100/50 blur-3xl" />
+        <div className="pointer-events-none absolute -left-24 top-44 h-72 w-72 rounded-full bg-gold-100/40 blur-3xl" />
         <div className="relative mx-auto max-w-3xl px-6 pb-20 pt-20 text-center">
-          <p className="font-cormorant text-sm tracking-[0.5em] text-rose-400">
+          <p className="font-cormorant text-sm tracking-[0.5em] text-gold-400">
             MOBILE WEDDING INVITATION
           </p>
           <p
-            className="mt-5 text-2xl text-rose-400"
+            className="mt-5 text-2xl text-gold-400"
             style={{ fontFamily: "var(--font-pen)" }}
           >
             우리 두 사람의 별처럼 빛나는 시작 ✦
           </p>
           <h1
-            className="mt-4 text-[2.6rem] leading-[1.3] text-gray-900 sm:text-5xl"
+            className="mt-4 text-[2.6rem] leading-[1.3] text-ink sm:text-5xl"
             style={{ fontFamily: "var(--font-song)" }}
           >
             우리의 특별한 날,
@@ -68,13 +68,13 @@ export default function Home() {
           <div className="mt-10 flex items-center justify-center gap-3">
             <Link
               href="/editor"
-              className="rounded-full bg-rose-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-rose-200/70 transition hover:bg-rose-600"
+              className="rounded-full bg-gold-400 px-8 py-4 text-base font-semibold text-ink shadow-lg shadow-gold-300/50 transition hover:bg-gold-500"
             >
               무료로 시작하기
             </Link>
             <Link
               href="#templates"
-              className="rounded-full border border-gray-300 bg-white/70 px-7 py-4 text-base font-semibold text-gray-600 backdrop-blur transition hover:border-gray-400"
+              className="rounded-full border border-ink/15 bg-white/70 px-7 py-4 text-base font-semibold text-ink/80 backdrop-blur transition hover:border-ink/30"
             >
               템플릿 둘러보기
             </Link>
@@ -85,14 +85,14 @@ export default function Home() {
       {/* 템플릿 미리보기 */}
       <section
         id="templates"
-        className="scroll-mt-16 border-y border-rose-100/70 bg-white"
+        className="scroll-mt-16 border-y border-gold-100/70 bg-white"
       >
        <div className="mx-auto max-w-5xl px-6 py-24">
-        <p className="text-center font-cormorant text-sm tracking-[0.4em] text-rose-400">
+        <p className="text-center font-cormorant text-sm tracking-[0.4em] text-gold-400">
           TEMPLATES
         </p>
         <h2
-          className="mt-3 text-center text-[2rem] text-gray-900"
+          className="mt-3 text-center text-[2rem] text-ink"
           style={{ fontFamily: "var(--font-song)" }}
         >
           4가지 디자인 템플릿
@@ -123,7 +123,7 @@ export default function Home() {
 
               <div className="flex items-center justify-between gap-3 px-6 py-5">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-ink">
                     {t.name}
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">{t.description}</p>
@@ -145,7 +145,7 @@ export default function Home() {
       {/* 사용 방법 */}
       <section className="mx-auto max-w-4xl px-6 py-24">
         <h2
-          className="mb-12 text-center text-[1.7rem] text-gray-900"
+          className="mb-12 text-center text-[1.7rem] text-ink"
           style={{ fontFamily: "var(--font-song)" }}
         >
           이렇게 만들어요
@@ -160,38 +160,41 @@ export default function Home() {
               key={n}
               className="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm"
             >
-              <span className="font-cormorant text-2xl tracking-widest text-rose-300">
+              <span className="font-cormorant text-2xl tracking-widest text-gold-300">
                 {n}
               </span>
-              <h3 className="mt-3 font-semibold text-gray-900">{title}</h3>
+              <h3 className="mt-3 font-semibold text-ink">{title}</h3>
               <p className="mt-2 text-sm text-gray-500">{desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <footer className="border-t border-gray-100 py-12 text-center">
-        <div className="flex items-center justify-center gap-2">
+      <footer className="bg-ink py-14 text-center">
+        <div className="flex items-center justify-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt=""
-            className="h-6 w-6 rounded-full"
-          />
+          <img src="/logo.png" alt="" className="h-9 w-9 rounded-full" />
           <span
-            className="text-sm text-gray-600"
+            className="text-lg text-white"
             style={{ fontFamily: "var(--font-song)" }}
           >
             별빛 초대장
           </span>
         </div>
-        <p className="mt-2 text-xs text-gray-400">
-          우리 두 사람의 별처럼 빛나는 시작
+        <p
+          className="mt-3 text-sm text-gold-300"
+          style={{ fontFamily: "var(--font-pen)" }}
+        >
+          우리 두 사람의 별처럼 빛나는 시작 ✦
         </p>
-        <p className="mt-5 text-xs text-gray-400">
-          © 2026{" "}
-          <span className="font-medium text-gray-500">별마마파파</span> · 결혼,
-          육아, 가족을 위한 웹서비스
+        <div className="mx-auto mt-7 h-px w-16 bg-white/15" />
+        <p className="mt-6 text-xs leading-6 text-white/45">
+          <span className="font-medium text-gold-300">별마마파파</span>
+          <br />
+          결혼 · 육아 · 가족을 위한 웹서비스
+        </p>
+        <p className="mt-4 text-[11px] text-white/30">
+          © 2026 별마마파파. All rights reserved.
         </p>
       </footer>
     </main>

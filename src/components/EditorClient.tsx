@@ -57,7 +57,7 @@ function ImageUpload({
   return (
     <div>
       <label
-        className={`relative flex ${className} w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400 transition hover:border-rose-300`}
+        className={`relative flex ${className} w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400 transition hover:border-gold-300`}
       >
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -125,7 +125,7 @@ const fmtDate = (iso: string) => {
 
 // 공통 입력 스타일
 const INPUT_CLASS =
-  "w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 text-sm text-gray-800 transition placeholder:text-gray-300 focus:border-rose-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-100";
+  "w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 text-sm text-gray-800 transition placeholder:text-gray-300 focus:border-gold-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-100";
 
 function Group({
   title,
@@ -140,7 +140,7 @@ function Group({
     <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
       <div className="mb-4 flex items-center gap-2.5">
         {step !== undefined && (
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-50 text-[11px] font-semibold text-rose-400">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold-50 text-[11px] font-semibold text-gold-400">
             {step}
           </span>
         )}
@@ -171,7 +171,7 @@ function FontPicker({
             onClick={() => onChange(f.id)}
             className={`rounded-lg border-2 px-2 py-2.5 text-center text-base text-gray-800 transition ${
               selected
-                ? "border-rose-400 bg-rose-50"
+                ? "border-gold-400 bg-gold-50"
                 : "border-gray-200 hover:border-gray-300"
             }`}
             style={{ fontFamily: f.family || undefined }}
@@ -290,13 +290,13 @@ export default function EditorClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf7f4] text-gray-800">
+    <div className="min-h-screen bg-cream text-gray-800">
       {/* 상단 네비 — 메인으로 돌아가기 */}
-      <header className="sticky top-0 z-40 border-b border-rose-100/70 bg-[#faf7f4]/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-gold-100/70 bg-cream/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-gray-500 transition hover:text-rose-500"
+            className="flex items-center gap-2 text-sm text-gray-500 transition hover:text-gold-500"
           >
             <span aria-hidden>←</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -322,7 +322,7 @@ export default function EditorClient() {
       {/* 폼 */}
       <div className="space-y-4">
         <div className="mb-1">
-          <p className="font-cormorant text-sm tracking-[0.4em] text-rose-400">
+          <p className="font-cormorant text-sm tracking-[0.4em] text-gold-400">
             CREATE YOUR INVITATION
           </p>
           <h1
@@ -494,7 +494,7 @@ export default function EditorClient() {
         <Group title="사진" step={7}>
           <div ref={photoSectionRef}>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              대표 사진 <span className="text-rose-400">*필수</span>
+              대표 사진 <span className="text-gold-400">*필수</span>
             </span>
             <div
               className={
@@ -543,7 +543,7 @@ export default function EditorClient() {
                 <button
                   type="button"
                   onClick={addGallery}
-                  className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-2xl text-gray-300 transition hover:border-rose-300 hover:text-rose-400"
+                  className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-2xl text-gray-300 transition hover:border-gold-300 hover:text-gold-400"
                 >
                   +
                 </button>
@@ -591,7 +591,7 @@ export default function EditorClient() {
                   </select>
                   <button
                     onClick={() => removeAccount(i)}
-                    className="ml-auto text-xs text-gray-400 hover:text-rose-400"
+                    className="ml-auto text-xs text-gray-400 hover:text-gold-400"
                   >
                     삭제
                   </button>
@@ -621,7 +621,7 @@ export default function EditorClient() {
           </div>
           <button
             onClick={addAccount}
-            className="mt-3 w-full rounded-xl border border-dashed border-rose-200 py-2.5 text-sm font-medium text-rose-400 transition hover:bg-rose-50"
+            className="mt-3 w-full rounded-xl border border-dashed border-gold-200 py-2.5 text-sm font-medium text-gold-400 transition hover:bg-gold-50"
           >
             + 계좌 추가
           </button>
@@ -629,7 +629,7 @@ export default function EditorClient() {
 
         <button
           onClick={openConfirm}
-          className="w-full rounded-2xl bg-gradient-to-r from-rose-400 to-rose-500 py-4 text-base font-semibold text-white shadow-lg shadow-rose-200/60 transition hover:from-rose-500 hover:to-rose-600"
+          className="w-full rounded-2xl bg-gold-400 py-4 text-base font-semibold text-ink shadow-lg shadow-gold-300/50 transition hover:bg-gold-500"
         >
           청첩장 제작하기
         </button>
@@ -686,7 +686,7 @@ export default function EditorClient() {
       {result && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-2xl">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gold-100 text-2xl">
               💌
             </div>
             <h2 className="text-lg font-bold text-gray-800">
@@ -706,7 +706,7 @@ export default function EditorClient() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={copyLink}
-                className="flex-1 rounded-lg bg-rose-500 py-2.5 text-sm font-semibold text-white"
+                className="flex-1 rounded-lg bg-gold-400 py-2.5 text-sm font-semibold text-ink transition hover:bg-gold-500"
               >
                 {copied ? "복사됨!" : "링크 복사"}
               </button>
@@ -785,7 +785,7 @@ export default function EditorClient() {
                       onClick={() => setPeriod(p.months)}
                       className={`rounded-xl border-2 py-2 text-sm font-medium transition ${
                         selected
-                          ? "border-rose-400 bg-rose-50 text-rose-500"
+                          ? "border-gold-400 bg-gold-50 text-gold-500"
                           : "border-gray-200 text-gray-600 hover:border-gray-300"
                       }`}
                     >
@@ -813,7 +813,7 @@ export default function EditorClient() {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex-1 rounded-xl bg-gradient-to-r from-rose-400 to-rose-500 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                className="flex-1 rounded-xl bg-gold-400 py-2.5 text-sm font-semibold text-ink shadow-sm transition hover:bg-gold-500 disabled:opacity-50"
               >
                 {submitting ? "제작 중..." : "네, 제작할게요"}
               </button>

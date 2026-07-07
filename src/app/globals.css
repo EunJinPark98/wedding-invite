@@ -12,6 +12,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ───────── 브랜드 팔레트 (로고: 앤티크 골드 + 딥 네이비) ───────── */
+@theme {
+  --color-gold-50: #faf4e4;
+  --color-gold-100: #f3e8c8;
+  --color-gold-200: #e8d5a2;
+  --color-gold-300: #d9bf70;
+  --color-gold-400: #c6a23f; /* 메인 액센트 골드 */
+  --color-gold-500: #ac8a2b;
+  --color-gold-600: #927423;
+  --color-cream: #fbf8f1; /* 페이지 배경 아이보리 */
+  --color-ink: #20233a; /* 딥 네이비 (로고 배경) */
+}
+
 /* 청첩장은 항상 밝은 테마로 고정 (OS 다크모드 무시) */
 :root {
   color-scheme: light;
