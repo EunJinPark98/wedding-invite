@@ -35,9 +35,6 @@ export default function LoginClient() {
       provider: "kakao",
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-        // 이메일(account_email)은 카카오 비즈 앱 전환 전엔 권한이 없어 요청에서 제외
-        // (요청하면 KOE205 발생). 닉네임/프로필 사진만 사용.
-        scopes: "profile_nickname profile_image",
       },
     });
     if (error) {
