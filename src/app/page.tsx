@@ -169,24 +169,23 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-gold-200/50 bg-white py-14 text-center">
-        <div className="flex items-center justify-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" className="h-9 w-9 rounded-full shadow-sm" />
-          <span
-            className="text-lg text-ink"
-            style={{ fontFamily: "var(--font-song)" }}
-          >
-            별빛 초대장
-          </span>
-        </div>
+        <span
+          className="text-lg text-ink"
+          style={{ fontFamily: "var(--font-song)" }}
+        >
+          별빛 초대장
+        </span>
         <div className="mx-auto mt-7 flex items-center justify-center gap-2.5">
           <span className="h-px w-12 bg-gold-200" />
           <span className="text-[10px] text-gold-400">✦</span>
           <span className="h-px w-12 bg-gold-200" />
         </div>
-        <p className="mt-6 text-xs leading-6 text-gray-400">
-          <span className="font-medium text-gold-500">별마마파파</span>
-          <br />
+        <div className="mt-6 flex items-center justify-center gap-1.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="" className="h-5 w-5 rounded-full shadow-sm" />
+          <span className="text-xs font-medium text-gold-500">별마마파파</span>
+        </div>
+        <p className="mt-1.5 text-xs text-gray-400">
           결혼 · 육아 · 가족을 위한 웹서비스
         </p>
         <p className="mt-4 text-[11px] text-gray-300">
