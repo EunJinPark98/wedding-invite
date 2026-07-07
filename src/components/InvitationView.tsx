@@ -412,10 +412,10 @@ function ContactInner({
           style={{ borderColor: t.line, background: t.pageBg }}
         >
           <span
-            className="font-cormorant block text-[10px] tracking-[0.3em]"
+            className="block text-[11px] font-medium tracking-wide"
             style={{ color: t.accent }}
           >
-            {c.role === "신랑" ? "GROOM" : "BRIDE"}
+            {c.role}
           </span>
           <span
             className="mt-1 block text-[15px] font-medium"
@@ -732,24 +732,6 @@ function ModernLayout({
       </header>
       <div className="px-8">
         <Photo data={data} t={t} className="aspect-[4/5] w-full rounded-sm" />
-        {/* 매거진풍 캡션 라인 */}
-        <div
-          className="flex items-center justify-between border-b pb-3 pt-3"
-          style={{ borderColor: t.line }}
-        >
-          <span
-            className="font-cormorant text-[10px] tracking-[0.3em]"
-            style={{ color: t.sub }}
-          >
-            GROOM & BRIDE
-          </span>
-          <span
-            className="font-cormorant text-[10px] tracking-[0.3em]"
-            style={{ color: t.sub }}
-          >
-            {p ? `${p.wkEn}. ${data.weddingTime}` : data.weddingTime}
-          </span>
-        </div>
       </div>
       <div className="px-8 pb-2 pt-9 text-center">
         <h1
