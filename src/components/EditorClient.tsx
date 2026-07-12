@@ -543,7 +543,7 @@ export default function EditorClient() {
                   className="h-24"
                 />
               ))}
-              {data.gallery.length < MAX_GALLERY ? (
+              {data.gallery.length < MAX_GALLERY && (
                 <button
                   type="button"
                   onClick={addGallery}
@@ -551,18 +551,6 @@ export default function EditorClient() {
                 >
                   +
                 </button>
-              ) : (
-                <div
-                  title="8장부터는 유료 플랜으로 준비 중이에요"
-                  className="flex h-24 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-gray-300"
-                >
-                  <span className="text-base">🔒</span>
-                  <span className="px-1 text-center text-[10px] leading-tight">
-                    8장부터 유료
-                    <br />
-                    (준비 중)
-                  </span>
-                </div>
               )}
             </div>
           </div>
@@ -794,22 +782,6 @@ export default function EditorClient() {
               <div className="grid grid-cols-4 gap-1.5">
                 {PERIOD_OPTIONS.map((p) => {
                   const selected = period === p.months;
-                  if (p.paid) {
-                    return (
-                      <button
-                        key={p.months}
-                        type="button"
-                        disabled
-                        title="유료 플랜으로 준비 중이에요"
-                        className="relative cursor-not-allowed rounded-xl border-2 border-gray-100 bg-gray-50 py-2 text-sm text-gray-300"
-                      >
-                        {p.label}
-                        <span className="absolute -top-2 right-1 rounded-full bg-gold-400 px-1.5 py-px text-[9px] font-bold text-ink">
-                          유료
-                        </span>
-                      </button>
-                    );
-                  }
                   return (
                     <button
                       key={p.months}
@@ -836,7 +808,7 @@ export default function EditorClient() {
                     })()
                   )}
                 </span>
-                에 게시가 종료돼요 · 6개월 이상은 유료로 준비 중
+                에 게시가 종료돼요
               </p>
             </div>
 

@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { customAlphabet } from "nanoid";
-import { saveInvitation, countInvitationsByUser } from "@/lib/store";
+import { saveInvitation } from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
-import {
-  FREE_INVITATIONS,
-  PERIOD_OPTIONS,
-  SAMPLE_MAIN_PHOTO,
-} from "@/lib/types";
+import { MAX_GALLERY, PERIOD_OPTIONS, SAMPLE_MAIN_PHOTO } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
 // 공유 링크에 쓰기 좋은 짧은 slug (헷갈리는 문자 제외)
@@ -45,13 +41,6 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  // 6개월/1년은 유료 (결제 도입 전까지 잠금)
-  if (option.paid) {
-    return NextResponse.json(
-      { error: "6개월 이상 운영은 유료 플랜으로 준비 중이에요. 지금은 1개월/3개월을 선택해 주세요." },
-      { status: 403 }
-    );
-  }
   // 예시 사진(개인 사진)은 실제 청첩장에 쓸 수 없음 — 본인 사진 필수
   if (!data.mainPhotoUrl?.trim() || data.mainPhotoUrl === SAMPLE_MAIN_PHOTO) {
     return NextResponse.json(
@@ -59,15 +48,18 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  // 갤러리 무료 한도 (8장부터 유료 예정)
-  if (Array.isArray(data.gallery) && data.gallery.filter(Boolean).length > 7) {
+  // 갤러리 장수 한도 (로딩 속도를 위한 기술적 한도)
+  if (
+    Array.isArray(data.gallery) &&
+    data.gallery.filter(Boolean).length > MAX_GALLERY
+  ) {
     return NextResponse.json(
-      { error: "갤러리 사진 8장부터는 유료 플랜으로 준비 중이에요. 7장까지 담아 주세요." },
-      { status: 403 }
+      { error: `갤러리 사진은 최대 ${MAX_GALLERY}장까지 담을 수 있어요.` },
+      { status: 400 }
     );
   }
 
-  // 로그인 필수 + 계정당 무료 1개 제한 (Supabase 미설정 로컬 개발 모드는 통과)
+  // 로그인 필수 (Supabase 미설정 로컬 개발 모드는 통과)
   let userId: string | null = null;
   if (authEnabled) {
     const user = await getUser();
@@ -78,16 +70,6 @@ export async function POST(req: Request) {
       );
     }
     userId = user.id;
-    const count = await countInvitationsByUser(userId);
-    if (count >= FREE_INVITATIONS) {
-      return NextResponse.json(
-        {
-          error:
-            "무료 플랜은 청첩장을 1개까지 만들 수 있어요. 추가 제작은 유료 플랜으로 준비 중이에요.",
-        },
-        { status: 403 }
-      );
-    }
   }
 
   try {

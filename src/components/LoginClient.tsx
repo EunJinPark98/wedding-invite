@@ -118,7 +118,7 @@ export default function LoginClient() {
           {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
           <p className="mt-6 text-[11px] leading-5 text-gray-400">
-            무료 플랜: 청첩장 1개 · 갤러리 사진 7장 · 운영 기간 최대 3개월
+            청첩장 제작 · 갤러리 사진 · 운영 기간 모두 무료예요
           </p>
         </div>
 
