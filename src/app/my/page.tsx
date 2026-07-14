@@ -23,6 +23,7 @@ export default async function MyPage() {
     groomName: inv.data?.groomName ?? "",
     brideName: inv.data?.brideName ?? "",
     weddingDate: inv.data?.weddingDate ?? "",
+    mainPhotoUrl: inv.data?.mainPhotoUrl ?? "",
     createdAt: inv.createdAt,
     expiresAt: inv.expiresAt,
     expired: isExpired(inv),

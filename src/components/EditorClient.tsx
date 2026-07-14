@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
 import AuthStatus from "./AuthStatus";
+import KakaoShareButton from "./KakaoShareButton";
 import { TEMPLATES, FONTS } from "@/lib/templates";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
@@ -741,7 +742,18 @@ export default function EditorClient({
                 {fmtDate(resultExpires)}까지 공개 · 이후 자동 비공개
               </p>
             )}
-            <div className="mt-4 flex gap-2">
+            <KakaoShareButton
+              url={result}
+              title={`${data.groomName} ♥ ${data.brideName} 결혼합니다`}
+              description={
+                data.weddingDate
+                  ? `${data.weddingDate} · 모바일 청첩장이 도착했어요`
+                  : "모바일 청첩장이 도착했어요"
+              }
+              imageUrl={data.mainPhotoUrl}
+              className="mt-4 w-full py-2.5 text-sm"
+            />
+            <div className="mt-2 flex gap-2">
               <button
                 onClick={copyLink}
                 className="flex-1 rounded-lg bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white transition hover:from-gold-500 hover:to-gold-600"

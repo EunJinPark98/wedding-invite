@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthStatus from "./AuthStatus";
+import KakaoShareButton from "./KakaoShareButton";
 
 export interface MyInvitation {
   slug: string;
@@ -11,6 +12,7 @@ export interface MyInvitation {
   groomName: string;
   brideName: string;
   weddingDate: string;
+  mainPhotoUrl: string;
   createdAt: string;
   expiresAt: string | null;
   expired: boolean;
@@ -163,6 +165,19 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                   >
                     청첩장 보기
                   </Link>
+                  {!inv.expired && (
+                    <KakaoShareButton
+                      url={`/v/${inv.slug}`}
+                      title={`${inv.groomName} ♥ ${inv.brideName} 결혼합니다`}
+                      description={
+                        inv.weddingDate
+                          ? `${inv.weddingDate} · 모바일 청첩장이 도착했어요`
+                          : "모바일 청첩장이 도착했어요"
+                      }
+                      imageUrl={inv.mainPhotoUrl}
+                      className="px-4 py-2.5 text-sm"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => copyLink(inv.slug)}
