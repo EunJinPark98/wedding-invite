@@ -851,7 +851,7 @@ function RomanticLayout({
         </div>
         <p
           className="inv-hero-in text-3xl"
-          style={{ fontFamily: "var(--font-pen)", color: t.accent }}
+          style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
           우리, 결혼해요
         </p>

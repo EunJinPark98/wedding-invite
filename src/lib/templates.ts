@@ -90,25 +90,20 @@ export interface FontOption {
   sample: string;
 }
 
+// 실제 인쇄·모바일 청첩장에서 널리 쓰이는 서체 위주로 구성
 export const FONTS: FontOption[] = [
   { id: "default", name: "템플릿 기본", family: "", sample: "가나다 Abc" },
-  // 세리프
+  // 명조(세리프) — 격식 있는 본문·이름
+  {
+    id: "serifkr",
+    name: "본명조",
+    family: "var(--font-serifkr)",
+    sample: "우리 결혼해요",
+  },
   {
     id: "myeongjo",
     name: "나눔명조",
     family: "var(--font-myeongjo)",
-    sample: "우리 결혼해요",
-  },
-  {
-    id: "song",
-    name: "송명",
-    family: "var(--font-song)",
-    sample: "우리 결혼해요",
-  },
-  {
-    id: "hahmlet",
-    name: "햄릿",
-    family: "var(--font-hahmlet)",
     sample: "우리 결혼해요",
   },
   {
@@ -117,17 +112,17 @@ export const FONTS: FontOption[] = [
     family: "var(--font-gowun)",
     sample: "우리 결혼해요",
   },
-  // 고딕
+  {
+    id: "song",
+    name: "송명",
+    family: "var(--font-song)",
+    sample: "우리 결혼해요",
+  },
+  // 고딕 — 깔끔한 모던 스타일
   {
     id: "noto",
     name: "본고딕",
     family: "var(--font-noto)",
-    sample: "우리 결혼해요",
-  },
-  {
-    id: "nanumgothic",
-    name: "나눔고딕",
-    family: "var(--font-nanumgothic)",
     sample: "우리 결혼해요",
   },
   {
@@ -136,11 +131,17 @@ export const FONTS: FontOption[] = [
     family: "var(--font-dodum)",
     sample: "우리 결혼해요",
   },
-  // 손글씨
   {
-    id: "pen",
-    name: "손글씨",
-    family: "var(--font-pen)",
+    id: "nanumgothic",
+    name: "나눔고딕",
+    family: "var(--font-nanumgothic)",
+    sample: "우리 결혼해요",
+  },
+  // 캘리그라피 — 인사말·타이틀 포인트
+  {
+    id: "brush",
+    name: "붓글씨",
+    family: "var(--font-brush)",
     sample: "우리 결혼해요",
   },
 ];

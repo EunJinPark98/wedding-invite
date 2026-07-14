@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { customAlphabet } from "nanoid";
-import { saveInvitation } from "@/lib/store";
+import { saveInvitation, countInvitationsByUser } from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
 import { MAX_GALLERY, PERIOD_OPTIONS, SAMPLE_MAIN_PHOTO } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // 로그인 필수 (Supabase 미설정 로컬 개발 모드는 통과)
+  // 로그인 필수 + 계정당 1개 제한 (Supabase 미설정 로컬 개발 모드는 통과)
   let userId: string | null = null;
   if (authEnabled) {
     const user = await getUser();
@@ -70,6 +70,17 @@ export async function POST(req: Request) {
       );
     }
     userId = user.id;
+    const count = await countInvitationsByUser(userId);
+    if (count >= 1) {
+      return NextResponse.json(
+        {
+          error:
+            "청첩장은 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 청첩장을 삭제해 주세요.",
+          code: "LIMIT_REACHED",
+        },
+        { status: 409 }
+      );
+    }
   }
 
   try {

@@ -62,6 +62,8 @@ export interface Invitation {
   createdAt: string;
   // 이 시각이 지나면 발행 페이지 비공개 (null이면 무기한 — 과거 데이터 호환)
   expiresAt: string | null;
+  // 발행 후 수정을 이미 사용했는지 (수정은 1회만 허용)
+  edited?: boolean;
 }
 
 // 저장/조회 데이터에 누락 필드가 있어도 렌더링이 깨지지 않도록 안전한 빈 값으로 보정.

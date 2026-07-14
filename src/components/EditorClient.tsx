@@ -9,6 +9,7 @@ import { TEMPLATES, FONTS } from "@/lib/templates";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
+  normalizeData,
   MAX_GALLERY,
   PERIOD_OPTIONS,
   SAMPLE_MAIN_PHOTO,
@@ -185,14 +186,27 @@ function FontPicker({
   );
 }
 
-export default function EditorClient() {
+export default function EditorClient({
+  editSlug,
+  initialTemplate,
+  initialData,
+}: {
+  // 수정 모드: 기존 청첩장 slug + 저장된 내용 (수정은 1회만 가능)
+  editSlug?: string;
+  initialTemplate?: TemplateId;
+  initialData?: InvitationData;
+} = {}) {
   const params = useSearchParams();
-  const initialTemplate = (params.get("template") as TemplateId) || "classic";
+  const isEdit = Boolean(editSlug);
+  const startTemplate =
+    initialTemplate ?? ((params.get("template") as TemplateId) || "classic");
 
   const [template, setTemplate] = useState<TemplateId>(
-    TEMPLATES.some((t) => t.id === initialTemplate) ? initialTemplate : "classic"
+    TEMPLATES.some((t) => t.id === startTemplate) ? startTemplate : "classic"
   );
-  const [data, setData] = useState<InvitationData>(emptyInvitation());
+  const [data, setData] = useState<InvitationData>(() =>
+    initialData ? normalizeData(initialData) : emptyInvitation()
+  );
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -265,15 +279,29 @@ export default function EditorClient() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/invitations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template, data, periodMonths: period }),
-      });
+      // 수정 모드는 PATCH(운영 기간 변경 없음), 신규는 POST
+      const res = await fetch(
+        isEdit ? `/api/invitations/${editSlug}` : "/api/invitations",
+        {
+          method: isEdit ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            isEdit
+              ? { template, data }
+              : { template, data, periodMonths: period }
+          ),
+        }
+      );
       const json = await res.json();
       if (res.status === 401) {
         // 로그인 필요 → 로그인 후 에디터로 복귀
-        window.location.href = "/login?next=/editor";
+        const next = isEdit ? `/editor?edit=${editSlug}` : "/editor";
+        window.location.href = `/login?next=${encodeURIComponent(next)}`;
+        return;
+      }
+      if (json.code === "LIMIT_REACHED") {
+        // 계정당 1개 제한 → 마이페이지에서 안내
+        window.location.href = "/my?notice=limit";
         return;
       }
       if (!res.ok) throw new Error(json.error || "저장에 실패했습니다.");
@@ -327,19 +355,21 @@ export default function EditorClient() {
       <div className="space-y-4">
         <div className="mb-1">
           <p className="font-cormorant text-sm tracking-[0.4em] text-gold-400">
-            CREATE YOUR INVITATION
+            {isEdit ? "EDIT YOUR INVITATION" : "CREATE YOUR INVITATION"}
           </p>
           <h1
             className="mt-2 text-[2rem] leading-tight tracking-tight text-gray-900"
             style={{ fontFamily: "var(--font-song)" }}
           >
-            청첩장 만들기
+            {isEdit ? "청첩장 수정하기" : "청첩장 만들기"}
           </h1>
           <p
             className="mt-2 text-sm text-gray-400"
             style={{ fontFamily: "var(--font-gowun)" }}
           >
-            입력한 내용이 미리보기에 실시간으로 반영돼요.
+            {isEdit
+              ? "수정은 1회만 가능해요. 저장 전에 꼼꼼히 확인해 주세요."
+              : "입력한 내용이 미리보기에 실시간으로 반영돼요."}
           </p>
         </div>
 
@@ -635,7 +665,7 @@ export default function EditorClient() {
           onClick={openConfirm}
           className="w-full rounded-2xl bg-gradient-to-r from-gold-400 to-gold-500 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
         >
-          청첩장 제작하기
+          {isEdit ? "수정 내용 저장하기" : "청첩장 제작하기"}
         </button>
         {photoWarn && needMainPhoto ? (
           <p className="text-center text-sm font-medium text-red-500">
@@ -643,7 +673,9 @@ export default function EditorClient() {
           </p>
         ) : (
           <p className="text-center text-xs text-gray-400">
-            제작 전에 미리보기로 한 번 더 확인할 수 있어요.
+            {isEdit
+              ? "저장 전에 미리보기로 한 번 더 확인할 수 있어요. 수정은 1회만 가능해요."
+              : "제작 전에 미리보기로 한 번 더 확인할 수 있어요. 청첩장은 계정당 1개만 만들 수 있어요."}
           </p>
         )}
       </div>
@@ -694,10 +726,12 @@ export default function EditorClient() {
               💌
             </div>
             <h2 className="text-lg font-bold text-gray-800">
-              청첩장이 완성됐어요!
+              {isEdit ? "수정이 완료됐어요!" : "청첩장이 완성됐어요!"}
             </h2>
             <p className="mt-1 text-sm text-gray-500">
-              아래 링크를 공유하세요.
+              {isEdit
+                ? "수정 1회를 모두 사용했어요. 링크는 그대로예요."
+                : "아래 링크를 공유하세요."}
             </p>
             <div className="mt-4 break-all rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700">
               {result}
@@ -723,12 +757,18 @@ export default function EditorClient() {
                 바로 보기
               </a>
             </div>
-            <button
-              onClick={() => setResult(null)}
-              className="mt-3 text-xs text-gray-400"
-            >
-              닫고 계속 편집
-            </button>
+            {isEdit ? (
+              <Link href="/my" className="mt-3 inline-block text-xs text-gray-400 hover:text-gold-500">
+                마이페이지로 이동
+              </Link>
+            ) : (
+              <button
+                onClick={() => setResult(null)}
+                className="mt-3 text-xs text-gray-400"
+              >
+                닫고 계속 편집
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -763,10 +803,12 @@ export default function EditorClient() {
         <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-3 sm:p-5">
           <div className="mx-auto flex min-h-0 w-full max-w-[460px] flex-1 flex-col rounded-2xl bg-white p-4 shadow-2xl sm:p-5">
             <h2 className="text-center text-lg font-bold text-gray-800">
-              이대로 제작할까요?
+              {isEdit ? "이대로 수정할까요?" : "이대로 제작할까요?"}
             </h2>
             <p className="mb-3 mt-1 text-center text-xs text-gray-500">
-              하객에게 보이는 실제 모습이에요. 확인 후 운영 기간을 선택하세요.
+              {isEdit
+                ? "하객에게 보이는 실제 모습이에요. 저장 즉시 반영돼요."
+                : "하객에게 보이는 실제 모습이에요. 확인 후 운영 기간을 선택하세요."}
             </p>
             <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
@@ -774,43 +816,52 @@ export default function EditorClient() {
               </div>
             </div>
 
-            {/* 운영 기간 선택 */}
-            <div className="mt-3.5">
-              <p className="mb-2 text-center text-xs font-semibold text-gray-600">
-                운영 기간
-              </p>
-              <div className="grid grid-cols-4 gap-1.5">
-                {PERIOD_OPTIONS.map((p) => {
-                  const selected = period === p.months;
-                  return (
-                    <button
-                      key={p.months}
-                      type="button"
-                      onClick={() => setPeriod(p.months)}
-                      className={`rounded-xl border-2 py-2 text-sm font-medium transition ${
-                        selected
-                          ? "border-gold-400 bg-gold-50 text-gold-500"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  );
-                })}
+            {isEdit ? (
+              /* 수정 모드 — 기간 변경 없음, 1회 제한 경고 */
+              <div className="mt-3.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-center text-xs leading-5 text-gold-600">
+                ⚠️ 수정은 <strong>딱 1회만</strong> 가능해요.
+                <br />
+                저장한 후에는 더 이상 수정할 수 없으니 꼼꼼히 확인해 주세요.
               </div>
-              <p className="mt-1.5 text-center text-[11px] text-gray-400">
-                <span className="font-medium text-gold-500">
-                  {fmtDate(
-                    (() => {
-                      const d = new Date();
-                      d.setMonth(d.getMonth() + period);
-                      return d.toISOString();
-                    })()
-                  )}
-                </span>
-                에 게시가 종료돼요
-              </p>
-            </div>
+            ) : (
+              /* 운영 기간 선택 */
+              <div className="mt-3.5">
+                <p className="mb-2 text-center text-xs font-semibold text-gray-600">
+                  운영 기간
+                </p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {PERIOD_OPTIONS.map((p) => {
+                    const selected = period === p.months;
+                    return (
+                      <button
+                        key={p.months}
+                        type="button"
+                        onClick={() => setPeriod(p.months)}
+                        className={`rounded-xl border-2 py-2 text-sm font-medium transition ${
+                          selected
+                            ? "border-gold-400 bg-gold-50 text-gold-500"
+                            : "border-gray-200 text-gray-600 hover:border-gray-300"
+                        }`}
+                      >
+                        {p.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-1.5 text-center text-[11px] text-gray-400">
+                  <span className="font-medium text-gold-500">
+                    {fmtDate(
+                      (() => {
+                        const d = new Date();
+                        d.setMonth(d.getMonth() + period);
+                        return d.toISOString();
+                      })()
+                    )}
+                  </span>
+                  에 게시가 종료돼요 · 계정당 1개 · 제작 후 1회 수정 가능
+                </p>
+              </div>
+            )}
 
             {error && (
               <p className="mt-2 text-center text-sm text-red-500">{error}</p>
@@ -828,7 +879,11 @@ export default function EditorClient() {
                 disabled={submitting}
                 className="flex-1 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:from-gold-500 hover:to-gold-600 disabled:opacity-50"
               >
-                {submitting ? "제작 중..." : "네, 제작할게요"}
+                {submitting
+                  ? "저장 중..."
+                  : isEdit
+                    ? "네, 수정할게요"
+                    : "네, 제작할게요"}
               </button>
             </div>
           </div>

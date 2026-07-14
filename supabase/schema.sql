@@ -7,12 +7,14 @@ create table if not exists public.invitations (
   data jsonb not null,
   created_at timestamptz not null default now(),
   expires_at timestamptz, -- 운영 기간 만료 시각 (null = 무기한)
-  user_id uuid references auth.users (id) -- 만든 계정 (무료 1개 제한용)
+  user_id uuid references auth.users (id), -- 만든 계정 (계정당 1개 제한용)
+  edited boolean not null default false -- 발행 후 수정 사용 여부 (수정은 1회만)
 );
 
 -- 기존 테이블에 컬럼이 없으면 추가 (재실행해도 안전)
 alter table public.invitations add column if not exists expires_at timestamptz;
 alter table public.invitations add column if not exists user_id uuid references auth.users (id);
+alter table public.invitations add column if not exists edited boolean not null default false;
 
 create index if not exists invitations_slug_idx on public.invitations (slug);
 create index if not exists invitations_user_idx on public.invitations (user_id);

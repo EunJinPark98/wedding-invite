@@ -56,6 +56,12 @@ export default function AuthStatus() {
       <span className="max-w-[160px] truncate font-medium text-gray-600">
         {name ? `${name}님` : email}
       </span>
+      <Link
+        href="/my"
+        className="text-xs text-gray-400 transition hover:text-gold-600"
+      >
+        마이페이지
+      </Link>
       <button
         type="button"
         onClick={async () => {

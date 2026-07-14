@@ -30,6 +30,26 @@
   color-scheme: light;
 }
 
+/* ───────── 클릭 가능 요소 공통 인터랙션 ─────────
+   Tailwind v4 preflight는 버튼에 cursor:default를 주므로 전역으로 복원 */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  select,
+  summary,
+  label:has(input[type="file"]),
+  label:has(input[type="checkbox"]),
+  label:has(input[type="radio"]) {
+    cursor: pointer;
+  }
+  /* 키보드 포커스 표시 (마우스 클릭 시에는 표시 안 함) */
+  :focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

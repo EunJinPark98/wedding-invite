@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import {
   Nanum_Myeongjo,
   Noto_Sans_KR,
+  Noto_Serif_KR,
   Gowun_Batang,
-  Nanum_Pen_Script,
+  Nanum_Brush_Script,
   Song_Myung,
-  Hahmlet,
   Nanum_Gothic,
   Gowun_Dodum,
   Cormorant_Garamond,
@@ -34,11 +34,12 @@ const gowun = Gowun_Batang({
   variable: "--font-gowun",
 });
 
-const pen = Nanum_Pen_Script({
+// 붓글씨 (청첩장 인사말·타이틀 캘리그라피용)
+const brush = Nanum_Brush_Script({
   weight: ["400"],
   display: "swap",
   preload: false,
-  variable: "--font-pen",
+  variable: "--font-brush",
 });
 
 const song = Song_Myung({
@@ -47,11 +48,12 @@ const song = Song_Myung({
   variable: "--font-song",
 });
 
-const hahmlet = Hahmlet({
+// 본명조 — 실제 인쇄 청첩장에서 가장 널리 쓰이는 세리프
+const serifKr = Noto_Serif_KR({
   weight: ["400", "500", "600"],
   display: "swap",
   preload: false,
-  variable: "--font-hahmlet",
+  variable: "--font-serifkr",
 });
 
 const nanumGothic = Nanum_Gothic({
@@ -95,7 +97,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${myeongjo.variable} ${notoKr.variable} ${gowun.variable} ${pen.variable} ${song.variable} ${hahmlet.variable} ${nanumGothic.variable} ${dodum.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${myeongjo.variable} ${notoKr.variable} ${serifKr.variable} ${gowun.variable} ${brush.variable} ${song.variable} ${nanumGothic.variable} ${dodum.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
