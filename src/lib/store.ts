@@ -111,7 +111,7 @@ export async function listInvitationsByUser(
     if (!userId) return [];
     const { data, error } = await supabase()
       .from("invitations")
-      .select("slug, template, data, created_at, expires_at, edited")
+      .select("slug, template, data, created_at, expires_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -121,7 +121,6 @@ export async function listInvitationsByUser(
       data: r.data,
       createdAt: r.created_at,
       expiresAt: r.expires_at ?? null,
-      edited: Boolean(r.edited),
     }));
   }
   // 로컬 폴백은 계정 개념이 없어 전체 반환 (개발용)
@@ -154,7 +153,7 @@ export async function getInvitationOwned(
     if (!userId) return null;
     const { data, error } = await supabase()
       .from("invitations")
-      .select("slug, template, data, created_at, expires_at, edited")
+      .select("slug, template, data, created_at, expires_at")
       .eq("slug", slug)
       .eq("user_id", userId)
       .maybeSingle();
@@ -166,46 +165,39 @@ export async function getInvitationOwned(
       data: data.data,
       createdAt: data.created_at,
       expiresAt: data.expires_at ?? null,
-      edited: Boolean(data.edited),
     };
   }
   const db = await readLocal();
   return db[slug] ?? null;
 }
 
-export type UpdateResult =
-  | { ok: true }
-  | { ok: false; code: "not_found" | "already_edited" };
-
-// 발행 후 1회만 허용되는 수정 (소유자 검증 포함)
+// 청첩장 수정 (소유자 검증 포함) — 횟수 제한 없음
 export async function updateInvitation(
   slug: string,
   userId: string | null,
   template: TemplateId,
   rawData: InvitationData
-): Promise<UpdateResult> {
+): Promise<boolean> {
   const data = normalizeData(rawData);
 
   if (useSupabase) {
     const existing = await getInvitationOwned(slug, userId);
-    if (!existing) return { ok: false, code: "not_found" };
-    if (existing.edited) return { ok: false, code: "already_edited" };
+    if (!existing) return false;
     const { error } = await supabase()
       .from("invitations")
-      .update({ template, data, edited: true })
+      .update({ template, data })
       .eq("slug", slug)
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
-    return { ok: true };
+    return true;
   }
 
   const db = await readLocal();
   const inv = db[slug];
-  if (!inv) return { ok: false, code: "not_found" };
-  if (inv.edited) return { ok: false, code: "already_edited" };
-  db[slug] = { ...inv, template, data, edited: true };
+  if (!inv) return false;
+  db[slug] = { ...inv, template, data };
   await writeLocal(db);
-  return { ok: true };
+  return true;
 }
 
 // 삭제 (소유자 검증 포함) — 복원 불가

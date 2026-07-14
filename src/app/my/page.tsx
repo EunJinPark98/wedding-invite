@@ -25,7 +25,6 @@ export default async function MyPage() {
     weddingDate: inv.data?.weddingDate ?? "",
     createdAt: inv.createdAt,
     expiresAt: inv.expiresAt,
-    edited: Boolean(inv.edited),
     expired: isExpired(inv),
   }));
 

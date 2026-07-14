@@ -13,7 +13,6 @@ export interface MyInvitation {
   weddingDate: string;
   createdAt: string;
   expiresAt: string | null;
-  edited: boolean;
   expired: boolean;
 }
 
@@ -95,18 +94,13 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
           마이페이지
         </h1>
         <p className="mt-2 text-sm text-gray-500">
-          청첩장은 계정당 1개만 만들 수 있고, 제작 후 수정은 1회만 가능해요.
+          청첩장은 계정당 1개만 만들 수 있어요. 수정은 언제든지 가능해요.
         </p>
 
         {notice === "limit" && (
           <div className="mt-5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
             이미 만든 청첩장이 있어요. 새로 만들려면 아래에서 기존 청첩장을
             삭제해 주세요.
-          </div>
-        )}
-        {notice === "edited" && (
-          <div className="mt-5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
-            이 청첩장은 이미 1회 수정을 완료해서 더 이상 수정할 수 없어요.
           </div>
         )}
         {error && (
@@ -159,15 +153,6 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                       게시 종료일: {fmtDate(inv.expiresAt)}
                     </p>
                   </div>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                      inv.edited
-                        ? "bg-gray-100 text-gray-400"
-                        : "bg-emerald-50 text-emerald-600"
-                    }`}
-                  >
-                    {inv.edited ? "수정 1회 사용됨" : "수정 1회 가능"}
-                  </span>
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -185,21 +170,12 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                   >
                     {copied === inv.slug ? "복사됨!" : "링크 복사"}
                   </button>
-                  {inv.edited ? (
-                    <span
-                      title="수정은 1회만 가능해요"
-                      className="cursor-not-allowed rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-300"
-                    >
-                      수정 완료
-                    </span>
-                  ) : (
-                    <Link
-                      href={`/editor?edit=${inv.slug}`}
-                      className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-gold-300 hover:text-gold-600"
-                    >
-                      수정하기 (1회 가능)
-                    </Link>
-                  )}
+                  <Link
+                    href={`/editor?edit=${inv.slug}`}
+                    className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-gold-300 hover:text-gold-600"
+                  >
+                    수정하기
+                  </Link>
                   <button
                     type="button"
                     onClick={() => {

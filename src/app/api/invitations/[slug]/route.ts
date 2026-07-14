@@ -21,7 +21,7 @@ async function requireUser(): Promise<
   return { userId: user.id };
 }
 
-// 발행 후 수정 — 1회만 허용, 운영 기간은 변경 불가
+// 발행 후 수정 — 횟수 제한 없음, 운영 기간은 변경 불가
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -70,14 +70,8 @@ export async function PATCH(
   }
 
   try {
-    const result = await updateInvitation(slug, auth.userId, template, data);
-    if (!result.ok) {
-      if (result.code === "already_edited") {
-        return NextResponse.json(
-          { error: "이 청첩장은 이미 1회 수정을 완료했어요. 더 이상 수정할 수 없어요." },
-          { status: 403 }
-        );
-      }
+    const updated = await updateInvitation(slug, auth.userId, template, data);
+    if (!updated) {
       return NextResponse.json(
         { error: "청첩장을 찾을 수 없어요." },
         { status: 404 }

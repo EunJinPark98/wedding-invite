@@ -24,11 +24,10 @@ export default async function EditorPage({
     userId = user.id;
   }
 
-  // 수정 모드: 본인 청첩장만, 1회 수정 소진 시 마이페이지로 안내
+  // 수정 모드: 본인 청첩장만
   if (edit) {
     const inv = await getInvitationOwned(edit, userId);
     if (!inv) redirect("/my");
-    if (inv.edited) redirect("/my?notice=edited");
     return (
       <Suspense
         fallback={

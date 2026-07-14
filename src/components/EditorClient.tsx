@@ -191,7 +191,7 @@ export default function EditorClient({
   initialTemplate,
   initialData,
 }: {
-  // 수정 모드: 기존 청첩장 slug + 저장된 내용 (수정은 1회만 가능)
+  // 수정 모드: 기존 청첩장 slug + 저장된 내용
   editSlug?: string;
   initialTemplate?: TemplateId;
   initialData?: InvitationData;
@@ -368,7 +368,7 @@ export default function EditorClient({
             style={{ fontFamily: "var(--font-gowun)" }}
           >
             {isEdit
-              ? "수정은 1회만 가능해요. 저장 전에 꼼꼼히 확인해 주세요."
+              ? "수정 내용은 저장 즉시 청첩장에 반영돼요."
               : "입력한 내용이 미리보기에 실시간으로 반영돼요."}
           </p>
         </div>
@@ -674,7 +674,7 @@ export default function EditorClient({
         ) : (
           <p className="text-center text-xs text-gray-400">
             {isEdit
-              ? "저장 전에 미리보기로 한 번 더 확인할 수 있어요. 수정은 1회만 가능해요."
+              ? "저장 전에 미리보기로 한 번 더 확인할 수 있어요."
               : "제작 전에 미리보기로 한 번 더 확인할 수 있어요. 청첩장은 계정당 1개만 만들 수 있어요."}
           </p>
         )}
@@ -730,7 +730,7 @@ export default function EditorClient({
             </h2>
             <p className="mt-1 text-sm text-gray-500">
               {isEdit
-                ? "수정 1회를 모두 사용했어요. 링크는 그대로예요."
+                ? "수정 내용이 청첩장에 반영됐어요. 링크는 그대로예요."
                 : "아래 링크를 공유하세요."}
             </p>
             <div className="mt-4 break-all rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700">
@@ -757,18 +757,13 @@ export default function EditorClient({
                 바로 보기
               </a>
             </div>
-            {isEdit ? (
-              <Link href="/my" className="mt-3 inline-block text-xs text-gray-400 hover:text-gold-500">
-                마이페이지로 이동
-              </Link>
-            ) : (
-              <button
-                onClick={() => setResult(null)}
-                className="mt-3 text-xs text-gray-400"
-              >
-                닫고 계속 편집
-              </button>
-            )}
+            {/* 닫으면 마이페이지로 이동 */}
+            <Link
+              href="/my"
+              className="mt-3 inline-block text-xs text-gray-400 hover:text-gold-500"
+            >
+              닫기
+            </Link>
           </div>
         </div>
       )}
@@ -817,11 +812,10 @@ export default function EditorClient({
             </div>
 
             {isEdit ? (
-              /* 수정 모드 — 기간 변경 없음, 1회 제한 경고 */
+              /* 수정 모드 — 운영 기간은 변경 없음 */
               <div className="mt-3.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-center text-xs leading-5 text-gold-600">
-                ⚠️ 수정은 <strong>딱 1회만</strong> 가능해요.
-                <br />
-                저장한 후에는 더 이상 수정할 수 없으니 꼼꼼히 확인해 주세요.
+                저장하면 하객에게 바로 반영돼요. 운영 기간과 링크는 그대로
+                유지돼요.
               </div>
             ) : (
               /* 운영 기간 선택 */
@@ -858,7 +852,7 @@ export default function EditorClient({
                       })()
                     )}
                   </span>
-                  에 게시가 종료돼요 · 계정당 1개 · 제작 후 1회 수정 가능
+                  에 게시가 종료돼요 · 계정당 1개 · 제작 후에도 수정할 수 있어요
                 </p>
               </div>
             )}
