@@ -55,6 +55,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-noto), "Apple SD Gothic Neo", "Malgun Gothic",
     sans-serif;
+  /* 한글이 단어 중간에서 잘리지 않도록 (모바일 가독성) */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 영문 장식 서체 유틸 */

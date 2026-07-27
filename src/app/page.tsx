@@ -48,7 +48,7 @@ export default function Home() {
             MOBILE WEDDING INVITATION
           </p>
           <h1
-            className="mt-6 text-[2.6rem] leading-[1.3] text-ink sm:text-5xl"
+            className="mt-6 text-[1.9rem] leading-[1.4] text-ink sm:text-5xl sm:leading-[1.3]"
             style={{ fontFamily: "var(--font-song)" }}
           >
             별처럼 빛나는 시작,
@@ -63,16 +63,16 @@ export default function Home() {
             <br />
             반짝이는 시작을 카톡 링크로 바로 전하세요.
           </p>
-          <div className="mt-10 flex items-center justify-center gap-3">
+          <div className="mx-auto mt-10 flex max-w-[280px] flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center">
             <Link
               href="/editor"
-              className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
+              className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-8 py-4 text-center text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
             >
               무료로 제작하기
             </Link>
             <Link
               href="#templates"
-              className="rounded-full border border-gold-300/70 bg-white/80 px-7 py-4 text-base font-semibold text-gray-600 backdrop-blur transition hover:border-gold-400 hover:text-gold-600"
+              className="rounded-full border border-gold-300/70 bg-white/80 px-7 py-4 text-center text-base font-semibold text-gray-600 backdrop-blur transition hover:border-gold-400 hover:text-gold-600"
             >
               템플릿 둘러보기
             </Link>
@@ -90,7 +90,7 @@ export default function Home() {
           TEMPLATES
         </p>
         <h2
-          className="mt-3 text-center text-[2rem] text-ink"
+          className="mt-3 text-center text-[1.6rem] text-ink sm:text-[2rem]"
           style={{ fontFamily: "var(--font-song)" }}
         >
           6가지 디자인 템플릿

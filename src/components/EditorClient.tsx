@@ -465,12 +465,20 @@ export default function EditorClient({
               />
             </div>
           </div>
-          <p className="text-xs text-gray-400">
-            사진을 올리면 청첩장에 신랑·신부 프로필 섹션이 생겨요.
-          </p>
-        </Group>
-
-        <Group title="혼주" step={4}>
+          <div className="grid grid-cols-2 gap-3">
+            <Field
+              label="신랑 연락처"
+              value={data.groomPhone}
+              onChange={(v) => set("groomPhone", v)}
+              placeholder="010-0000-0000"
+            />
+            <Field
+              label="신부 연락처"
+              value={data.bridePhone}
+              onChange={(v) => set("bridePhone", v)}
+              placeholder="010-0000-0000"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <Field
               label="신랑 아버지"
@@ -498,12 +506,12 @@ export default function EditorClient({
             />
           </div>
           <p className="text-xs text-gray-400">
-            비워두면 청첩장에 표시되지 않아요. 부모님 성함을 모두 비우면 이름만
-            표기됩니다.
+            사진을 올리면 프로필 섹션이 생기고, 연락처를 입력하면 이름 옆에
+            전화·문자 버튼이 붙어요. 부모님 성함은 비우면 표시되지 않아요.
           </p>
         </Group>
 
-        <Group title="예식 일시 · 장소" step={5}>
+        <Group title="예식 일시 · 장소" step={4}>
           <div className="grid grid-cols-2 gap-3">
             <Field
               label="예식일"
@@ -535,7 +543,7 @@ export default function EditorClient({
           />
         </Group>
 
-        <Group title="인사말" step={6}>
+        <Group title="인사말" step={5}>
           <Field
             label="제목"
             value={data.greetingTitle}
@@ -566,7 +574,7 @@ export default function EditorClient({
           </label>
         </Group>
 
-        <Group title="사진" step={7}>
+        <Group title="사진" step={6}>
           <div ref={photoSectionRef}>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               대표 사진 <span className="text-gold-400">*필수</span>
@@ -661,22 +669,7 @@ export default function EditorClient({
           </p>
         </Group>
 
-        <Group title="연락처" step={8}>
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label="신랑 연락처"
-              value={data.groomPhone}
-              onChange={(v) => set("groomPhone", v)}
-            />
-            <Field
-              label="신부 연락처"
-              value={data.bridePhone}
-              onChange={(v) => set("bridePhone", v)}
-            />
-          </div>
-        </Group>
-
-        <Group title="마음 전하실 곳 (계좌)" step={9}>
+        <Group title="마음 전하실 곳 (계좌)" step={7}>
           <div className="space-y-3">
             {data.accounts.map((a, i) => (
               <div

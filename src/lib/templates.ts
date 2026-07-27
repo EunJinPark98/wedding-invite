@@ -100,7 +100,7 @@ export const THEMES: Record<TemplateId, TemplateTheme> = {
     sub: "#8f887e",
     pageBg: "#fdfbf7",
     bodyFont: "var(--font-noto)",
-    headingFont: "var(--font-serifkr)",
+    headingFont: "var(--font-myeongjo)",
     swatch: "linear-gradient(135deg,#fdfbf7 0%,#c8794f 100%)",
   },
 };

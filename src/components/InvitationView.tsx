@@ -284,12 +284,12 @@ function CoupleInner({
         const parents = [p.father, p.mother].map((s) => s.trim()).filter(Boolean);
         return (
           <div key={p.role} className="text-center">
-            {/* 신랑/신부 타이틀 */}
+            {/* 신랑/신부 타이틀 (영문 스몰캡) */}
             <p
-              className="inv-fade mb-4 text-[17px] tracking-[0.3em]"
-              style={{ fontFamily: t.headingFont, color: t.ink }}
+              className="inv-fade font-cormorant mb-4 text-lg font-medium tracking-[0.35em]"
+              style={{ color: t.ink }}
             >
-              {p.role}
+              {p.role === "신랑" ? "GROOM" : "BRIDE"}
             </p>
             <ProfilePhoto src={p.photo} role={p.role} t={t} arch={arch} preview={preview} />
             {/* 이름 ↵ 전화·문자 */}
@@ -675,7 +675,7 @@ function ClassicLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="classic" />
-      <Sec label="신랑 신부" t={t} variant="classic">
+      <Sec label="GROOM & BRIDE" t={t} variant="classic">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="classic" />
@@ -722,34 +722,39 @@ function ModernLayout({
   const p = dateParts(data.weddingDate);
   return (
     <>
-      {/* 풀커버 히어로 — 사진 위에 타이포 오버레이 */}
-      <div className="relative overflow-hidden">
-        <Photo data={data} t={t} className="h-[620px] w-full" kenburns />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/5 to-black/50" />
-        <div className="absolute inset-x-0 top-0 px-8 pt-14 text-left text-white">
-          <div className="inv-hero-in mb-5 h-px w-10 bg-white/70" />
-          <p className="inv-hero-in font-cormorant text-base font-semibold tracking-[0.45em]">
-            THE WEDDING DAY
-          </p>
-          {p && (
-            <p className="inv-hero-in mt-3.5 font-cormorant text-[3.2rem] leading-none tracking-tight">
-              {p.year}.{String(p.month).padStart(2, "0")}.
-              {String(p.day).padStart(2, "0")}
-            </p>
-          )}
-          <p className="inv-hero-in-delay mt-3 text-sm text-white/85">
-            {p ? `${p.wkEn} · ${data.weddingTime}` : data.weddingTime}
-          </p>
-        </div>
-        <p className="absolute inset-x-0 bottom-12 text-center font-cormorant text-[30px] font-light italic tracking-[0.03em] text-white">
-          <LetterReveal text="We're getting married" />
+      {/* 에디토리얼 헤더 + 풀블리드 사진 */}
+      <header className="px-8 pb-4 pt-16">
+        <div
+          className="inv-hero-in mb-5 h-px w-10"
+          style={{ background: t.ink }}
+        />
+        <p
+          className="inv-hero-in font-cormorant text-base font-semibold tracking-[0.45em]"
+          style={{ color: t.sub }}
+        >
+          THE WEDDING DAY
         </p>
+        {p && (
+          <p
+            className="inv-hero-in mt-3 font-cormorant text-[3.2rem] leading-none tracking-tight"
+            style={{ color: t.ink }}
+          >
+            {p.year}.{String(p.month).padStart(2, "0")}.
+            {String(p.day).padStart(2, "0")}
+          </p>
+        )}
+        <p className="inv-hero-in-delay mt-3 text-sm" style={{ color: t.sub }}>
+          {p ? `${p.wkEn} · ${data.weddingTime}` : data.weddingTime}
+        </p>
+      </header>
+      <div className="overflow-hidden">
+        <Photo data={data} t={t} className="aspect-[4/5] w-full" kenburns />
       </div>
       <Sec label="INVITATION" index="01" t={t} variant="modern">
         <GreetingInner data={data} t={t} align="left" />
       </Sec>
       <Divider t={t} variant="modern" />
-      <Sec label="신랑 신부" index="02" t={t} variant="modern">
+      <Sec label="GROOM & BRIDE" index="02" t={t} variant="modern">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="modern" />
@@ -814,14 +819,14 @@ function RomanticLayout({
         {/* 흩날리는 꽃잎 */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           {[
-            { left: "6%", size: 11, dur: 13, delay: 0 },
-            { left: "18%", size: 8, dur: 15, delay: 4 },
-            { left: "32%", size: 10, dur: 12, delay: 7 },
-            { left: "46%", size: 8, dur: 16, delay: 2 },
-            { left: "60%", size: 11, dur: 13, delay: 9 },
-            { left: "72%", size: 9, dur: 14, delay: 5.5 },
-            { left: "84%", size: 10, dur: 15, delay: 1 },
-            { left: "94%", size: 8, dur: 12, delay: 6.5 },
+            { left: "8%", size: 13, dur: 11, delay: 0 },
+            { left: "22%", size: 10, dur: 14, delay: 3 },
+            { left: "34%", size: 12, dur: 13, delay: 9 },
+            { left: "46%", size: 11, dur: 12, delay: 6 },
+            { left: "58%", size: 13, dur: 14, delay: 1 },
+            { left: "68%", size: 14, dur: 13, delay: 1.5 },
+            { left: "84%", size: 10, dur: 15, delay: 4.5 },
+            { left: "93%", size: 12, dur: 12, delay: 8 },
           ].map((f, i) => (
             <span
               key={i}
@@ -892,7 +897,7 @@ function RomanticLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="romantic" />
-      <Sec label="신랑 신부" t={t} variant="romantic">
+      <Sec label="GROOM & BRIDE" t={t} variant="romantic">
         <CoupleInner data={data} t={t} arch preview={preview} />
       </Sec>
       <Divider t={t} variant="romantic" />
@@ -982,7 +987,7 @@ function BotanicalLayout({
           <GreetingInner data={data} t={t} />
         </Sec>
         <Divider t={t} variant="botanical" />
-        <Sec label="신랑 신부" t={t} variant="botanical">
+        <Sec label="GROOM & BRIDE" t={t} variant="botanical">
           <CoupleInner data={data} t={t} preview={preview} />
         </Sec>
         <Divider t={t} variant="botanical" />
@@ -1116,7 +1121,7 @@ function StarlightLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="starlight" />
-      <Sec label="신랑 신부" t={t} variant="starlight">
+      <Sec label="GROOM & BRIDE" t={t} variant="starlight">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="starlight" />
@@ -1188,19 +1193,25 @@ function CinemaLayout({
       </div>
       <div className="relative mt-8 overflow-hidden">
         <Photo data={data} t={t} className="aspect-[3/4.2] w-full" kenburns />
-        {/* 세로쓰기 캡션 — 화보 무드 */}
+        {/* 세로쓰기 캡션 — 화보 무드 (사진 위 가독성용 흰색+그림자) */}
         {data.venueName && (
           <p
-            className="absolute left-3.5 top-5 text-[12px] tracking-[0.25em]"
-            style={{ writingMode: "vertical-rl", color: "#22201d" }}
+            className="absolute left-3.5 top-5 text-[12.5px] tracking-[0.25em] text-white"
+            style={{
+              writingMode: "vertical-rl",
+              textShadow: "0 1px 10px rgba(0,0,0,0.55)",
+            }}
           >
             {data.venueName} {data.venueHall}
           </p>
         )}
         {p && (
           <p
-            className="font-cormorant absolute right-3.5 top-5 text-[12px] tracking-[0.3em]"
-            style={{ writingMode: "vertical-rl", color: "#22201d" }}
+            className="absolute right-3.5 top-5 text-[12.5px] tracking-[0.28em] text-white"
+            style={{
+              writingMode: "vertical-rl",
+              textShadow: "0 1px 10px rgba(0,0,0,0.55)",
+            }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")} {data.weddingTime}
@@ -1232,7 +1243,7 @@ function CinemaLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="cinema" />
-      <Sec label="신랑 신부" t={t} variant="cinema">
+      <Sec label="GROOM & BRIDE" t={t} variant="cinema">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="cinema" />

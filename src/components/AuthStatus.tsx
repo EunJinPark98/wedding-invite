@@ -53,7 +53,7 @@ export default function AuthStatus() {
 
   return (
     <span className="flex items-center gap-2.5 text-sm">
-      <span className="max-w-[160px] truncate font-medium text-gray-600">
+      <span className="max-w-[80px] truncate font-medium text-gray-600 sm:max-w-[160px]">
         {name ? `${name}님` : email}
       </span>
       <Link
