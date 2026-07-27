@@ -117,6 +117,97 @@ body {
   }
 }
 
+/* 대표 사진 켄번즈 줌 (은은하게 확대되는 시네마틱 연출) */
+@keyframes inv-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+.inv-kenburns {
+  animation: inv-kenburns 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-kenburns {
+    animation: none;
+  }
+}
+
+/* 하트 두근거림 */
+@keyframes inv-heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.22);
+  }
+  35% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.14);
+  }
+  65% {
+    transform: scale(1);
+  }
+}
+.inv-heartbeat {
+  display: inline-block;
+  animation: inv-heartbeat 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-heartbeat {
+    animation: none;
+  }
+}
+
+/* 카운트다운 숫자 갱신 시 살짝 튀어오르는 효과 */
+@keyframes inv-tick {
+  from {
+    opacity: 0.4;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-tick {
+  animation: inv-tick 0.4s ease-out;
+}
+
+/* 스크롤 진입 시 확대 등장 (사진·카드용) */
+@keyframes inv-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-zoom {
+  animation: inv-zoom-in 0.9s ease-out both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 45%;
+}
+@supports not (animation-timeline: view()) {
+  .inv-zoom {
+    animation: inv-zoom-in 0.9s ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-zoom {
+    animation: none;
+  }
+}
+
 /* 로맨틱: 꽃잎이 흩날리는 히어로 */
 @keyframes inv-petal-fall {
   0% {

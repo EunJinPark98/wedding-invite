@@ -440,6 +440,33 @@ export default function EditorClient({
               onChange={(v) => set("brideName", v)}
             />
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                신랑 사진 (선택)
+              </span>
+              <ImageUpload
+                value={data.groomPhotoUrl}
+                onChange={(url) => set("groomPhotoUrl", url)}
+                label="신랑 사진"
+                className="h-28"
+              />
+            </div>
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                신부 사진 (선택)
+              </span>
+              <ImageUpload
+                value={data.bridePhotoUrl}
+                onChange={(url) => set("bridePhotoUrl", url)}
+                label="신부 사진"
+                className="h-28"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400">
+            사진을 올리면 청첩장에 신랑·신부 프로필 섹션이 생겨요.
+          </p>
         </Group>
 
         <Group title="혼주" step={4}>

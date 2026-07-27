@@ -2,6 +2,8 @@ import { normalizeData, type InvitationData, type TemplateId } from "@/lib/types
 import { getTheme, getFontFamily, type TemplateTheme } from "@/lib/templates";
 import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
+import Countdown from "./Countdown";
+import MapSection from "./MapSection";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -248,19 +250,142 @@ function DateInner({
           >
             {dday === 0 ? "D-DAY ♡" : `D-${dday}`}
           </p>
-          {dday > 0 && (
-            <p className="mt-2.5 text-xs" style={{ color: t.sub }}>
-              {data.groomName} · {data.brideName}의 결혼식이{" "}
-              <span className="font-semibold" style={{ color: t.accent }}>
-                {dday}일
-              </span>{" "}
-              남았습니다
-            </p>
-          )}
         </div>
       )}
+      {/* 실시간 카운트다운 (일/시/분/초) */}
+      <Countdown
+        iso={data.weddingDate}
+        t={t}
+        groomName={data.groomName}
+        brideName={data.brideName}
+      />
     </div>
   );
+}
+
+/* ════════ 신랑 · 신부 프로필 ════════ */
+function ProfilePhoto({
+  src,
+  role,
+  t,
+  arch = false,
+}: {
+  src: string;
+  role: string;
+  t: TemplateTheme;
+  arch?: boolean;
+}) {
+  const shape = arch
+    ? { borderTopLeftRadius: "999px", borderTopRightRadius: "999px", borderBottomLeftRadius: "14px", borderBottomRightRadius: "14px" }
+    : { borderRadius: "999px" };
+  if (src)
+    return (
+      <div
+        className="inv-zoom mx-auto h-[120px] w-[104px] overflow-hidden border-[3px]"
+        style={{ ...shape, borderColor: "#fff", boxShadow: `0 10px 24px -10px ${t.accent}66` }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={`${role} 사진`} className="h-full w-full object-cover" />
+      </div>
+    );
+  // 미리보기 전용 빈 슬롯
+  return (
+    <div
+      className="mx-auto flex h-[120px] w-[104px] items-center justify-center border border-dashed"
+      style={{ ...shape, borderColor: t.line, background: t.accentSoft, color: t.sub }}
+    >
+      <span className="text-[11px]">{role} 사진</span>
+    </div>
+  );
+}
+
+function CoupleInner({
+  data,
+  t,
+  arch = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  arch?: boolean;
+}) {
+  const people = [
+    {
+      role: "신랑",
+      name: data.groomName,
+      photo: data.groomPhotoUrl,
+      father: data.groomFather,
+      mother: data.groomMother,
+      relation: "아들",
+      tel: data.groomPhone,
+    },
+    {
+      role: "신부",
+      name: data.brideName,
+      photo: data.bridePhotoUrl,
+      father: data.brideFather,
+      mother: data.brideMother,
+      relation: "딸",
+      tel: data.bridePhone,
+    },
+  ];
+  return (
+    <div className="mx-auto grid max-w-[340px] grid-cols-2 gap-5">
+      {people.map((p) => {
+        const parents = [p.father, p.mother].map((s) => s.trim()).filter(Boolean);
+        return (
+          <div key={p.role} className="text-center">
+            <ProfilePhoto src={p.photo} role={p.role} t={t} arch={arch} />
+            <p
+              className="font-cormorant mt-4 text-[10px] tracking-[0.3em]"
+              style={{ color: t.accent }}
+            >
+              {p.role === "신랑" ? "GROOM" : "BRIDE"}
+            </p>
+            <p
+              className="mt-1 text-lg"
+              style={{ fontFamily: t.headingFont, color: t.ink }}
+            >
+              {p.name}
+            </p>
+            {parents.length > 0 && (
+              <p className="mt-1 text-xs leading-5" style={{ color: t.sub }}>
+                {parents.join(" · ")}의 {p.relation}
+              </p>
+            )}
+            {p.tel && (
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <a
+                  href={`tel:${p.tel}`}
+                  aria-label={`${p.role}에게 전화`}
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-white transition"
+                  style={{ background: t.accent }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z" />
+                  </svg>
+                </a>
+                <a
+                  href={`sms:${p.tel}`}
+                  aria-label={`${p.role}에게 문자`}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border transition"
+                  style={{ borderColor: t.line, color: t.accent, background: t.pageBg }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                  </svg>
+                </a>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// 프로필 섹션 노출: 사진이 하나라도 있거나 미리보기 모드
+function showCouple(data: InvitationData, preview: boolean) {
+  return preview || Boolean(data.groomPhotoUrl || data.bridePhotoUrl);
 }
 
 function LocationInner({
@@ -289,20 +414,8 @@ function LocationInner({
       >
         {data.venueAddress}
       </p>
-      <a
-        href={`https://map.naver.com/p/search/${encodeURIComponent(
-          data.venueAddress
-        )}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 inline-block rounded-full px-7 py-3 text-sm font-medium text-white transition"
-        style={{
-          background: t.accent,
-          boxShadow: `0 8px 20px -8px ${t.accent}aa`,
-        }}
-      >
-        네이버지도에서 길찾기
-      </a>
+      {/* 실제 지도 + 네이버 길찾기 + 주소 복사 */}
+      <MapSection address={data.venueAddress} t={t} />
     </div>
   );
 }
@@ -580,7 +693,7 @@ function NamesAmp({
     <>
       {data.groomName}
       <span
-        className="mx-2.5 align-middle text-[0.8em]"
+        className="inv-heartbeat mx-2.5 align-middle text-[0.8em]"
         style={{ color: heartColor ?? t.accent }}
       >
         ♡
@@ -594,15 +707,22 @@ function Photo({
   data,
   t,
   className,
+  kenburns = false,
 }: {
   data: InvitationData;
   t: TemplateTheme;
   className: string;
+  // true면 은은하게 확대되는 시네마틱 연출 (부모에 overflow-hidden 필요)
+  kenburns?: boolean;
 }) {
   if (data.mainPhotoUrl)
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={data.mainPhotoUrl} alt="대표 사진" className={`object-cover ${className}`} />
+      <img
+        src={data.mainPhotoUrl}
+        alt="대표 사진"
+        className={`object-cover ${kenburns ? "inv-kenburns" : ""} ${className}`}
+      />
     );
   return (
     <div
@@ -629,8 +749,8 @@ function ClassicLayout({
   const p = dateParts(data.weddingDate);
   return (
     <>
-      <div className="relative">
-        <Photo data={data} t={t} className="h-[500px] w-full" />
+      <div className="relative overflow-hidden">
+        <Photo data={data} t={t} className="h-[500px] w-full" kenburns />
         <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/20" />
         {/* 스테이셔너리풍 이중 인셋 프레임 */}
         <div className="pointer-events-none absolute inset-3 border border-white/40" />
@@ -658,6 +778,14 @@ function ClassicLayout({
       <Sec label="INVITATION" t={t} variant="classic">
         <GreetingInner data={data} t={t} />
       </Sec>
+      {showCouple(data, preview) && (
+        <>
+          <Divider t={t} variant="classic" />
+          <Sec label="GROOM & BRIDE" t={t} variant="classic">
+            <CoupleInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
       <Divider t={t} variant="classic" />
       <Sec label="THE DAY" t={t} variant="classic">
         <DateInner data={data} t={t} />
@@ -731,7 +859,9 @@ function ModernLayout({
         </p>
       </header>
       <div className="px-8">
-        <Photo data={data} t={t} className="aspect-[4/5] w-full rounded-sm" />
+        <div className="overflow-hidden rounded-sm">
+          <Photo data={data} t={t} className="aspect-[4/5] w-full" kenburns />
+        </div>
       </div>
       <div className="px-8 pb-2 pt-9 text-center">
         <h1
@@ -751,6 +881,14 @@ function ModernLayout({
       <Sec label="INVITATION" index="01" t={t} variant="modern">
         <GreetingInner data={data} t={t} align="left" />
       </Sec>
+      {showCouple(data, preview) && (
+        <>
+          <Divider t={t} variant="modern" />
+          <Sec label="GROOM & BRIDE" t={t} variant="modern">
+            <CoupleInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
       <Divider t={t} variant="modern" />
       <Sec label="DATE" index="02" t={t} variant="modern">
         <DateInner data={data} t={t} calendar />
@@ -767,17 +905,8 @@ function ModernLayout({
           <p className="mt-3 text-sm" style={{ color: t.ink }}>
             {data.venueAddress}
           </p>
-          <a
-            href={`https://map.naver.com/p/search/${encodeURIComponent(
-              data.venueAddress
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-block border px-6 py-2.5 text-sm"
-            style={{ borderColor: t.ink, color: t.ink }}
-          >
-            네이버지도에서 길찾기 →
-          </a>
+          {/* 실제 지도 + 네이버 길찾기 + 주소 복사 */}
+          <MapSection address={data.venueAddress} t={t} square />
         </div>
       </Sec>
       {showGallery(data, preview) && (
@@ -866,14 +995,14 @@ function RomanticLayout({
             boxShadow: `0 16px 40px -12px ${t.accent}55`,
           }}
         >
-          <Photo data={data} t={t} className="h-full w-full" />
+          <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
         <h1
           className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
           style={{ fontFamily: t.headingFont }}
         >
           {data.groomName}
-          <span className="mx-2" style={{ color: t.accent }}>
+          <span className="inv-heartbeat mx-2" style={{ color: t.accent }}>
             ♡
           </span>
           {data.brideName}
@@ -901,6 +1030,14 @@ function RomanticLayout({
       <Sec label="INVITATION" t={t} variant="romantic">
         <GreetingInner data={data} t={t} />
       </Sec>
+      {showCouple(data, preview) && (
+        <>
+          <Divider t={t} variant="romantic" />
+          <Sec label="GROOM & BRIDE" t={t} variant="romantic">
+            <CoupleInner data={data} t={t} arch />
+          </Sec>
+        </>
+      )}
       <Divider t={t} variant="romantic" />
       <Sec label="OUR DAY" t={t} variant="romantic">
         <DateInner data={data} t={t} heart />
@@ -988,7 +1125,7 @@ function BotanicalLayout({
                 borderColor: t.accentSoft,
               }}
             >
-              <Photo data={data} t={t} className="h-full w-full" />
+              <Photo data={data} t={t} className="h-full w-full" kenburns />
             </div>
           </div>
           <h1
@@ -1007,6 +1144,14 @@ function BotanicalLayout({
         <Sec label="INVITATION" t={t} variant="botanical">
           <GreetingInner data={data} t={t} />
         </Sec>
+        {showCouple(data, preview) && (
+          <>
+            <Divider t={t} variant="botanical" />
+            <Sec label="GROOM & BRIDE" t={t} variant="botanical">
+              <CoupleInner data={data} t={t} />
+            </Sec>
+          </>
+        )}
         <Divider t={t} variant="botanical" />
         <Sec label="THE DAY" t={t} variant="botanical">
           <DateInner data={data} t={t} />

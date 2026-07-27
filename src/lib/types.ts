@@ -47,6 +47,9 @@ export interface InvitationData {
   fontBody: string; // 서브(본문)
   // 사진
   mainPhotoUrl: string;
+  // 신랑/신부 개별 프로필 사진 (선택)
+  groomPhotoUrl: string;
+  bridePhotoUrl: string;
   gallery: string[];
   // 연락처
   groomPhone: string;
@@ -85,6 +88,8 @@ export const normalizeData = (
   fontHeading: d?.fontHeading ?? "default",
   fontBody: d?.fontBody ?? "default",
   mainPhotoUrl: d?.mainPhotoUrl ?? "",
+  groomPhotoUrl: d?.groomPhotoUrl ?? "",
+  bridePhotoUrl: d?.bridePhotoUrl ?? "",
   gallery: Array.isArray(d?.gallery)
     ? d.gallery.filter((g) => typeof g === "string").slice(0, MAX_GALLERY)
     : [],
@@ -114,6 +119,8 @@ export const emptyInvitation = (): InvitationData => ({
   fontBody: "default",
   // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
   mainPhotoUrl: SAMPLE_MAIN_PHOTO,
+  groomPhotoUrl: "",
+  bridePhotoUrl: "",
   // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
   gallery: ["", "", ""],
   groomPhone: "010-1234-5678",
