@@ -552,6 +552,18 @@ export default function EditorClient({
               className={`${INPUT_CLASS} leading-7`}
             />
           </label>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              맺음말 · 맨 아래 문구 (선택)
+            </span>
+            <textarea
+              value={data.footerMessage}
+              onChange={(e) => set("footerMessage", e.target.value)}
+              rows={2}
+              placeholder="비워두면 두 분의 이름과 날짜가 표시돼요"
+              className={`${INPUT_CLASS} leading-7`}
+            />
+          </label>
         </Group>
 
         <Group title="사진" step={7}>

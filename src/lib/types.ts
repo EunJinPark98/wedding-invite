@@ -75,6 +75,8 @@ export interface InvitationData {
   bridePhone: string;
   // 마음 전하실 곳
   accounts: Account[];
+  // 맨 아래 푸터에 들어갈 맺음말 (비우면 이름·날짜 표시)
+  footerMessage: string;
 }
 
 export interface Invitation {
@@ -120,6 +122,7 @@ export const normalizeData = (
   accounts: Array.isArray(d?.accounts)
     ? d.accounts.filter((a) => a && typeof a === "object")
     : [],
+  footerMessage: d?.footerMessage ?? "",
 });
 
 export const emptyInvitation = (): InvitationData => ({
@@ -152,4 +155,5 @@ export const emptyInvitation = (): InvitationData => ({
     { side: "신랑측", name: "김선일", bank: "국민은행", number: "123-456-7890" },
     { side: "신부측", name: "박은진", bank: "신한은행", number: "987-654-3210" },
   ],
+  footerMessage: "",
 });

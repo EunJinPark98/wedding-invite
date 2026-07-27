@@ -158,19 +158,22 @@ body {
 .inv-motion-focus {
   animation: inv-motion-focus 2.6s ease-out both;
 }
-/* 4. 흑백 → 컬러: 흑백 사진에 색이 물드는 연출 */
+/* 4. 흑백 → 컬러: 흑백으로 잠시 머물다 색이 물드는 연출 */
 @keyframes inv-motion-mono {
-  from {
+  0% {
     filter: grayscale(1);
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
-  to {
+  35% {
+    filter: grayscale(1);
+  }
+  100% {
     filter: grayscale(0);
     transform: scale(1);
   }
 }
 .inv-motion-mono {
-  animation: inv-motion-mono 3.5s ease-in-out both;
+  animation: inv-motion-mono 5s ease-in-out both;
 }
 @media (prefers-reduced-motion: reduce) {
   .inv-kenburns,
@@ -241,6 +244,29 @@ body {
   .inv-shoot,
   .inv-glow {
     animation: none;
+  }
+}
+
+/* 알파벳이 한 글자씩 나타나는 연출 (모던 히어로) */
+@keyframes inv-letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: inv-letter-in 0.5s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-letter {
+    animation: none;
+    opacity: 1;
   }
 }
 
