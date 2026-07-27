@@ -57,7 +57,7 @@ function MiniCalendar({
 
   return (
     <div
-      className="mx-auto max-w-[280px] rounded-2xl px-3 pb-6 pt-7"
+      className="inv-fade mx-auto max-w-[280px] rounded-2xl px-3 pb-6 pt-7"
       style={{ background: t.accentSoft }}
     >
       <div className="mb-5 text-center">
@@ -121,50 +121,6 @@ function MiniCalendar({
 }
 
 /* ════════ 내용 블록 (라벨/래퍼 없이 알맹이만) ════════ */
-function ParentLine({
-  father,
-  mother,
-  relation,
-  role,
-  name,
-  t,
-}: {
-  father: string;
-  mother: string;
-  relation: string;
-  role: string;
-  name: string;
-  t: TemplateTheme;
-}) {
-  const parents = [father, mother].map((p) => p.trim()).filter(Boolean);
-  return (
-    <div className="inv-fade text-center">
-      <span
-        className="block text-[10px] tracking-[0.3em]"
-        style={{ color: t.accent }}
-      >
-        {role}
-      </span>
-      <p className="mt-1.5 text-sm leading-6" style={{ color: t.sub }}>
-        {parents.length > 0 && (
-          <>
-            {parents.join(" · ")}
-            <span className="opacity-70">의</span>
-            <br />
-          </>
-        )}
-        {parents.length > 0 && <span className="mr-1.5">{relation}</span>}
-        <span
-          className="text-[15px] font-medium"
-          style={{ color: t.ink }}
-        >
-          {name}
-        </span>
-      </p>
-    </div>
-  );
-}
-
 function GreetingInner({
   data,
   t,
@@ -188,30 +144,6 @@ function GreetingInner({
       >
         {data.greetingMessage}
       </p>
-      {/* 혼주 소개 */}
-      <div
-        className={`mt-10 space-y-6 border-t pt-8 ${
-          align === "left" ? "" : "mx-auto max-w-[280px]"
-        }`}
-        style={{ borderColor: t.line }}
-      >
-        <ParentLine
-          father={data.groomFather}
-          mother={data.groomMother}
-          relation="아들"
-          role="신랑"
-          name={data.groomName}
-          t={t}
-        />
-        <ParentLine
-          father={data.brideFather}
-          mother={data.brideMother}
-          relation="딸"
-          role="신부"
-          name={data.brideName}
-          t={t}
-        />
-      </div>
     </div>
   );
 }
@@ -245,7 +177,7 @@ function DateInner({
       </p>
       {calendar && <MiniCalendar iso={data.weddingDate} t={t} heart={heart} />}
       {dday !== null && (
-        <div className="mt-7">
+        <div className="inv-fade mt-7">
           <p
             className="font-cormorant inline-block rounded-full border px-5 py-1.5 text-xs font-medium tracking-[0.3em]"
             style={{ borderColor: `${t.accent}66`, color: t.accent }}
@@ -352,24 +284,23 @@ function CoupleInner({
         const parents = [p.father, p.mother].map((s) => s.trim()).filter(Boolean);
         return (
           <div key={p.role} className="text-center">
-            {/* 큰 신랑/신부 타이틀 */}
+            {/* 신랑/신부 타이틀 */}
             <p
-              className="inv-fade mb-4 text-xl tracking-[0.35em]"
+              className="inv-fade mb-4 text-[17px] tracking-[0.3em]"
               style={{ fontFamily: t.headingFont, color: t.ink }}
             >
               {p.role}
             </p>
             <ProfilePhoto src={p.photo} role={p.role} t={t} arch={arch} preview={preview} />
-            {/* 이름 + 전화·문자 */}
-            <div className="inv-fade mt-5 flex items-center justify-center gap-2">
-              <p
-                className="text-lg"
-                style={{ fontFamily: t.headingFont, color: t.ink }}
-              >
-                {p.name}
-              </p>
-              {p.tel && (
-                <>
+            {/* 이름 ↵ 전화·문자 */}
+            <p
+              className="inv-fade mt-5 text-lg"
+              style={{ fontFamily: t.headingFont, color: t.ink }}
+            >
+              {p.name}
+            </p>
+            {p.tel && (
+              <div className="inv-fade mt-2.5 flex items-center justify-center gap-2">
                   <a
                     href={`tel:${p.tel}`}
                     aria-label={`${p.role}에게 전화`}
@@ -390,17 +321,15 @@ function CoupleInner({
                       <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
                     </svg>
                   </a>
-                </>
-              )}
-            </div>
-            {/* 부모 소개: "아버지 · 어머니의 ↵ 아들" */}
+              </div>
+            )}
+            {/* 부모 소개: "아버지 · 어머니 ↵ 아들" */}
             {parents.length > 0 && (
               <p
                 className="inv-fade mt-2.5 text-xs leading-6"
                 style={{ color: t.sub }}
               >
                 {parents.join(" · ")}
-                <span className="opacity-70">의</span>
                 <br />
                 {p.relation}
               </p>
@@ -513,11 +442,11 @@ function GalleryInner({
   }
   return (
     <>
-      <p className="mb-6 text-sm" style={{ color: t.sub }}>
+      <p className="inv-fade mb-6 text-sm" style={{ color: t.sub }}>
         우리의 모든 순간을 담았습니다
       </p>
       <GalleryAlbum images={gallery} rounded={rounded} />
-      <p className="mt-4 text-xs" style={{ color: t.sub }}>
+      <p className="inv-fade mt-4 text-xs" style={{ color: t.sub }}>
         사진을 누르면 크게 볼 수 있어요
       </p>
     </>
@@ -555,14 +484,14 @@ function Label({
 }) {
   if (variant === "modern") {
     return (
-      <div className="mb-6 flex items-baseline gap-3">
+      <div className="inv-fade mb-7 flex items-baseline gap-3">
         {index && (
-          <span className="font-cormorant text-sm" style={{ color: t.accent }}>
+          <span className="font-cormorant text-base" style={{ color: t.accent }}>
             {index}
           </span>
         )}
         <span
-          className="font-cormorant text-xs font-semibold tracking-[0.3em]"
+          className="font-cormorant text-[15px] font-semibold tracking-[0.3em]"
           style={{ color: t.ink }}
         >
           {text}
@@ -571,11 +500,11 @@ function Label({
       </div>
     );
   }
-  // 절제된 스몰캡 라벨 — 장식 없이 자간과 컬러로만 구분
+  // 큼직한 스몰캡 라벨 — 장식 없이 자간과 컬러로만 구분
   return (
-    <div className="mb-9 text-center">
+    <div className="inv-fade mb-9 text-center">
       <span
-        className="font-cormorant text-[10px] font-medium tracking-[0.5em]"
+        className="font-cormorant text-[16px] font-medium tracking-[0.45em]"
         style={{ color: t.accent }}
       >
         {text}
@@ -793,39 +722,26 @@ function ModernLayout({
   const p = dateParts(data.weddingDate);
   return (
     <>
-      <header className="px-8 pb-4 pt-16">
-        <div
-          className="inv-hero-in mb-5 h-px w-10"
-          style={{ background: t.ink }}
-        />
-        <p
-          className="inv-hero-in font-cormorant text-xs font-semibold tracking-[0.4em]"
-          style={{ color: t.sub }}
-        >
-          THE WEDDING DAY
-        </p>
-        {p && (
-          <p
-            className="inv-hero-in mt-3 font-cormorant text-[3.4rem] leading-none tracking-tight"
-            style={{ color: t.ink }}
-          >
-            {p.year}.{String(p.month).padStart(2, "0")}.
-            {String(p.day).padStart(2, "0")}
+      {/* 풀커버 히어로 — 사진 위에 타이포 오버레이 */}
+      <div className="relative overflow-hidden">
+        <Photo data={data} t={t} className="h-[620px] w-full" kenburns />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-black/5 to-black/50" />
+        <div className="absolute inset-x-0 top-0 px-8 pt-14 text-left text-white">
+          <div className="inv-hero-in mb-5 h-px w-10 bg-white/70" />
+          <p className="inv-hero-in font-cormorant text-base font-semibold tracking-[0.45em]">
+            THE WEDDING DAY
           </p>
-        )}
-        <p className="inv-hero-in-delay mt-3 text-sm" style={{ color: t.sub }}>
-          {p ? `${p.wkEn} · ${data.weddingTime}` : data.weddingTime}
-        </p>
-      </header>
-      {/* 여백 없는 풀블리드 사진 */}
-      <div className="overflow-hidden">
-        <Photo data={data} t={t} className="aspect-[4/5] w-full" kenburns />
-      </div>
-      <div className="px-8 pb-2 pt-10 text-center">
-        <p
-          className="font-cormorant text-[26px] italic leading-snug tracking-[0.02em]"
-          style={{ color: t.ink }}
-        >
+          {p && (
+            <p className="inv-hero-in mt-3.5 font-cormorant text-[3.2rem] leading-none tracking-tight">
+              {p.year}.{String(p.month).padStart(2, "0")}.
+              {String(p.day).padStart(2, "0")}
+            </p>
+          )}
+          <p className="inv-hero-in-delay mt-3 text-sm text-white/85">
+            {p ? `${p.wkEn} · ${data.weddingTime}` : data.weddingTime}
+          </p>
+        </div>
+        <p className="absolute inset-x-0 bottom-12 text-center font-cormorant text-[30px] font-light italic tracking-[0.03em] text-white">
           <LetterReveal text="We're getting married" />
         </p>
       </div>
@@ -1247,43 +1163,27 @@ function CinemaLayout({
   const p = dateParts(data.weddingDate);
   return (
     <>
-      {/* 필름 화보 히어로 — 좌우 이름 + 풀블리드 사진 + 세로 캡션 */}
+      {/* 필름 화보 히어로 — 좌우 이름 + 화보 사진 + 필카 감성 날짜 스탬프 */}
       <div className="px-6 pt-11">
-        <div className="flex items-start justify-between">
-          <div className="inv-hero-in text-left">
-            <p
-              className="text-[22px] leading-tight"
-              style={{ fontFamily: t.headingFont, color: t.ink }}
-            >
-              {data.groomName}
-            </p>
-            <p
-              className="font-cormorant mt-1.5 text-[9px] tracking-[0.35em]"
-              style={{ color: t.sub }}
-            >
-              GROOM
-            </p>
-          </div>
+        <div className="flex items-center justify-between">
+          <p
+            className="inv-hero-in text-[22px] leading-tight"
+            style={{ fontFamily: t.headingFont, color: t.ink }}
+          >
+            {data.groomName}
+          </p>
           <span
-            className="font-cormorant pt-1.5 text-base italic"
+            className="font-cormorant text-base italic"
             style={{ color: t.accent }}
           >
             and
           </span>
-          <div className="inv-hero-in text-right">
-            <p
-              className="text-[22px] leading-tight"
-              style={{ fontFamily: t.headingFont, color: t.ink }}
-            >
-              {data.brideName}
-            </p>
-            <p
-              className="font-cormorant mt-1.5 text-[9px] tracking-[0.35em]"
-              style={{ color: t.sub }}
-            >
-              BRIDE
-            </p>
-          </div>
+          <p
+            className="inv-hero-in text-[22px] leading-tight"
+            style={{ fontFamily: t.headingFont, color: t.ink }}
+          >
+            {data.brideName}
+          </p>
         </div>
       </div>
       <div className="relative mt-8 overflow-hidden">
@@ -1291,33 +1191,42 @@ function CinemaLayout({
         {/* 세로쓰기 캡션 — 화보 무드 */}
         {data.venueName && (
           <p
-            className="absolute left-3.5 top-5 text-[10px] tracking-[0.25em] text-white/90"
-            style={{
-              writingMode: "vertical-rl",
-              textShadow: "0 1px 8px rgba(0,0,0,0.45)",
-            }}
+            className="absolute left-3.5 top-5 text-[12px] tracking-[0.25em]"
+            style={{ writingMode: "vertical-rl", color: "#22201d" }}
           >
             {data.venueName} {data.venueHall}
           </p>
         )}
         {p && (
           <p
-            className="font-cormorant absolute bottom-5 right-3.5 text-[10px] tracking-[0.3em] text-white/90"
-            style={{
-              writingMode: "vertical-rl",
-              textShadow: "0 1px 8px rgba(0,0,0,0.45)",
-            }}
+            className="font-cormorant absolute right-3.5 top-5 text-[12px] tracking-[0.3em]"
+            style={{ writingMode: "vertical-rl", color: "#22201d" }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")} {data.weddingTime}
           </p>
         )}
+        {/* 필름 카메라 날짜 스탬프 */}
+        {p && (
+          <span
+            aria-hidden
+            className="absolute bottom-4 right-4 text-[13px] tracking-[0.18em]"
+            style={{
+              fontFamily: "monospace",
+              color: "#ffb03a",
+              textShadow: "0 0 8px rgba(255,150,40,0.8)",
+            }}
+          >
+            &apos;{String(p.year).slice(2)} {String(p.month).padStart(2, "0")}{" "}
+            {String(p.day).padStart(2, "0")}
+          </span>
+        )}
       </div>
       <p
-        className="inv-credit pt-9 text-center font-cormorant text-[10px] tracking-[0.45em]"
+        className="pt-10 text-center font-cormorant text-[19px] tracking-[0.3em]"
         style={{ color: t.accent }}
       >
-        OUR MOMENT, FOREVER
+        <LetterReveal text="OUR MOMENT, FOREVER" />
       </p>
       <Sec label="INVITATION" t={t} variant="cinema">
         <GreetingInner data={data} t={t} />
@@ -1369,18 +1278,22 @@ function Footer({
   fp: ReturnType<typeof dateParts>;
   template: TemplateId;
 }) {
-  // 별빛 템플릿은 히어로의 금빛 글씨 색으로 푸터를 마감
+  // 별빛 템플릿은 본문과 같은 네이비로 이어지고, 글씨는 금빛으로
   const isStar = template === "starlight";
-  const bg = isStar ? t.accent : t.ink;
-  const mainColor = isStar ? "#171b34" : t.pageBg;
-  const subColor = isStar ? "rgba(23,27,52,0.55)" : "rgba(255,255,255,0.55)";
-  const lineColor = isStar ? "rgba(23,27,52,0.25)" : "rgba(255,255,255,0.2)";
+  const bg = isStar ? t.pageBg : t.ink;
+  const mainColor = isStar ? t.accent : t.pageBg;
+  const subColor = isStar ? "rgba(217,191,112,0.6)" : "rgba(255,255,255,0.55)";
+  const lineColor = isStar ? "rgba(217,191,112,0.3)" : "rgba(255,255,255,0.2)";
   const message = data.footerMessage.trim();
 
   return (
     <footer
       className="mt-10 px-8 pb-14 pt-16 text-center"
-      style={{ background: bg }}
+      style={
+        isStar
+          ? { background: bg, borderTop: "1px solid rgba(217,191,112,0.25)" }
+          : { background: bg }
+      }
     >
       <p
         className="font-cormorant mb-6 flex items-center justify-center gap-3 text-[10px] tracking-[0.5em]"

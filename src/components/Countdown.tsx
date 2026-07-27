@@ -52,7 +52,7 @@ export default function Countdown({
   ];
 
   return (
-    <div className="mt-8">
+    <div className="inv-fade mt-8">
       <div className="mx-auto flex max-w-[280px] items-start justify-center">
         {cells.map((c, i) => (
           <div key={c.label} className="flex items-start">
