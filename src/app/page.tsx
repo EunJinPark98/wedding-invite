@@ -188,7 +188,32 @@ export default function Home() {
         <p className="mt-1.5 text-xs text-gray-400">
           결혼 · 육아 · 가족을 위한 웹서비스
         </p>
-        <p className="mt-4 text-[11px] text-gray-300">
+
+        {/* 문의하기 */}
+        <div className="mt-6 flex items-center justify-center gap-3">
+          <a
+            href="https://instagram.com/byeolmamapapa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-full border border-gold-200 px-4 py-2 text-xs font-medium text-gold-600 transition hover:bg-gold-50"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4c0 3.2-2.6 5.8-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2m-.3 2C5.5 4 4 5.5 4 7.5v9c0 2 1.5 3.5 3.5 3.5h9c2 0 3.5-1.5 3.5-3.5v-9c0-2-1.5-3.5-3.5-3.5h-9m11.1 1.5c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1m-5.8 1.5c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6 2.7-6 6-6m0 2c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z" />
+            </svg>
+            Instagram
+          </a>
+          <a
+            href="mailto:obliviscor29@naver.com"
+            className="flex items-center gap-1.5 rounded-full border border-gold-200 px-4 py-2 text-xs font-medium text-gold-600 transition hover:bg-gold-50"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+            </svg>
+            문의하기
+          </a>
+        </div>
+
+        <p className="mt-5 text-[11px] text-gray-300">
           © 2026 별마마파파. All rights reserved.
         </p>
       </footer>
