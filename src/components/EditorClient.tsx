@@ -11,6 +11,7 @@ import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
   normalizeData,
+  HERO_MOTIONS,
   MAX_GALLERY,
   PERIOD_OPTIONS,
   SAMPLE_MAIN_PHOTO,
@@ -580,6 +581,36 @@ export default function EditorClient({
                 미리보기에 보이는 사진은 예시예요. 두 분의 사진을 올려 주세요.
               </p>
             )}
+          </div>
+          {/* 대표 사진 모션 선택 */}
+          <div>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              대표 사진 모션
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              {HERO_MOTIONS.map((m) => {
+                const selected = data.heroMotion === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => set("heroMotion", m.id)}
+                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                      selected
+                        ? "border-gold-400 bg-gold-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="block text-sm font-medium text-gray-800">
+                      {m.label}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] text-gray-400">
+                      {m.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">

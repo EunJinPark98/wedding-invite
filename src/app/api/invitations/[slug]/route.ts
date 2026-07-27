@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { deleteInvitation, updateInvitation } from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
-import { MAX_GALLERY, SAMPLE_MAIN_PHOTO } from "@/lib/types";
+import { MAX_GALLERY, SAMPLE_MAIN_PHOTO, TEMPLATE_IDS } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
-const TEMPLATES: TemplateId[] = ["classic", "modern", "romantic", "botanical"];
+const TEMPLATES: readonly TemplateId[] = TEMPLATE_IDS;
 
 // 로그인 확인 (로컬 개발 모드는 통과) — 실패 시 에러 응답 반환
 async function requireUser(): Promise<

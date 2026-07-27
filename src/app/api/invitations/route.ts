@@ -2,13 +2,18 @@ import { NextResponse } from "next/server";
 import { customAlphabet } from "nanoid";
 import { saveInvitation, countInvitationsByUser } from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
-import { MAX_GALLERY, PERIOD_OPTIONS, SAMPLE_MAIN_PHOTO } from "@/lib/types";
+import {
+  MAX_GALLERY,
+  PERIOD_OPTIONS,
+  SAMPLE_MAIN_PHOTO,
+  TEMPLATE_IDS,
+} from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
 // 공유 링크에 쓰기 좋은 짧은 slug (헷갈리는 문자 제외)
 const nano = customAlphabet("23456789abcdefghijkmnpqrstuvwxyz", 8);
 
-const TEMPLATES: TemplateId[] = ["classic", "modern", "romantic", "botanical"];
+const TEMPLATES: readonly TemplateId[] = TEMPLATE_IDS;
 
 export async function POST(req: Request) {
   let body: { template?: string; data?: InvitationData; periodMonths?: number };

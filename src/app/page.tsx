@@ -93,7 +93,7 @@ export default function Home() {
           className="mt-3 text-center text-[2rem] text-ink"
           style={{ fontFamily: "var(--font-song)" }}
         >
-          4가지 디자인 템플릿
+          6가지 디자인 템플릿
         </h2>
         <p className="mt-3 text-center text-sm text-gray-500">
           실제 청첩장 모습 그대로 미리 보고 선택하세요.

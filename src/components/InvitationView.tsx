@@ -336,10 +336,10 @@ function CoupleInner({
           <div key={p.role} className="text-center">
             <ProfilePhoto src={p.photo} role={p.role} t={t} arch={arch} />
             <p
-              className="font-cormorant mt-4 text-[10px] tracking-[0.3em]"
+              className="mt-4 text-[11px] font-medium tracking-[0.3em]"
               style={{ color: t.accent }}
             >
-              {p.role === "신랑" ? "GROOM" : "BRIDE"}
+              {p.role}
             </p>
             <p
               className="mt-1 text-lg"
@@ -600,7 +600,15 @@ function Label({
     );
   }
   const ornament =
-    variant === "romantic" ? "♡" : variant === "botanical" ? "❧" : "";
+    variant === "romantic"
+      ? "♡"
+      : variant === "botanical"
+        ? "❧"
+        : variant === "starlight"
+          ? "✦"
+          : variant === "cinema"
+            ? "❋"
+            : "";
   return (
     <div className="mb-7 flex items-center justify-center gap-2.5">
       <span className="h-px w-7" style={{ background: t.line }} />
@@ -642,6 +650,22 @@ function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
     return (
       <div className="flex justify-center py-1.5" style={{ color: t.accent }}>
         <span className="text-sm">❦</span>
+      </div>
+    );
+  if (variant === "starlight")
+    return (
+      <div className="flex items-center justify-center gap-3 py-1">
+        <span className="h-px w-10" style={{ background: t.line }} />
+        <span className="inv-twinkle relative text-xs" style={{ color: t.accent, position: "static" }}>
+          ✦
+        </span>
+        <span className="h-px w-10" style={{ background: t.line }} />
+      </div>
+    );
+  if (variant === "cinema")
+    return (
+      <div className="flex justify-center py-2">
+        <span className="inv-film h-[18px] w-28 rounded-[3px]" />
       </div>
     );
   // classic
@@ -703,6 +727,14 @@ function NamesAmp({
   );
 }
 
+// 대표 사진 모션 id → CSS 클래스 (부모에 overflow-hidden 필요)
+const MOTION_CLASS: Record<string, string> = {
+  zoomin: "inv-kenburns",
+  zoomout: "inv-motion-zoomout",
+  focus: "inv-motion-focus",
+  mono: "inv-motion-mono",
+};
+
 function Photo({
   data,
   t,
@@ -712,16 +744,19 @@ function Photo({
   data: InvitationData;
   t: TemplateTheme;
   className: string;
-  // true면 은은하게 확대되는 시네마틱 연출 (부모에 overflow-hidden 필요)
+  // true면 선택된 대표 사진 모션 적용 (부모에 overflow-hidden 필요)
   kenburns?: boolean;
 }) {
+  const motion = kenburns
+    ? (MOTION_CLASS[data.heroMotion] ?? MOTION_CLASS.zoomin)
+    : "";
   if (data.mainPhotoUrl)
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={data.mainPhotoUrl}
         alt="대표 사진"
-        className={`object-cover ${kenburns ? "inv-kenburns" : ""} ${className}`}
+        className={`object-cover ${motion} ${className}`}
       />
     );
   return (
@@ -781,7 +816,7 @@ function ClassicLayout({
       {showCouple(data, preview) && (
         <>
           <Divider t={t} variant="classic" />
-          <Sec label="GROOM & BRIDE" t={t} variant="classic">
+          <Sec label="신랑 신부" t={t} variant="classic">
             <CoupleInner data={data} t={t} />
           </Sec>
         </>
@@ -884,7 +919,7 @@ function ModernLayout({
       {showCouple(data, preview) && (
         <>
           <Divider t={t} variant="modern" />
-          <Sec label="GROOM & BRIDE" t={t} variant="modern">
+          <Sec label="신랑 신부" t={t} variant="modern">
             <CoupleInner data={data} t={t} />
           </Sec>
         </>
@@ -1033,7 +1068,7 @@ function RomanticLayout({
       {showCouple(data, preview) && (
         <>
           <Divider t={t} variant="romantic" />
-          <Sec label="GROOM & BRIDE" t={t} variant="romantic">
+          <Sec label="신랑 신부" t={t} variant="romantic">
             <CoupleInner data={data} t={t} arch />
           </Sec>
         </>
@@ -1147,7 +1182,7 @@ function BotanicalLayout({
         {showCouple(data, preview) && (
           <>
             <Divider t={t} variant="botanical" />
-            <Sec label="GROOM & BRIDE" t={t} variant="botanical">
+            <Sec label="신랑 신부" t={t} variant="botanical">
               <CoupleInner data={data} t={t} />
             </Sec>
           </>
@@ -1185,6 +1220,252 @@ function BotanicalLayout({
         )}
       </div>
     </div>
+  );
+}
+
+// 5) 별빛 — 밤하늘·반짝이는 별·금빛 글로우 (다크 테마)
+function StarlightLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  // 별 위치 (고정 배열 — 렌더마다 동일)
+  const stars = [
+    { left: "6%", top: "8%", size: 3, delay: 0 },
+    { left: "16%", top: "22%", size: 2, delay: 0.9 },
+    { left: "26%", top: "5%", size: 2.5, delay: 1.7 },
+    { left: "38%", top: "15%", size: 2, delay: 0.4 },
+    { left: "52%", top: "7%", size: 3, delay: 2.2 },
+    { left: "64%", top: "19%", size: 2, delay: 1.2 },
+    { left: "76%", top: "9%", size: 2.5, delay: 0.6 },
+    { left: "88%", top: "17%", size: 3, delay: 1.9 },
+    { left: "10%", top: "42%", size: 2, delay: 2.6 },
+    { left: "90%", top: "38%", size: 2, delay: 0.2 },
+    { left: "5%", top: "68%", size: 2.5, delay: 1.4 },
+    { left: "93%", top: "62%", size: 2.5, delay: 2.1 },
+    { left: "20%", top: "85%", size: 2, delay: 0.8 },
+    { left: "80%", top: "88%", size: 2, delay: 1.6 },
+    { left: "45%", top: "93%", size: 2.5, delay: 2.4 },
+  ];
+  return (
+    <>
+      <div className="relative overflow-hidden px-8 pb-16 pt-16 text-center">
+        {/* 밤하늘: 반짝이는 별 + 별똥별 */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {stars.map((s, i) => (
+            <span
+              key={i}
+              className="inv-twinkle"
+              style={{
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                background: "#ffe9a8",
+                boxShadow: "0 0 6px 1px rgba(255,233,168,0.7)",
+                animationDelay: `${s.delay}s`,
+              }}
+            />
+          ))}
+          <span className="inv-shoot" style={{ right: "-10%", top: "12%" }} />
+          <span
+            className="inv-shoot"
+            style={{ right: "-4%", top: "40%", animationDelay: "4.5s" }}
+          />
+        </div>
+        <p
+          className="inv-hero-in text-2xl"
+          style={{ fontFamily: "var(--font-brush)", color: t.accent }}
+        >
+          별빛 아래, 우리
+        </p>
+        <p
+          className="inv-hero-in font-cormorant mt-2 text-[10px] tracking-[0.5em]"
+          style={{ color: t.sub }}
+        >
+          WEDDING INVITATION
+        </p>
+        {/* 금빛 링 + 글로우 사진 */}
+        <div
+          className="inv-hero-in inv-glow relative mx-auto mt-8 w-fit rounded-full p-2"
+          style={{ border: `1px solid ${t.accent}66` }}
+        >
+          <div
+            className="overflow-hidden rounded-full"
+            style={{ width: "212px", height: "212px" }}
+          >
+            <Photo data={data} t={t} className="h-full w-full" kenburns />
+          </div>
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-8 text-2xl tracking-wide"
+          style={{ fontFamily: t.headingFont, color: t.ink }}
+        >
+          <NamesAmp data={data} t={t} />
+        </h1>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
+            style={{ color: t.sub }}
+          >
+            {p.year}. {String(p.month).padStart(2, "0")}.{" "}
+            {String(p.day).padStart(2, "0")}. {p.wkEn}
+          </p>
+        )}
+      </div>
+      <Sec label="INVITATION" t={t} variant="starlight">
+        <GreetingInner data={data} t={t} />
+      </Sec>
+      {showCouple(data, preview) && (
+        <>
+          <Divider t={t} variant="starlight" />
+          <Sec label="신랑 신부" t={t} variant="starlight">
+            <CoupleInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
+      <Divider t={t} variant="starlight" />
+      <Sec label="THE DAY" t={t} variant="starlight">
+        <DateInner data={data} t={t} />
+      </Sec>
+      <Divider t={t} variant="starlight" />
+      <Sec label="LOCATION" t={t} variant="starlight">
+        <LocationInner data={data} t={t} />
+      </Sec>
+      {showGallery(data, preview) && (
+        <>
+          <Divider t={t} variant="starlight" />
+          <Sec label="GALLERY" t={t} variant="starlight">
+            <GalleryInner data={data} t={t} rounded="rounded-2xl" preview={preview} />
+          </Sec>
+        </>
+      )}
+      <Divider t={t} variant="starlight" />
+      <Sec label="CONTACT" t={t} variant="starlight">
+        <ContactInner data={data} t={t} />
+      </Sec>
+      {data.accounts.filter((a) => a.number).length > 0 && (
+        <>
+          <Divider t={t} variant="starlight" />
+          <Sec label="ACCOUNT" t={t} variant="starlight">
+            <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
+              마음 전하실 곳
+            </h3>
+            <AccountInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
+    </>
+  );
+}
+
+// 6) 필름 — 폴라로이드·필름 스트립·레트로 무드
+function CinemaLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  return (
+    <>
+      <div className="relative overflow-hidden pb-14 text-center">
+        {/* 상단 필름 스트립 */}
+        <div className="inv-film h-7 w-full" />
+        <p
+          className="inv-hero-in font-cormorant mt-10 text-[10px] tracking-[0.5em]"
+          style={{ color: t.sub }}
+        >
+          OUR WEDDING FILM
+        </p>
+        {/* 폴라로이드 사진 (살랑살랑) */}
+        <div
+          className="inv-sway inv-hero-in relative mx-auto mt-7 w-fit bg-white p-3 pb-14"
+          style={{ boxShadow: "0 20px 44px -16px rgba(61,54,48,0.5)" }}
+        >
+          {/* 마스킹 테이프 */}
+          <span
+            aria-hidden
+            className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rotate-[-4deg]"
+            style={{ background: `${t.accent}40`, backdropFilter: "blur(1px)" }}
+          />
+          <div className="overflow-hidden" style={{ width: "232px" }}>
+            <Photo data={data} t={t} className="aspect-[4/5] w-full" kenburns />
+          </div>
+          <p
+            className="absolute inset-x-0 bottom-3.5 text-xl"
+            style={{ fontFamily: "var(--font-brush)", color: t.ink }}
+          >
+            우리, 결혼합니다
+          </p>
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-8 text-2xl tracking-wide"
+          style={{ fontFamily: t.headingFont }}
+        >
+          <NamesAmp data={data} t={t} />
+        </h1>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            style={{ color: t.sub }}
+          >
+            {p.year}. {String(p.month).padStart(2, "0")}.{" "}
+            {String(p.day).padStart(2, "0")}. {p.wkEn}
+          </p>
+        )}
+      </div>
+      <Sec label="INVITATION" t={t} variant="cinema">
+        <GreetingInner data={data} t={t} />
+      </Sec>
+      {showCouple(data, preview) && (
+        <>
+          <Divider t={t} variant="cinema" />
+          <Sec label="신랑 신부" t={t} variant="cinema">
+            <CoupleInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
+      <Divider t={t} variant="cinema" />
+      <Sec label="THE DAY" t={t} variant="cinema">
+        <DateInner data={data} t={t} />
+      </Sec>
+      <Divider t={t} variant="cinema" />
+      <Sec label="LOCATION" t={t} variant="cinema">
+        <LocationInner data={data} t={t} />
+      </Sec>
+      {showGallery(data, preview) && (
+        <>
+          <Divider t={t} variant="cinema" />
+          <Sec label="GALLERY" t={t} variant="cinema">
+            <GalleryInner data={data} t={t} rounded="rounded-sm" preview={preview} />
+          </Sec>
+        </>
+      )}
+      <Divider t={t} variant="cinema" />
+      <Sec label="CONTACT" t={t} variant="cinema">
+        <ContactInner data={data} t={t} />
+      </Sec>
+      {data.accounts.filter((a) => a.number).length > 0 && (
+        <>
+          <Divider t={t} variant="cinema" />
+          <Sec label="ACCOUNT" t={t} variant="cinema">
+            <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
+              마음 전하실 곳
+            </h3>
+            <AccountInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
+    </>
   );
 }
 
@@ -1266,6 +1547,8 @@ export default function InvitationView({
       {template === "modern" && <ModernLayout data={data} t={t} preview={preview} />}
       {template === "romantic" && <RomanticLayout data={data} t={t} preview={preview} />}
       {template === "botanical" && <BotanicalLayout data={data} t={t} preview={preview} />}
+      {template === "starlight" && <StarlightLayout data={data} t={t} preview={preview} />}
+      {template === "cinema" && <CinemaLayout data={data} t={t} preview={preview} />}
 
       <Footer data={data} t={t} fp={fp} />
     </div>

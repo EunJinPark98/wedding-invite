@@ -117,7 +117,8 @@ body {
   }
 }
 
-/* 대표 사진 켄번즈 줌 (은은하게 확대되는 시네마틱 연출) */
+/* ── 대표 사진 모션 4종 (업체 청첩장에서 널리 쓰는 연출) ── */
+/* 1. 줌 인: 은은하게 확대되는 시네마틱 연출 */
 @keyframes inv-kenburns {
   from {
     transform: scale(1);
@@ -130,8 +131,152 @@ body {
   animation: inv-kenburns 16s ease-in-out infinite alternate;
   will-change: transform;
 }
+/* 2. 줌 아웃: 크게 시작해 천천히 물러나는 연출 */
+@keyframes inv-motion-zoomout {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.inv-motion-zoomout {
+  animation: inv-motion-zoomout 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+/* 3. 아웃포커스: 흐릿한 화면이 서서히 선명해지는 연출 */
+@keyframes inv-motion-focus {
+  from {
+    filter: blur(12px);
+    transform: scale(1.06);
+  }
+  to {
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+.inv-motion-focus {
+  animation: inv-motion-focus 2.6s ease-out both;
+}
+/* 4. 흑백 → 컬러: 흑백 사진에 색이 물드는 연출 */
+@keyframes inv-motion-mono {
+  from {
+    filter: grayscale(1);
+    transform: scale(1.03);
+  }
+  to {
+    filter: grayscale(0);
+    transform: scale(1);
+  }
+}
+.inv-motion-mono {
+  animation: inv-motion-mono 3.5s ease-in-out both;
+}
 @media (prefers-reduced-motion: reduce) {
-  .inv-kenburns {
+  .inv-kenburns,
+  .inv-motion-zoomout,
+  .inv-motion-focus,
+  .inv-motion-mono {
+    animation: none;
+  }
+}
+
+/* ── 별빛 템플릿: 밤하늘 연출 ── */
+/* 별 반짝임 */
+@keyframes inv-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+.inv-twinkle {
+  position: absolute;
+  border-radius: 9999px;
+  animation: inv-twinkle 2.8s ease-in-out infinite;
+}
+/* 별똥별 */
+@keyframes inv-shoot {
+  0% {
+    transform: translate(120px, -40px) rotate(-35deg);
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.9;
+  }
+  18% {
+    transform: translate(-160px, 140px) rotate(-35deg);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.inv-shoot {
+  position: absolute;
+  width: 90px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffe9a8);
+  animation: inv-shoot 9s ease-in infinite;
+}
+/* 금빛 글로우 (사진 링) */
+@keyframes inv-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 22px 2px rgba(217, 191, 112, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 46px 10px rgba(217, 191, 112, 0.55);
+  }
+}
+.inv-glow {
+  animation: inv-glow 3.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-twinkle,
+  .inv-shoot,
+  .inv-glow {
+    animation: none;
+  }
+}
+
+/* ── 필름 템플릿: 폴라로이드·필름 연출 ── */
+/* 폴라로이드가 살랑살랑 흔들리는 연출 */
+@keyframes inv-sway {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(-0.5deg);
+  }
+}
+.inv-sway {
+  animation: inv-sway 5.5s ease-in-out infinite;
+  transform-origin: top center;
+}
+/* 필름 스트립이 옆으로 흐르는 연출 */
+.inv-film {
+  background-color: #241f1a;
+  background-image: radial-gradient(circle, #f6efe3 2.2px, transparent 2.9px),
+    radial-gradient(circle, #f6efe3 2.2px, transparent 2.9px);
+  background-size: 16px 8px, 16px 8px;
+  background-position: 0 3px, 0 calc(100% - 11px);
+  background-repeat: repeat-x, repeat-x;
+  animation: inv-filmroll 8s linear infinite;
+}
+@keyframes inv-filmroll {
+  to {
+    background-position: 160px 3px, 160px calc(100% - 11px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-sway,
+  .inv-film {
     animation: none;
   }
 }

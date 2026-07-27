@@ -1,6 +1,23 @@
 // 모바일 청첩장 데이터 모델
 
-export type TemplateId = "classic" | "modern" | "romantic" | "botanical";
+export const TEMPLATE_IDS = [
+  "classic",
+  "modern",
+  "romantic",
+  "botanical",
+  "starlight",
+  "cinema",
+] as const;
+export type TemplateId = (typeof TEMPLATE_IDS)[number];
+
+// 대표 사진 모션 (청첩장 업체에서 많이 쓰는 연출 4종)
+export const HERO_MOTIONS = [
+  { id: "zoomin", label: "줌 인", desc: "천천히 확대" },
+  { id: "zoomout", label: "줌 아웃", desc: "천천히 축소" },
+  { id: "focus", label: "아웃포커스", desc: "흐림 → 선명" },
+  { id: "mono", label: "흑백 → 컬러", desc: "흑백에서 물들듯" },
+] as const;
+export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 
 // 갤러리 사진 최대 장수 — 페이지 로딩 속도를 위한 기술적 한도 (요금제 아님)
 export const MAX_GALLERY = 20;
@@ -47,6 +64,8 @@ export interface InvitationData {
   fontBody: string; // 서브(본문)
   // 사진
   mainPhotoUrl: string;
+  // 대표 사진 모션 (HeroMotion id)
+  heroMotion: string;
   // 신랑/신부 개별 프로필 사진 (선택)
   groomPhotoUrl: string;
   bridePhotoUrl: string;
@@ -88,6 +107,9 @@ export const normalizeData = (
   fontHeading: d?.fontHeading ?? "default",
   fontBody: d?.fontBody ?? "default",
   mainPhotoUrl: d?.mainPhotoUrl ?? "",
+  heroMotion: HERO_MOTIONS.some((m) => m.id === d?.heroMotion)
+    ? (d!.heroMotion as HeroMotion)
+    : "zoomin",
   groomPhotoUrl: d?.groomPhotoUrl ?? "",
   bridePhotoUrl: d?.bridePhotoUrl ?? "",
   gallery: Array.isArray(d?.gallery)
@@ -119,6 +141,7 @@ export const emptyInvitation = (): InvitationData => ({
   fontBody: "default",
   // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
   mainPhotoUrl: SAMPLE_MAIN_PHOTO,
+  heroMotion: "zoomin",
   groomPhotoUrl: "",
   bridePhotoUrl: "",
   // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
