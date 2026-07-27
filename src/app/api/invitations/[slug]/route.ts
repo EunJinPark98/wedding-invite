@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { deleteInvitation, updateInvitation } from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
-import { MAX_GALLERY, SAMPLE_MAIN_PHOTO, TEMPLATE_IDS } from "@/lib/types";
+import { MAX_GALLERY, isSamplePhoto, TEMPLATE_IDS } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
 const TEMPLATES: readonly TemplateId[] = TEMPLATE_IDS;
@@ -53,7 +53,7 @@ export async function PATCH(
       { status: 400 }
     );
   }
-  if (!data.mainPhotoUrl?.trim() || data.mainPhotoUrl === SAMPLE_MAIN_PHOTO) {
+  if (!data.mainPhotoUrl?.trim() || isSamplePhoto(data.mainPhotoUrl)) {
     return NextResponse.json(
       { error: "대표 사진을 등록해 주세요. 미리보기의 사진은 예시용이에요." },
       { status: 400 }

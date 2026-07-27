@@ -16,16 +16,39 @@ export const TEMPLATE_IDS = [
   "dolbear",
   "dolcloud",
   "dolhanbok",
+  "dolstar",
+  "dolgarden",
+  "dolcrayon",
   // 칠순 · 팔순 전용
   "seniorgold",
   "seniorbloom",
   "seniorpine",
+  "seniorstar",
+  "seniorink",
+  "seniorwarm",
   // 생일 전용
   "bdaypop",
   "bdayneon",
   "bdayminimal",
+  "bdaystar",
+  "bdaycake",
+  "bdaybloom",
 ] as const;
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
+
+// 칠순·팔순 등 수연(壽宴) 연세 선택지
+export const SENIOR_AGES = [
+  { age: 70, label: "칠순", hanja: "七旬" },
+  { age: 80, label: "팔순", hanja: "八旬" },
+  { age: 90, label: "구순", hanja: "九旬" },
+  { age: 100, label: "백수", hanja: "百壽" },
+] as const;
+export type SeniorAge = (typeof SENIOR_AGES)[number]["age"];
+export const getSeniorAgeMeta = (age: number) =>
+  SENIOR_AGES.find((s) => s.age === age) ?? SENIOR_AGES[0];
+// 연세를 바꾸면 따라 바뀌는 기본 인사말 제목 (사용자가 직접 고친 경우엔 유지)
+export const seniorGreetingTitle = (age: number) =>
+  `${getSeniorAgeMeta(age).label} 잔치에 초대합니다`;
 
 // 대표 사진 모션 (청첩장 업체에서 많이 쓰는 연출 4종)
 export const HERO_MOTIONS = [
@@ -39,8 +62,16 @@ export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 // 갤러리 사진 최대 장수 — 페이지 로딩 속도를 위한 기술적 한도 (요금제 아님)
 export const MAX_GALLERY = 20;
 
-// 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 청첩장 제작에는 사용 불가
+// 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 초대장 제작에는 사용 불가
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
+export const SAMPLE_BABY_PHOTO = "/baby.jpg";
+// 예시 사진 전체 — 제작 시 본인 사진으로 교체했는지 검사할 때 사용
+export const SAMPLE_PHOTOS: readonly string[] = [
+  SAMPLE_MAIN_PHOTO,
+  SAMPLE_BABY_PHOTO,
+];
+export const isSamplePhoto = (url: string | undefined | null) =>
+  !!url && SAMPLE_PHOTOS.includes(url);
 
 // 청첩장 운영(공개) 기간 선택지 — 모두 무료
 export const PERIOD_OPTIONS = [
@@ -61,6 +92,8 @@ export interface Account {
 export interface InvitationData {
   // 초대장 종류 (기본 "wedding")
   category: Category;
+  // 수연 연세 (senior 카테고리 전용 — 70=칠순, 80=팔순, 90=구순, 100=백수)
+  seniorAge: number;
   // 신랑/신부 (다른 카테고리에서는 주인공/아기/생일 주인공으로 재사용)
   groomName: string;
   brideName: string;
@@ -115,6 +148,9 @@ export const normalizeData = (
   category: CATEGORY_IDS.includes(d?.category as Category)
     ? (d!.category as Category)
     : "wedding",
+  seniorAge: SENIOR_AGES.some((s) => s.age === d?.seniorAge)
+    ? (d!.seniorAge as number)
+    : 70,
   groomName: d?.groomName ?? "",
   brideName: d?.brideName ?? "",
   groomFather: d?.groomFather ?? "",
@@ -160,6 +196,7 @@ const CATEGORY_SAMPLE: Record<
     greetingTitle: string;
     greetingMessage: string;
     accountLabel: string;
+    mainPhoto: string;
   }
 > = {
   wedding: {
@@ -173,9 +210,10 @@ const CATEGORY_SAMPLE: Record<
     greetingMessage:
       "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
     accountLabel: "축의금",
+    mainPhoto: SAMPLE_MAIN_PHOTO,
   },
   doljanchi: {
-    groomName: "김하람",
+    groomName: "김한별",
     brideName: "",
     groomFather: "김아빠",
     groomMother: "박엄마",
@@ -183,8 +221,9 @@ const CATEGORY_SAMPLE: Record<
     brideMother: "",
     greetingTitle: "우리 아이의 첫 생일에 초대합니다",
     greetingMessage:
-      "건강하게 자라준 하람이의 첫 생일을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
+      "건강하게 자라준 한별이의 첫 생일을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
     accountLabel: "축하금",
+    mainPhoto: SAMPLE_BABY_PHOTO,
   },
   senior: {
     groomName: "김대한",
@@ -193,10 +232,11 @@ const CATEGORY_SAMPLE: Record<
     groomMother: "",
     brideFather: "",
     brideMother: "",
-    greetingTitle: "칠순을 축하하는 자리에 초대합니다",
+    greetingTitle: seniorGreetingTitle(70),
     greetingMessage:
       "그동안 걸어오신 길에 존경과 감사를 담아\n작은 자리를 마련했습니다.\n오셔서 축복해 주시면 큰 힘이 되겠습니다.",
     accountLabel: "축하금",
+    mainPhoto: SAMPLE_MAIN_PHOTO,
   },
   birthday: {
     groomName: "김민준",
@@ -209,6 +249,7 @@ const CATEGORY_SAMPLE: Record<
     greetingMessage:
       "소중한 하루를 함께 나누고 싶어\n작은 자리를 마련했습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
     accountLabel: "축하금",
+    mainPhoto: SAMPLE_MAIN_PHOTO,
   },
 };
 
@@ -216,6 +257,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
   const s = CATEGORY_SAMPLE[category];
   return {
     category,
+    seniorAge: 70,
     groomName: s.groomName,
     brideName: s.brideName,
     groomFather: s.groomFather,
@@ -232,7 +274,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     fontHeading: "default",
     fontBody: "default",
     // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
-    mainPhotoUrl: SAMPLE_MAIN_PHOTO,
+    mainPhotoUrl: s.mainPhoto,
     heroMotion: "zoomin",
     groomPhotoUrl: "",
     bridePhotoUrl: "",

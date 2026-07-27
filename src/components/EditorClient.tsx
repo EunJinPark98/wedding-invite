@@ -16,7 +16,9 @@ import {
   HERO_MOTIONS,
   MAX_GALLERY,
   PERIOD_OPTIONS,
-  SAMPLE_MAIN_PHOTO,
+  SENIOR_AGES,
+  isSamplePhoto,
+  seniorGreetingTitle,
   type Account,
   type Category,
   type InvitationData,
@@ -208,7 +210,6 @@ export default function EditorClient({
   const category: Category =
     initialData?.category ??
     (categoryParam && CATEGORY_IDS.includes(categoryParam) ? categoryParam : "wedding");
-  const labels = getCategoryLabels(category);
   // 이 카테고리 전용 템플릿만 선택 가능
   const catTemplates = getTemplatesByCategory(category);
 
@@ -223,6 +224,8 @@ export default function EditorClient({
   const [data, setData] = useState<InvitationData>(() =>
     initialData ? normalizeData(initialData) : emptyInvitation(category)
   );
+  // 칠순 카테고리는 선택한 연세(70/80/90/100)에 따라 문구가 바뀜
+  const labels = getCategoryLabels(category, data.seniorAge);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -235,8 +238,7 @@ export default function EditorClient({
   const photoSectionRef = useRef<HTMLDivElement>(null);
 
   // 예시 사진 그대로거나 비어있으면 본인 대표 사진 등록 필요
-  const needMainPhoto =
-    !data.mainPhotoUrl || data.mainPhotoUrl === SAMPLE_MAIN_PHOTO;
+  const needMainPhoto = !data.mainPhotoUrl || isSamplePhoto(data.mainPhotoUrl);
 
   function openConfirm() {
     if (needMainPhoto) {
@@ -255,6 +257,17 @@ export default function EditorClient({
     key: K,
     value: InvitationData[K]
   ) => setData((d) => ({ ...d, [key]: value }));
+
+  // 연세를 바꾸면 기본 인사말 제목도 따라감 (직접 고쳐 쓴 제목은 그대로 둠)
+  const setSeniorAge = (age: number) =>
+    setData((d) => ({
+      ...d,
+      seniorAge: age,
+      greetingTitle:
+        d.greetingTitle === seniorGreetingTitle(d.seniorAge)
+          ? seniorGreetingTitle(age)
+          : d.greetingTitle,
+    }));
 
   const setAccount = (i: number, patch: Partial<Account>) =>
     setData((d) => ({
@@ -419,6 +432,36 @@ export default function EditorClient({
               );
             })}
           </div>
+          {/* 대표 사진 모션 — 템플릿과 함께 고르는 첫인상 연출 */}
+          <div>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              대표 사진 모션
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              {HERO_MOTIONS.map((m) => {
+                const selected = data.heroMotion === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => set("heroMotion", m.id)}
+                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                      selected
+                        ? "border-gold-400 bg-gold-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="block text-sm font-medium text-gray-800">
+                      {m.label}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] text-gray-400">
+                      {m.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </Group>
 
         <Group title="글꼴" step={2}>
@@ -443,6 +486,38 @@ export default function EditorClient({
         </Group>
 
         <Group title={labels.groupTitle} step={3}>
+          {/* 칠순 · 팔순 · 구순 · 백수 선택 — 초대장 문구가 통째로 바뀜 */}
+          {category === "senior" && (
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                어떤 잔치인가요?
+              </span>
+              <div className="grid grid-cols-4 gap-2">
+                {SENIOR_AGES.map((s) => {
+                  const selected = data.seniorAge === s.age;
+                  return (
+                    <button
+                      key={s.age}
+                      type="button"
+                      onClick={() => setSeniorAge(s.age)}
+                      className={`rounded-xl border-2 px-2 py-2.5 text-center transition ${
+                        selected
+                          ? "border-gold-400 bg-gold-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold text-gray-800">
+                        {s.label}
+                      </span>
+                      <span className="mt-0.5 block text-[11px] text-gray-400">
+                        {s.age}세
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
             <Field
               label={labels.personLabel}
@@ -643,36 +718,6 @@ export default function EditorClient({
                 미리보기에 보이는 사진은 예시예요. 두 분의 사진을 올려 주세요.
               </p>
             )}
-          </div>
-          {/* 대표 사진 모션 선택 */}
-          <div>
-            <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              대표 사진 모션
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              {HERO_MOTIONS.map((m) => {
-                const selected = data.heroMotion === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => set("heroMotion", m.id)}
-                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
-                      selected
-                        ? "border-gold-400 bg-gold-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <span className="block text-sm font-medium text-gray-800">
-                      {m.label}
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-gray-400">
-                      {m.desc}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
           </div>
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">

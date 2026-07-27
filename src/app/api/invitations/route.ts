@@ -5,7 +5,7 @@ import { getUser, authEnabled } from "@/lib/supabase/server";
 import {
   MAX_GALLERY,
   PERIOD_OPTIONS,
-  SAMPLE_MAIN_PHOTO,
+  isSamplePhoto,
   TEMPLATE_IDS,
 } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     );
   }
   // 예시 사진(개인 사진)은 실제 청첩장에 쓸 수 없음 — 본인 사진 필수
-  if (!data.mainPhotoUrl?.trim() || data.mainPhotoUrl === SAMPLE_MAIN_PHOTO) {
+  if (!data.mainPhotoUrl?.trim() || isSamplePhoto(data.mainPhotoUrl)) {
     return NextResponse.json(
       { error: "대표 사진을 등록해 주세요. 미리보기의 사진은 예시용이에요." },
       { status: 400 }

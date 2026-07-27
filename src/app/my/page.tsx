@@ -21,6 +21,7 @@ export default async function MyPage() {
     slug: inv.slug,
     templateName: getTheme(inv.template).name,
     category: inv.data?.category ?? "wedding",
+    seniorAge: inv.data?.seniorAge ?? 70,
     groomName: inv.data?.groomName ?? "",
     brideName: inv.data?.brideName ?? "",
     weddingDate: inv.data?.weddingDate ?? "",

@@ -1,4 +1,4 @@
-import type { Category } from "./types";
+import { getSeniorAgeMeta, type Category } from "./types";
 
 // 메인 페이지 카테고리 선택 카드
 export const CATEGORIES: {
@@ -23,7 +23,7 @@ export const CATEGORIES: {
     id: "senior",
     label: "칠순 · 팔순 잔치",
     emoji: "🌾",
-    tagline: "부모님의 특별한 날을 빛내요",
+    tagline: "칠순부터 백수까지 빛나는 날",
   },
   {
     id: "birthday",
@@ -35,6 +35,12 @@ export const CATEGORIES: {
 
 export const getCategoryMeta = (id: string) =>
   CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[0];
+
+// 초대장 데이터에서 바로 라벨을 뽑는 헬퍼 (칠순 연세까지 함께 반영)
+export const labelsOf = (d: {
+  category: Category;
+  seniorAge?: number;
+}): CategoryLabels => getCategoryLabels(d.category, d.seniorAge);
 
 // 카테고리별 문구/필드 라벨. wedding 값은 기존 하드코딩 문구와 완전히 동일하게 유지해
 // (레이아웃에서 category === "wedding"일 때 기존 로직을 그대로 타도록) 기존 청첩장이
@@ -68,9 +74,17 @@ export interface CategoryLabels {
   heroKicker2: string; // 모던 헤드라인
   heroPhrase: string; // 로맨틱·별빛 붓글씨 문구 (non-wedding 전용)
   countdownLabel: string; // 카운트다운 문구 "OOO의 {countdownLabel}까지"
+  seniorLabel: string; // 칠순/팔순/구순/백수 (senior 전용, 그 외 "")
+  seniorHanja: string; // 七旬/八旬/九旬/百壽 (senior 전용, 그 외 "")
 }
 
-export function getCategoryLabels(category: Category): CategoryLabels {
+// seniorAge는 senior 카테고리에서만 의미가 있음 (70=칠순, 80=팔순, 90=구순, 100=백수)
+export function getCategoryLabels(
+  category: Category,
+  seniorAge: number = 70
+): CategoryLabels {
+  // 칠순/팔순/구순/백수 — 선택한 연세에 따라 문구가 통째로 바뀜
+  const age = getSeniorAgeMeta(seniorAge);
   switch (category) {
     case "doljanchi":
       return {
@@ -99,11 +113,13 @@ export function getCategoryLabels(category: Category): CategoryLabels {
         heroKicker2: "THE FIRST BIRTHDAY",
         heroPhrase: "첫 생일을 축하해요",
         countdownLabel: "첫 생일",
+        seniorLabel: "",
+        seniorHanja: "",
       };
     case "senior":
       return {
         noun: "초대장",
-        editorTitle: "칠순 · 팔순 초대장 만들기",
+        editorTitle: `${age.label} 초대장 만들기`,
         groupTitle: "주인공 정보",
         personLabel: "주인공 성함",
         person2Label: "",
@@ -115,18 +131,20 @@ export function getCategoryLabels(category: Category): CategoryLabels {
         showParents: false,
         parent1Label: "",
         parent2Label: "",
-        dateSectionTitle: "잔치 일시 · 장소",
-        dateFieldLabel: "잔치 날짜",
+        dateSectionTitle: `${age.label} 일시 · 장소`,
+        dateFieldLabel: `${age.label} 날짜`,
         venueLabel: "잔치 장소",
         accountsGroupTitle: "마음 전하실 곳 (계좌)",
         accountsLabel: "마음 전하실 곳",
         sectionCoupleLabel: "축하합니다",
         personTitle: "",
         relation: "",
-        heroKicker: "70TH · 80TH BIRTHDAY",
+        heroKicker: `${age.age}TH BIRTHDAY CELEBRATION`,
         heroKicker2: "THE CELEBRATION DAY",
         heroPhrase: "귀한 걸음 함께해 주세요",
-        countdownLabel: "잔치",
+        countdownLabel: `${age.label} 잔치`,
+        seniorLabel: age.label,
+        seniorHanja: age.hanja,
       };
     case "birthday":
       return {
@@ -155,6 +173,8 @@ export function getCategoryLabels(category: Category): CategoryLabels {
         heroKicker2: "THE BIRTHDAY",
         heroPhrase: "생일을 축하해요",
         countdownLabel: "생일",
+        seniorLabel: "",
+        seniorHanja: "",
       };
     case "wedding":
     default:
@@ -184,6 +204,8 @@ export function getCategoryLabels(category: Category): CategoryLabels {
         heroKicker2: "THE WEDDING DAY",
         heroPhrase: "",
         countdownLabel: "결혼식",
+        seniorLabel: "",
+        seniorHanja: "",
       };
   }
 }

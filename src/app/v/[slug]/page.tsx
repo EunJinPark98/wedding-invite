@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import InvitationView from "@/components/InvitationView";
 import { getInvitation, isExpired } from "@/lib/store";
-import { getCategoryLabels } from "@/lib/categories";
+import { labelsOf } from "@/lib/categories";
 
 export async function generateMetadata({
   params,
@@ -14,7 +14,7 @@ export async function generateMetadata({
   if (!inv) return { title: "초대장을 찾을 수 없습니다" };
   if (isExpired(inv)) return { title: "게시 기간이 종료된 초대장입니다" };
   const { groomName, brideName, weddingDate, venueName } = inv.data;
-  const labels = getCategoryLabels(inv.data.category);
+  const labels = labelsOf(inv.data);
   const title = labels.showPerson2
     ? `${groomName} ♥ ${brideName} 결혼합니다`
     : `${groomName}의 ${labels.countdownLabel}에 초대합니다`;
