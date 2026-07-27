@@ -365,36 +365,27 @@ body {
   }
 }
 
-/* 로맨틱: 꽃잎 여러 개가 좌우로 흔들리며 회전하며 떨어지는 히어로 */
+/* 로맨틱: 꽃잎이 흩날리는 히어로 */
 @keyframes inv-petal-fall {
   0% {
-    transform: translate(0, -10%) rotate(0deg);
+    transform: translateY(-8%) rotate(0deg);
     opacity: 0;
   }
-  10% {
+  12% {
     opacity: 0.85;
   }
-  25% {
-    transform: translate(16px, 15%) rotate(70deg);
-  }
-  50% {
-    transform: translate(-14px, 45%) rotate(160deg);
-  }
-  75% {
-    transform: translate(16px, 75%) rotate(260deg);
-  }
-  90% {
-    opacity: 0.75;
+  85% {
+    opacity: 0.7;
   }
   100% {
-    transform: translate(-10px, 105%) rotate(340deg);
+    transform: translateY(105%) rotate(200deg);
     opacity: 0;
   }
 }
 .inv-petal {
   position: absolute;
   top: 0;
-  display: inline-block;
+  height: 100%;
   pointer-events: none;
   animation: inv-petal-fall linear infinite;
 }
