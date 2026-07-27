@@ -91,8 +91,8 @@ export const THEMES: Record<TemplateId, TemplateTheme> = {
   },
   cinema: {
     id: "cinema",
-    name: "필름",
-    description: "폴라로이드와 필름이 흐르는 레트로 감성 청첩장",
+    name: "시네마",
+    description: "영화 포스터처럼 깊고 묵직한 무드의 시네마 청첩장",
     accent: "#b5674d",
     accentSoft: "#f6ece1",
     line: "#e5d7c4",

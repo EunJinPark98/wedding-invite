@@ -118,30 +118,30 @@ body {
 }
 
 /* ── 대표 사진 모션 4종 (업체 청첩장에서 널리 쓰는 연출) ── */
-/* 1. 줌 인: 은은하게 확대되는 시네마틱 연출 */
+/* 1. 줌 인: 천천히 확대되는 시네마틱 연출 */
 @keyframes inv-kenburns {
   from {
     transform: scale(1);
   }
   to {
-    transform: scale(1.08);
+    transform: scale(1.15);
   }
 }
 .inv-kenburns {
-  animation: inv-kenburns 16s ease-in-out infinite alternate;
+  animation: inv-kenburns 9s ease-in-out infinite alternate;
   will-change: transform;
 }
 /* 2. 줌 아웃: 크게 시작해 천천히 물러나는 연출 */
 @keyframes inv-motion-zoomout {
   from {
-    transform: scale(1.12);
+    transform: scale(1.18);
   }
   to {
     transform: scale(1);
   }
 }
 .inv-motion-zoomout {
-  animation: inv-motion-zoomout 16s ease-in-out infinite alternate;
+  animation: inv-motion-zoomout 9s ease-in-out infinite alternate;
   will-change: transform;
 }
 /* 3. 아웃포커스: 흐릿한 화면이 서서히 선명해지는 연출 */
@@ -244,39 +244,22 @@ body {
   }
 }
 
-/* ── 필름 템플릿: 폴라로이드·필름 연출 ── */
-/* 폴라로이드가 살랑살랑 흔들리는 연출 */
-@keyframes inv-sway {
-  0%,
-  100% {
-    transform: rotate(-2.5deg);
+/* ── 시네마 템플릿: 엔딩 크레딧처럼 은은히 떠오르는 연출 ── */
+@keyframes inv-credit {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
   }
-  50% {
-    transform: rotate(-0.5deg);
-  }
-}
-.inv-sway {
-  animation: inv-sway 5.5s ease-in-out infinite;
-  transform-origin: top center;
-}
-/* 필름 스트립이 옆으로 흐르는 연출 */
-.inv-film {
-  background-color: #241f1a;
-  background-image: radial-gradient(circle, #f6efe3 2.2px, transparent 2.9px),
-    radial-gradient(circle, #f6efe3 2.2px, transparent 2.9px);
-  background-size: 16px 8px, 16px 8px;
-  background-position: 0 3px, 0 calc(100% - 11px);
-  background-repeat: repeat-x, repeat-x;
-  animation: inv-filmroll 8s linear infinite;
-}
-@keyframes inv-filmroll {
   to {
-    background-position: 160px 3px, 160px calc(100% - 11px);
+    opacity: 1;
+    transform: none;
   }
+}
+.inv-credit {
+  animation: inv-credit 1.6s ease-out 0.6s both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .inv-sway,
-  .inv-film {
+  .inv-credit {
     animation: none;
   }
 }

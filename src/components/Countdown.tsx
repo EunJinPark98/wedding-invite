@@ -46,40 +46,45 @@ export default function Countdown({
 
   const cells = [
     { label: "DAYS", value: time.days },
-    { label: "HOUR", value: time.hours },
+    { label: "HOURS", value: time.hours },
     { label: "MIN", value: time.mins },
     { label: "SEC", value: time.secs },
   ];
 
   return (
-    <div className="mt-7">
-      <div className="mx-auto grid max-w-[300px] grid-cols-4 gap-1.5">
-        {cells.map((c) => (
-          <div
-            key={c.label}
-            className="rounded-xl py-3"
-            style={{ background: t.accentSoft }}
-          >
-            <p
-              key={`${c.label}-${c.value}`}
-              className="inv-tick text-xl font-semibold tabular-nums"
-              style={{ color: t.ink }}
-            >
-              {String(c.value).padStart(2, "0")}
-            </p>
-            <p
-              className="font-cormorant mt-0.5 text-[9px] tracking-[0.2em]"
-              style={{ color: t.accent }}
-            >
-              {c.label}
-            </p>
+    <div className="mt-8">
+      <div className="mx-auto flex max-w-[280px] items-start justify-center">
+        {cells.map((c, i) => (
+          <div key={c.label} className="flex items-start">
+            {i > 0 && (
+              <span
+                className="font-cormorant px-2.5 pt-1 text-lg font-light"
+                style={{ color: t.line }}
+              >
+                :
+              </span>
+            )}
+            <div className="w-11 text-center">
+              <p
+                key={`${c.label}-${c.value}`}
+                className="inv-tick font-cormorant text-[26px] font-light leading-none tabular-nums"
+                style={{ color: t.ink }}
+              >
+                {String(c.value).padStart(2, "0")}
+              </p>
+              <p
+                className="font-cormorant mt-1.5 text-[8px] tracking-[0.25em]"
+                style={{ color: t.sub }}
+              >
+                {c.label}
+              </p>
+            </div>
           </div>
         ))}
       </div>
-      <p className="mt-4 text-[13px]" style={{ color: t.sub }}>
-        {groomName} <span style={{ color: t.accent }}>♡</span> {brideName}의
-        결혼식이{" "}
-        <span className="font-semibold" style={{ color: t.accent }}>
+      <p className="mt-5 text-[13px]" style={{ color: t.sub }}>
+        {groomName} · {brideName}의 결혼식이{" "}
+        <span className="font-medium" style={{ color: t.accent }}>
           {time.days}일
         </span>{" "}
         남았습니다

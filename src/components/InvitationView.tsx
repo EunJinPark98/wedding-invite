@@ -57,10 +57,10 @@ function MiniCalendar({
 
   return (
     <div
-      className="mx-auto max-w-[300px] rounded-2xl px-4 pb-5 pt-6"
-      style={{ background: t.accentSoft }}
+      className="mx-auto max-w-[280px] border-y px-2 pb-6 pt-7"
+      style={{ borderColor: t.line }}
     >
-      <div className="mb-4 text-center">
+      <div className="mb-5 text-center">
         <p className="text-2xl font-light" style={{ color: t.ink }}>
           {month + 1}
           <span className="ml-0.5 text-sm" style={{ color: t.sub }}>
@@ -68,7 +68,7 @@ function MiniCalendar({
           </span>
         </p>
         <p
-          className="font-cormorant mt-0.5 text-[10px] tracking-[0.35em]"
+          className="font-cormorant mt-1 text-[9px] tracking-[0.4em]"
           style={{ color: t.accent }}
         >
           {MONTHS_EN[month]}
@@ -175,13 +175,13 @@ function GreetingInner({
   return (
     <div className={align === "left" ? "text-left" : "text-center"}>
       <h2
-        className="mb-7 text-xl leading-relaxed tracking-[0.02em]"
+        className="mb-8 text-[19px] leading-relaxed tracking-[0.04em]"
         style={{ fontFamily: t.headingFont }}
       >
         {data.greetingTitle}
       </h2>
       <p
-        className="whitespace-pre-line text-[15px] leading-9"
+        className="whitespace-pre-line text-[14px] leading-[2.2]"
         style={{ color: t.sub }}
       >
         {data.greetingMessage}
@@ -243,12 +243,12 @@ function DateInner({
       </p>
       {calendar && <MiniCalendar iso={data.weddingDate} t={t} heart={heart} />}
       {dday !== null && (
-        <div className="mt-6">
+        <div className="mt-7">
           <p
-            className="font-cormorant inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.25em] text-white"
-            style={{ background: t.accent }}
+            className="font-cormorant inline-block rounded-full border px-5 py-1.5 text-xs font-medium tracking-[0.3em]"
+            style={{ borderColor: `${t.accent}66`, color: t.accent }}
           >
-            {dday === 0 ? "D-DAY ♡" : `D-${dday}`}
+            {dday === 0 ? "D-DAY" : `D-${dday}`}
           </p>
         </div>
       )}
@@ -409,8 +409,8 @@ function LocationInner({
         </p>
       )}
       <p
-        className="mx-auto mt-5 max-w-[260px] rounded-xl px-4 py-3 text-sm leading-6"
-        style={{ background: t.accentSoft, color: t.ink }}
+        className="mx-auto mt-4 max-w-[260px] text-[13px] leading-6"
+        style={{ color: t.sub }}
       >
         {data.venueAddress}
       </p>
@@ -513,45 +513,55 @@ function ContactInner({
   t: TemplateTheme;
 }) {
   return (
-    <div className="mx-auto grid max-w-[320px] grid-cols-2 gap-3">
+    <div className="mx-auto max-w-[290px]">
       {[
         { role: "신랑", name: data.groomName, tel: data.groomPhone },
         { role: "신부", name: data.brideName, tel: data.bridePhone },
-      ].map((c) => (
-        <a
+      ].map((c, i) => (
+        <div
           key={c.role}
-          href={`tel:${c.tel}`}
-          className="rounded-2xl border px-4 py-4 text-center transition"
-          style={{ borderColor: t.line, background: t.pageBg }}
+          className={`flex items-center justify-between py-4 ${i === 0 ? "border-b" : ""}`}
+          style={{ borderColor: t.line }}
         >
-          <span
-            className="block text-[11px] font-medium tracking-wide"
-            style={{ color: t.accent }}
-          >
-            {c.role}
-          </span>
-          <span
-            className="mt-1 block text-[15px] font-medium"
-            style={{ color: t.ink }}
-          >
-            {c.name}
-          </span>
-          <span
-            className="mt-1.5 inline-flex items-center gap-1 text-xs"
-            style={{ color: t.sub }}
-          >
-            <svg
-              width="11"
-              height="11"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden
+          <div className="text-left">
+            <span
+              className="block text-[10px] tracking-[0.25em]"
+              style={{ color: t.accent }}
             >
-              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z" />
-            </svg>
-            전화하기
-          </span>
-        </a>
+              {c.role}
+            </span>
+            <span
+              className="mt-0.5 block text-[15px]"
+              style={{ color: t.ink, fontFamily: t.headingFont }}
+            >
+              {c.name}
+            </span>
+          </div>
+          {c.tel && (
+            <div className="flex items-center gap-2">
+              <a
+                href={`tel:${c.tel}`}
+                aria-label={`${c.role}에게 전화`}
+                className="flex h-9 w-9 items-center justify-center rounded-full border transition"
+                style={{ borderColor: t.line, color: t.accent }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z" />
+                </svg>
+              </a>
+              <a
+                href={`sms:${c.tel}`}
+                aria-label={`${c.role}에게 문자`}
+                className="flex h-9 w-9 items-center justify-center rounded-full border transition"
+                style={{ borderColor: t.line, color: t.accent }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                </svg>
+              </a>
+            </div>
+          )}
+        </div>
       ))}
     </div>
   );
@@ -599,36 +609,15 @@ function Label({
       </div>
     );
   }
-  const ornament =
-    variant === "romantic"
-      ? "♡"
-      : variant === "botanical"
-        ? "❧"
-        : variant === "starlight"
-          ? "✦"
-          : variant === "cinema"
-            ? "❋"
-            : "";
+  // 절제된 스몰캡 라벨 — 장식 없이 자간과 컬러로만 구분
   return (
-    <div className="mb-7 flex items-center justify-center gap-2.5">
-      <span className="h-px w-7" style={{ background: t.line }} />
-      {ornament && (
-        <span className="text-xs" style={{ color: t.accent }}>
-          {ornament}
-        </span>
-      )}
+    <div className="mb-9 text-center">
       <span
-        className="font-cormorant text-xs tracking-[0.35em]"
+        className="font-cormorant text-[10px] font-medium tracking-[0.5em]"
         style={{ color: t.accent }}
       >
         {text}
       </span>
-      {ornament && (
-        <span className="text-xs" style={{ color: t.accent }}>
-          {ornament}
-        </span>
-      )}
-      <span className="h-px w-7" style={{ background: t.line }} />
     </div>
   );
 }
@@ -636,47 +625,15 @@ function Label({
 function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
   if (variant === "modern")
     return <div className="mx-8 h-px" style={{ background: t.line }} />;
-  if (variant === "romantic")
-    return (
-      <div className="flex items-center justify-center gap-3 py-1">
-        <span className="h-px w-10" style={{ background: t.line }} />
-        <span className="text-xs" style={{ color: t.accent }}>
-          ♡
-        </span>
-        <span className="h-px w-10" style={{ background: t.line }} />
-      </div>
-    );
-  if (variant === "botanical")
-    return (
-      <div className="flex justify-center py-1.5" style={{ color: t.accent }}>
-        <span className="text-sm">❦</span>
-      </div>
-    );
-  if (variant === "starlight")
-    return (
-      <div className="flex items-center justify-center gap-3 py-1">
-        <span className="h-px w-10" style={{ background: t.line }} />
-        <span className="inv-twinkle relative text-xs" style={{ color: t.accent, position: "static" }}>
-          ✦
-        </span>
-        <span className="h-px w-10" style={{ background: t.line }} />
-      </div>
-    );
-  if (variant === "cinema")
-    return (
-      <div className="flex justify-center py-2">
-        <span className="inv-film h-[18px] w-28 rounded-[3px]" />
-      </div>
-    );
-  // classic
+  // 미니멀 헤어라인 — 작은 마름모 하나로 절제
   return (
-    <div className="flex items-center justify-center gap-2 py-1">
-      <span className="h-px w-12" style={{ background: t.line }} />
+    <div className="flex items-center justify-center gap-2.5 py-1" aria-hidden>
+      <span className="h-px w-6" style={{ background: t.line }} />
       <span
-        className="inline-block h-1.5 w-1.5 rotate-45"
-        style={{ background: t.accent }}
+        className="inline-block h-[3px] w-[3px] rotate-45"
+        style={{ background: t.accent, opacity: 0.55 }}
       />
-      <span className="h-px w-12" style={{ background: t.line }} />
+      <span className="h-px w-6" style={{ background: t.line }} />
     </div>
   );
 }
@@ -785,25 +742,20 @@ function ClassicLayout({
   return (
     <>
       <div className="relative overflow-hidden">
-        <Photo data={data} t={t} className="h-[500px] w-full" kenburns />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/20" />
-        {/* 스테이셔너리풍 이중 인셋 프레임 */}
-        <div className="pointer-events-none absolute inset-3 border border-white/40" />
-        <div className="pointer-events-none absolute inset-[18px] border border-white/20" />
-        <div className="absolute inset-x-0 bottom-0 px-8 pb-10 text-center text-white">
-          <p className="inv-hero-in font-cormorant flex items-center justify-center gap-3 text-xs tracking-[0.45em]">
-            <span className="inline-block h-px w-6 bg-white/50" />
+        <Photo data={data} t={t} className="h-[520px] w-full" kenburns />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+        <div className="absolute inset-x-0 bottom-0 px-8 pb-11 text-center text-white">
+          <p className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em] text-white/80">
             WEDDING INVITATION
-            <span className="inline-block h-px w-6 bg-white/50" />
           </p>
           <h1
-            className="inv-hero-in mt-4 text-[2rem] leading-snug tracking-wide"
+            className="inv-hero-in mt-4 text-[1.8rem] leading-snug tracking-[0.06em]"
             style={{ fontFamily: t.headingFont }}
           >
             <NamesAmp data={data} t={t} heartColor="#e8c878" />
           </h1>
           {p && (
-            <p className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em] text-white/90">
+            <p className="inv-hero-in-delay mt-3 font-cormorant text-sm tracking-[0.35em] text-white/80">
               {p.year}. {String(p.month).padStart(2, "0")}.{" "}
               {String(p.day).padStart(2, "0")}. {p.wkEn}
             </p>
@@ -987,15 +939,13 @@ function RomanticLayout({
           background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 70%)`,
         }}
       >
-        {/* 흩날리는 꽃잎 */}
+        {/* 흩날리는 꽃잎 — 은은하게 소량만 */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           {[
-            { left: "8%", size: 13, dur: 11, delay: 0 },
-            { left: "22%", size: 10, dur: 14, delay: 3 },
-            { left: "46%", size: 11, dur: 12, delay: 6 },
-            { left: "68%", size: 14, dur: 13, delay: 1.5 },
-            { left: "84%", size: 10, dur: 15, delay: 4.5 },
-            { left: "93%", size: 12, dur: 12, delay: 8 },
+            { left: "10%", size: 10, dur: 13, delay: 0 },
+            { left: "38%", size: 8, dur: 15, delay: 5 },
+            { left: "70%", size: 11, dur: 14, delay: 2.5 },
+            { left: "90%", size: 8, dur: 16, delay: 8 },
           ].map((f, i) => (
             <span
               key={i}
@@ -1119,31 +1069,15 @@ function BotanicalLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
-  const corner = (pos: string, rotate: number) => (
-    <span
-      aria-hidden
-      className={`absolute ${pos} text-lg leading-none`}
-      style={{ color: t.accent, transform: `rotate(${rotate}deg)` }}
-    >
-      ❦
-    </span>
-  );
   return (
     <div className="p-3">
       <div
         className="relative border"
         style={{ borderColor: t.line }}
       >
-        {corner("left-1.5 top-1.5", 0)}
-        {corner("right-1.5 top-1.5", 90)}
-        {corner("bottom-1.5 right-1.5", 180)}
-        {corner("bottom-1.5 left-1.5", 270)}
-        <div className="px-7 pt-12 text-center">
-          <div className="inv-hero-in mb-4 text-2xl" style={{ color: t.accent }}>
-            ❧
-          </div>
+        <div className="px-7 pt-14 text-center">
           <p
-            className="inv-hero-in font-cormorant text-xs tracking-[0.4em]"
+            className="inv-hero-in font-cormorant text-[10px] tracking-[0.45em]"
             style={{ color: t.accent }}
           >
             THE MARRIAGE OF
@@ -1377,51 +1311,50 @@ function CinemaLayout({
   const p = dateParts(data.weddingDate);
   return (
     <>
-      <div className="relative overflow-hidden pb-14 text-center">
-        {/* 상단 필름 스트립 */}
-        <div className="inv-film h-7 w-full" />
-        <p
-          className="inv-hero-in font-cormorant mt-10 text-[10px] tracking-[0.5em]"
-          style={{ color: t.sub }}
-        >
+      {/* 시네마 히어로 — 영화 포스터처럼 어두운 배경 + 레터박스 사진 + 크레딧 타이포 */}
+      <div
+        className="relative overflow-hidden pb-12 text-center"
+        style={{ background: "#15120f" }}
+      >
+        <p className="inv-hero-in font-cormorant pt-11 text-[10px] tracking-[0.55em] text-white/55">
           OUR WEDDING FILM
         </p>
-        {/* 폴라로이드 사진 (살랑살랑) */}
         <div
-          className="inv-sway inv-hero-in relative mx-auto mt-7 w-fit bg-white p-3 pb-14"
-          style={{ boxShadow: "0 20px 44px -16px rgba(61,54,48,0.5)" }}
-        >
-          {/* 마스킹 테이프 */}
-          <span
-            aria-hidden
-            className="absolute -top-3 left-1/2 h-6 w-24 -translate-x-1/2 rotate-[-4deg]"
-            style={{ background: `${t.accent}40`, backdropFilter: "blur(1px)" }}
-          />
-          <div className="overflow-hidden" style={{ width: "232px" }}>
-            <Photo data={data} t={t} className="aspect-[4/5] w-full" kenburns />
-          </div>
-          <p
-            className="absolute inset-x-0 bottom-3.5 text-xl"
-            style={{ fontFamily: "var(--font-brush)", color: t.ink }}
-          >
-            우리, 결혼합니다
-          </p>
+          className="mx-auto mt-2 h-px w-10"
+          style={{ background: "rgba(255,255,255,0.2)" }}
+        />
+        {/* 레터박스 사진 */}
+        <div className="relative mx-6 mt-8 overflow-hidden">
+          <Photo data={data} t={t} className="aspect-[3/4] w-full" kenburns />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
         </div>
-        <h1
-          className="inv-hero-in-delay mt-8 text-2xl tracking-wide"
-          style={{ fontFamily: t.headingFont }}
-        >
-          <NamesAmp data={data} t={t} />
-        </h1>
-        {p && (
-          <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
-            style={{ color: t.sub }}
+        {/* 크레딧처럼 떠오르는 타이틀 */}
+        <div className="inv-credit">
+          <h1
+            className="mt-9 text-[1.65rem] tracking-[0.1em] text-white"
+            style={{ fontFamily: t.headingFont }}
           >
-            {p.year}. {String(p.month).padStart(2, "0")}.{" "}
-            {String(p.day).padStart(2, "0")}. {p.wkEn}
-          </p>
-        )}
+            {data.groomName}
+            <span
+              className="font-cormorant mx-3 align-middle text-[0.7em] italic"
+              style={{ color: t.accent }}
+            >
+              &
+            </span>
+            {data.brideName}
+          </h1>
+          {p && (
+            <p className="mt-4 font-cormorant text-[13px] tracking-[0.4em] text-white/70">
+              {p.year}. {String(p.month).padStart(2, "0")}.{" "}
+              {String(p.day).padStart(2, "0")}. {p.wkEn}
+            </p>
+          )}
+          {data.venueName && (
+            <p className="mt-1.5 text-[11px] tracking-wide text-white/40">
+              {data.weddingTime} · {data.venueName}
+            </p>
+          )}
+        </div>
       </div>
       <Sec label="INVITATION" t={t} variant="cinema">
         <GreetingInner data={data} t={t} />

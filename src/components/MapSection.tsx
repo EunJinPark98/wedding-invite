@@ -47,19 +47,16 @@ export default function MapSection({
         />
       </div>
 
-      {/* 길찾기 · 주소 복사 */}
+      {/* 길찾기 · 주소 복사 — 절제된 아웃라인 버튼 */}
       <div className="mt-3 grid grid-cols-2 gap-2">
         <a
           href={`https://map.naver.com/p/search/${encodeURIComponent(addr)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex items-center justify-center gap-1.5 py-3 text-[13px] font-medium text-white transition ${rounded}`}
-          style={{
-            background: t.accent,
-            boxShadow: `0 8px 20px -10px ${t.accent}aa`,
-          }}
+          className={`flex items-center justify-center gap-1.5 border py-3 text-[12.5px] transition ${rounded}`}
+          style={{ borderColor: `${t.accent}88`, color: t.accent }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
           </svg>
           네이버지도 길찾기
@@ -67,10 +64,10 @@ export default function MapSection({
         <button
           type="button"
           onClick={copyAddress}
-          className={`flex items-center justify-center gap-1.5 border py-3 text-[13px] font-medium transition ${rounded}`}
-          style={{ borderColor: t.line, color: t.ink, background: t.pageBg }}
+          className={`flex items-center justify-center gap-1.5 border py-3 text-[12.5px] transition ${rounded}`}
+          style={{ borderColor: t.line, color: t.sub }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
           </svg>
           {copied ? "복사됐어요!" : "주소 복사"}
