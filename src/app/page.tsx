@@ -1,13 +1,23 @@
 import Link from "next/link";
 import { TEMPLATES } from "@/lib/templates";
-import { emptyInvitation } from "@/lib/types";
+import { CATEGORIES, getCategoryMeta } from "@/lib/categories";
+import { emptyInvitation, CATEGORY_IDS, type Category } from "@/lib/types";
 import InvitationView from "@/components/InvitationView";
 import AuthStatus from "@/components/AuthStatus";
 
-// 카드 미리보기용 샘플 (갤러리·계좌는 비워 히어로만 가볍게 보여줌)
-const SAMPLE = { ...emptyInvitation(), gallery: [], accounts: [] };
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category: rawCategory } = await searchParams;
+  const category: Category = CATEGORY_IDS.includes(rawCategory as Category)
+    ? (rawCategory as Category)
+    : "wedding";
+  const catMeta = getCategoryMeta(category);
+  // 카드 미리보기용 샘플 (갤러리·계좌는 비워 히어로만 가볍게 보여줌)
+  const SAMPLE = { ...emptyInvitation(category), gallery: [], accounts: [] };
 
-export default function Home() {
   return (
     <main className="min-h-screen bg-cream text-gray-800">
       {/* 상단 네비 — 화이트 + 골드 헤어라인으로 크림 본문과 구분 */}
@@ -80,6 +90,45 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 카테고리 선택 — 결혼 외 다른 인생 이벤트 초대장 */}
+      <section className="border-t border-gold-100/70 bg-cream/60">
+        <div className="mx-auto max-w-5xl px-6 py-16">
+          <p className="text-center font-cormorant text-sm tracking-[0.4em] text-gold-400">
+            OCCASIONS
+          </p>
+          <h2
+            className="mt-3 text-center text-[1.4rem] text-ink sm:text-[1.7rem]"
+            style={{ fontFamily: "var(--font-song)" }}
+          >
+            어떤 초대장을 만들까요?
+          </h2>
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+            {CATEGORIES.map((c) => {
+              const selected = c.id === category;
+              return (
+                <Link
+                  key={c.id}
+                  href={`/?category=${c.id}#templates`}
+                  className={`rounded-2xl border-2 px-4 py-6 text-center transition ${
+                    selected
+                      ? "border-gold-400 bg-white shadow-md shadow-gold-200/50"
+                      : "border-gold-100 bg-white/70 hover:border-gold-300"
+                  }`}
+                >
+                  <span className="block text-3xl">{c.emoji}</span>
+                  <span className="mt-3 block text-sm font-semibold text-ink">
+                    {c.label}
+                  </span>
+                  <span className="mt-1 block text-xs text-gray-400">
+                    {c.tagline}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* 템플릿 미리보기 */}
       <section
         id="templates"
@@ -93,10 +142,10 @@ export default function Home() {
           className="mt-3 text-center text-[1.6rem] text-ink sm:text-[2rem]"
           style={{ fontFamily: "var(--font-song)" }}
         >
-          6가지 디자인 템플릿
+          {catMeta.label} 템플릿
         </h2>
         <p className="mt-3 text-center text-sm text-gray-500">
-          실제 청첩장 모습 그대로 미리 보고 선택하세요.
+          {catMeta.tagline} · 실제 모습 그대로 미리 보고 선택하세요.
         </p>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2">
@@ -127,7 +176,7 @@ export default function Home() {
                   <p className="mt-1 text-sm text-gray-500">{t.description}</p>
                 </div>
                 <Link
-                  href={`/editor?template=${t.id}`}
+                  href={`/editor?template=${t.id}&category=${category}`}
                   className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
                   style={{ background: t.accent }}
                 >

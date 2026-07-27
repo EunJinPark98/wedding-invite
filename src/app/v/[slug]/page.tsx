@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import InvitationView from "@/components/InvitationView";
 import { getInvitation, isExpired } from "@/lib/store";
+import { getCategoryLabels } from "@/lib/categories";
 
 export async function generateMetadata({
   params,
@@ -13,14 +14,22 @@ export async function generateMetadata({
   if (!inv) return { title: "청첩장을 찾을 수 없습니다" };
   if (isExpired(inv)) return { title: "게시 기간이 종료된 청첩장입니다" };
   const { groomName, brideName, weddingDate, venueName } = inv.data;
+  const labels = getCategoryLabels(inv.data.category);
+  const title = labels.showPerson2
+    ? `${groomName} ♥ ${brideName} 결혼합니다`
+    : `${groomName}의 ${labels.countdownLabel}에 초대합니다`;
   // 카톡 미리보기 카드에 예식일·장소까지 보이도록
   const when = [weddingDate, venueName].filter(Boolean).join(" · ");
-  const description = when || `${groomName}님과 ${brideName}님의 결혼식에 초대합니다.`;
+  const description =
+    when ||
+    (labels.showPerson2
+      ? `${groomName}님과 ${brideName}님의 결혼식에 초대합니다.`
+      : `${groomName}님의 ${labels.countdownLabel}에 초대합니다.`);
   return {
-    title: `${groomName} ♥ ${brideName} 결혼합니다`,
+    title,
     description,
     openGraph: {
-      title: `${groomName} ♥ ${brideName} 결혼합니다`,
+      title,
       description,
       images: inv.data.mainPhotoUrl ? [inv.data.mainPhotoUrl] : [],
     },

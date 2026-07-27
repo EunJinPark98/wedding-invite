@@ -7,9 +7,11 @@ import type { TemplateTheme } from "@/lib/templates";
 export default function AccountList({
   accounts,
   t,
+  showSide = true,
 }: {
   accounts: Account[];
   t: TemplateTheme;
+  showSide?: boolean;
 }) {
   const [copied, setCopied] = useState<number | null>(null);
 
@@ -35,12 +37,14 @@ export default function AccountList({
         >
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5">
-              <span
-                className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-                style={{ background: t.accent }}
-              >
-                {a.side}
-              </span>
+              {showSide && (
+                <span
+                  className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                  style={{ background: t.accent }}
+                >
+                  {a.side}
+                </span>
+              )}
               <span className="text-xs" style={{ color: t.sub }}>
                 {a.name}
               </span>

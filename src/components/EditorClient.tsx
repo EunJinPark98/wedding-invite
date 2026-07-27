@@ -7,15 +7,18 @@ import InvitationView from "./InvitationView";
 import AuthStatus from "./AuthStatus";
 import KakaoShareButton from "./KakaoShareButton";
 import { TEMPLATES, FONTS } from "@/lib/templates";
+import { getCategoryLabels } from "@/lib/categories";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
   normalizeData,
+  CATEGORY_IDS,
   HERO_MOTIONS,
   MAX_GALLERY,
   PERIOD_OPTIONS,
   SAMPLE_MAIN_PHOTO,
   type Account,
+  type Category,
   type InvitationData,
   type PeriodMonths,
   type TemplateId,
@@ -202,12 +205,18 @@ export default function EditorClient({
   const isEdit = Boolean(editSlug);
   const startTemplate =
     initialTemplate ?? ((params.get("template") as TemplateId) || "classic");
+  // 신규 제작 시 ?category=로 초대장 종류 결정 (수정 모드는 기존 데이터의 category를 따름)
+  const categoryParam = params.get("category") as Category | null;
+  const category: Category =
+    initialData?.category ??
+    (categoryParam && CATEGORY_IDS.includes(categoryParam) ? categoryParam : "wedding");
+  const labels = getCategoryLabels(category);
 
   const [template, setTemplate] = useState<TemplateId>(
     TEMPLATES.some((t) => t.id === startTemplate) ? startTemplate : "classic"
   );
   const [data, setData] = useState<InvitationData>(() =>
-    initialData ? normalizeData(initialData) : emptyInvitation()
+    initialData ? normalizeData(initialData) : emptyInvitation(category)
   );
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -363,7 +372,7 @@ export default function EditorClient({
             className="mt-2 text-[2rem] leading-tight tracking-tight text-gray-900"
             style={{ fontFamily: "var(--font-song)" }}
           >
-            {isEdit ? "청첩장 수정하기" : "청첩장 만들기"}
+            {isEdit ? `${labels.editorTitle.replace("만들기", "수정하기")}` : labels.editorTitle}
           </h1>
           <p
             className="mt-2 text-sm text-gray-400"
@@ -428,106 +437,134 @@ export default function EditorClient({
           </div>
         </Group>
 
-        <Group title="신랑 · 신부" step={3}>
-          <div className="grid grid-cols-2 gap-3">
+        <Group title={labels.groupTitle} step={3}>
+          <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
             <Field
-              label="신랑 이름"
+              label={labels.personLabel}
               value={data.groomName}
               onChange={(v) => set("groomName", v)}
             />
-            <Field
-              label="신부 이름"
-              value={data.brideName}
-              onChange={(v) => set("brideName", v)}
-            />
+            {labels.showPerson2 && (
+              <Field
+                label={labels.person2Label}
+                value={data.brideName}
+                onChange={(v) => set("brideName", v)}
+              />
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
             <div>
               <span className="mb-1.5 block text-xs font-medium text-gray-500">
-                신랑 사진 (선택)
+                {labels.photo1Label}
               </span>
               <ImageUpload
                 value={data.groomPhotoUrl}
                 onChange={(url) => set("groomPhotoUrl", url)}
-                label="신랑 사진"
+                label={labels.photo1Label}
                 className="h-28"
               />
             </div>
-            <div>
-              <span className="mb-1.5 block text-xs font-medium text-gray-500">
-                신부 사진 (선택)
-              </span>
-              <ImageUpload
-                value={data.bridePhotoUrl}
-                onChange={(url) => set("bridePhotoUrl", url)}
-                label="신부 사진"
-                className="h-28"
-              />
-            </div>
+            {labels.showPerson2 && (
+              <div>
+                <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                  {labels.photo2Label}
+                </span>
+                <ImageUpload
+                  value={data.bridePhotoUrl}
+                  onChange={(url) => set("bridePhotoUrl", url)}
+                  label={labels.photo2Label}
+                  className="h-28"
+                />
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
             <Field
-              label="신랑 연락처"
+              label={labels.contact1Label}
               value={data.groomPhone}
               onChange={(v) => set("groomPhone", v)}
               placeholder="010-0000-0000"
             />
-            <Field
-              label="신부 연락처"
-              value={data.bridePhone}
-              onChange={(v) => set("bridePhone", v)}
-              placeholder="010-0000-0000"
-            />
+            {labels.showPerson2 && (
+              <Field
+                label={labels.contact2Label}
+                value={data.bridePhone}
+                onChange={(v) => set("bridePhone", v)}
+                placeholder="010-0000-0000"
+              />
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label="신랑 아버지"
-              value={data.groomFather}
-              onChange={(v) => set("groomFather", v)}
-              placeholder="(선택)"
-            />
-            <Field
-              label="신랑 어머니"
-              value={data.groomMother}
-              onChange={(v) => set("groomMother", v)}
-              placeholder="(선택)"
-            />
-            <Field
-              label="신부 아버지"
-              value={data.brideFather}
-              onChange={(v) => set("brideFather", v)}
-              placeholder="(선택)"
-            />
-            <Field
-              label="신부 어머니"
-              value={data.brideMother}
-              onChange={(v) => set("brideMother", v)}
-              placeholder="(선택)"
-            />
-          </div>
+          {labels.showParents && (
+            <div className="grid grid-cols-2 gap-3">
+              {labels.showPerson2 ? (
+                <>
+                  <Field
+                    label="신랑 아버지"
+                    value={data.groomFather}
+                    onChange={(v) => set("groomFather", v)}
+                    placeholder="(선택)"
+                  />
+                  <Field
+                    label="신랑 어머니"
+                    value={data.groomMother}
+                    onChange={(v) => set("groomMother", v)}
+                    placeholder="(선택)"
+                  />
+                  <Field
+                    label="신부 아버지"
+                    value={data.brideFather}
+                    onChange={(v) => set("brideFather", v)}
+                    placeholder="(선택)"
+                  />
+                  <Field
+                    label="신부 어머니"
+                    value={data.brideMother}
+                    onChange={(v) => set("brideMother", v)}
+                    placeholder="(선택)"
+                  />
+                </>
+              ) : (
+                <>
+                  <Field
+                    label={labels.parent1Label}
+                    value={data.groomFather}
+                    onChange={(v) => set("groomFather", v)}
+                    placeholder="(선택)"
+                  />
+                  <Field
+                    label={labels.parent2Label}
+                    value={data.groomMother}
+                    onChange={(v) => set("groomMother", v)}
+                    placeholder="(선택)"
+                  />
+                </>
+              )}
+            </div>
+          )}
           <p className="text-xs text-gray-400">
             사진을 올리면 프로필 섹션이 생기고, 연락처를 입력하면 이름 옆에
-            전화·문자 버튼이 붙어요. 부모님 성함은 비우면 표시되지 않아요.
+            전화·문자 버튼이 붙어요.
+            {labels.showParents && " 부모님 성함은 비우면 표시되지 않아요."}
           </p>
         </Group>
 
-        <Group title="예식 일시 · 장소" step={4}>
+        <Group title={labels.dateSectionTitle} step={4}>
           <div className="grid grid-cols-2 gap-3">
             <Field
-              label="예식일"
+              label={labels.dateFieldLabel}
               type="date"
               value={data.weddingDate}
               onChange={(v) => set("weddingDate", v)}
             />
             <Field
-              label="예식 시간"
+              label="시간"
               value={data.weddingTime}
               onChange={(v) => set("weddingTime", v)}
               placeholder="오후 1시"
             />
           </div>
           <Field
-            label="예식장 이름"
+            label={labels.venueLabel}
             value={data.venueName}
             onChange={(v) => set("venueName", v)}
           />
@@ -669,7 +706,7 @@ export default function EditorClient({
           </p>
         </Group>
 
-        <Group title="마음 전하실 곳 (계좌)" step={7}>
+        <Group title={labels.accountsGroupTitle} step={7}>
           <div className="space-y-3">
             {data.accounts.map((a, i) => (
               <div
@@ -677,16 +714,18 @@ export default function EditorClient({
                 className="space-y-2.5 rounded-xl border border-gray-100 bg-gray-50/60 p-3.5"
               >
                 <div className="flex items-center gap-2">
-                  <select
-                    value={a.side}
-                    onChange={(e) =>
-                      setAccount(i, { side: e.target.value as Account["side"] })
-                    }
-                    className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-700"
-                  >
-                    <option value="신랑측">신랑측</option>
-                    <option value="신부측">신부측</option>
-                  </select>
+                  {labels.showPerson2 && (
+                    <select
+                      value={a.side}
+                      onChange={(e) =>
+                        setAccount(i, { side: e.target.value as Account["side"] })
+                      }
+                      className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-700"
+                    >
+                      <option value="신랑측">신랑측</option>
+                      <option value="신부측">신부측</option>
+                    </select>
+                  )}
                   <button
                     onClick={() => removeAccount(i)}
                     className="ml-auto text-xs text-gray-400 hover:text-gold-400"
@@ -807,11 +846,15 @@ export default function EditorClient({
             )}
             <KakaoShareButton
               url={result}
-              title={`${data.groomName} ♥ ${data.brideName} 결혼합니다`}
+              title={
+                labels.showPerson2
+                  ? `${data.groomName} ♥ ${data.brideName} 결혼합니다`
+                  : `${data.groomName}의 ${labels.countdownLabel}에 초대합니다`
+              }
               description={
                 data.weddingDate
-                  ? `${data.weddingDate} · 모바일 청첩장이 도착했어요`
-                  : "모바일 청첩장이 도착했어요"
+                  ? `${data.weddingDate} · 모바일 초대장이 도착했어요`
+                  : "모바일 초대장이 도착했어요"
               }
               imageUrl={data.mainPhotoUrl}
               className="mt-4 w-full py-2.5 text-sm"

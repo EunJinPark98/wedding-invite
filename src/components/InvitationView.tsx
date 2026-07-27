@@ -1,5 +1,6 @@
 import { normalizeData, type InvitationData, type TemplateId } from "@/lib/types";
 import { getTheme, getFontFamily, type TemplateTheme } from "@/lib/templates";
+import { getCategoryLabels } from "@/lib/categories";
 import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
 import Countdown from "./Countdown";
@@ -170,6 +171,7 @@ function DateInner({
   heart?: boolean;
 }) {
   const dday = daysUntil(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
   return (
     <div className="text-center">
       <p className="inv-fade mb-7 text-lg" style={{ fontFamily: t.headingFont }}>
@@ -192,6 +194,8 @@ function DateInner({
         t={t}
         groomName={data.groomName}
         brideName={data.brideName}
+        showPerson2={labels.showPerson2}
+        eventLabel={labels.countdownLabel}
       />
     </div>
   );
@@ -258,40 +262,61 @@ function CoupleInner({
   arch?: boolean;
   preview?: boolean;
 }) {
-  const people = [
-    {
-      role: "신랑",
-      name: data.groomName,
-      photo: data.groomPhotoUrl,
-      father: data.groomFather,
-      mother: data.groomMother,
-      relation: "아들",
-      tel: data.groomPhone,
-    },
-    {
-      role: "신부",
-      name: data.brideName,
-      photo: data.bridePhotoUrl,
-      father: data.brideFather,
-      mother: data.brideMother,
-      relation: "딸",
-      tel: data.bridePhone,
-    },
-  ];
+  const labels = getCategoryLabels(data.category);
+  const people = labels.showPerson2
+    ? [
+        {
+          role: "신랑",
+          name: data.groomName,
+          photo: data.groomPhotoUrl,
+          father: data.groomFather,
+          mother: data.groomMother,
+          relation: "아들",
+          tel: data.groomPhone,
+        },
+        {
+          role: "신부",
+          name: data.brideName,
+          photo: data.bridePhotoUrl,
+          father: data.brideFather,
+          mother: data.brideMother,
+          relation: "딸",
+          tel: data.bridePhone,
+        },
+      ]
+    : [
+        {
+          role: labels.personTitle,
+          name: data.groomName,
+          photo: data.groomPhotoUrl,
+          father: data.groomFather,
+          mother: data.groomMother,
+          relation: labels.relation,
+          tel: data.groomPhone,
+        },
+      ];
   return (
-    <div className="grid grid-cols-2 gap-5">
+    <div
+      className={
+        labels.showPerson2
+          ? "grid grid-cols-2 gap-5"
+          : "mx-auto max-w-[220px]"
+      }
+    >
       {people.map((p) => {
         const parents = [p.father, p.mother].map((s) => s.trim()).filter(Boolean);
         return (
-          <div key={p.role} className="text-center">
+          <div key={p.role || "solo"} className="text-center">
             {/* 신랑/신부 타이틀 */}
-            <p
-              className="inv-fade mb-4 text-base tracking-[0.2em]"
-              style={{ fontFamily: t.headingFont, color: t.ink }}
-            >
-              {p.role}
-            </p>
-            <ProfilePhoto src={p.photo} role={p.role} t={t} arch={arch} preview={preview} />
+            {p.role && (
+              <p
+                className="inv-fade mb-4 text-base tracking-[0.2em]"
+                style={{ fontFamily: t.headingFont, color: t.ink }}
+              >
+                {p.role}
+              </p>
+            )}
+            <ProfilePhoto src={p.photo} role={p.role || "대표"} t={t} arch={arch} preview={preview} />
             {/* 이름 ↵ 전화·문자 */}
             <p
               className="inv-fade mt-5 text-lg"
@@ -303,7 +328,7 @@ function CoupleInner({
               <div className="inv-fade mt-2.5 flex items-center justify-center gap-2">
                   <a
                     href={`tel:${p.tel}`}
-                    aria-label={`${p.role}에게 전화`}
+                    aria-label="전화하기"
                     className="flex h-7 w-7 items-center justify-center rounded-full border transition"
                     style={{ borderColor: t.line, color: t.accent }}
                   >
@@ -313,7 +338,7 @@ function CoupleInner({
                   </a>
                   <a
                     href={`sms:${p.tel}`}
-                    aria-label={`${p.role}에게 문자`}
+                    aria-label="문자하기"
                     className="flex h-7 w-7 items-center justify-center rounded-full border transition"
                     style={{ borderColor: t.line, color: t.accent }}
                   >
@@ -324,7 +349,7 @@ function CoupleInner({
               </div>
             )}
             {/* 부모 소개: "아버지 · 어머니 ↵ 아들" */}
-            {parents.length > 0 && (
+            {labels.showParents && parents.length > 0 && (
               <p
                 className="inv-fade mt-2.5 text-xs leading-6"
                 style={{ color: t.sub }}
@@ -467,7 +492,13 @@ function AccountInner({
 }) {
   const accounts = data.accounts.filter((a) => a.number);
   if (accounts.length === 0) return null;
-  return <AccountList accounts={accounts} t={t} />;
+  return (
+    <AccountList
+      accounts={accounts}
+      t={t}
+      showSide={getCategoryLabels(data.category).showPerson2}
+    />
+  );
 }
 
 /* ════════ 라벨/구분선 (템플릿 변형) ════════ */
@@ -579,6 +610,9 @@ function NamesAmp({
   t: TemplateTheme;
   heartColor?: string;
 }) {
+  if (!getCategoryLabels(data.category).showPerson2) {
+    return <>{data.groomName}</>;
+  }
   return (
     <>
       {data.groomName}
@@ -648,6 +682,7 @@ function ClassicLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
   return (
     <>
       <div className="relative overflow-hidden">
@@ -655,7 +690,7 @@ function ClassicLayout({
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
         <div className="absolute inset-x-0 bottom-0 px-8 pb-11 text-center text-white">
           <p className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em] text-white/80">
-            WEDDING INVITATION
+            {labels.heroKicker}
           </p>
           <h1
             className="inv-hero-in mt-4 text-[1.8rem] leading-snug tracking-[0.06em]"
@@ -675,7 +710,7 @@ function ClassicLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="classic" />
-      <Sec label="GROOM & BRIDE" t={t} variant="classic">
+      <Sec label={labels.sectionCoupleLabel} t={t} variant="classic">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="classic" />
@@ -699,7 +734,7 @@ function ClassicLayout({
           <Divider t={t} variant="classic" />
           <Sec label="ACCOUNT" t={t} variant="classic">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
-              마음 전하실 곳
+              {getCategoryLabels(data.category).accountsLabel}
             </h3>
             <AccountInner data={data} t={t} />
           </Sec>
@@ -732,7 +767,7 @@ function ModernLayout({
           className="inv-hero-in font-cormorant text-base font-semibold tracking-[0.45em]"
           style={{ color: t.sub }}
         >
-          THE WEDDING DAY
+          {getCategoryLabels(data.category).heroKicker2}
         </p>
         {p && (
           <p
@@ -754,7 +789,7 @@ function ModernLayout({
         <GreetingInner data={data} t={t} align="left" />
       </Sec>
       <Divider t={t} variant="modern" />
-      <Sec label="GROOM & BRIDE" index="02" t={t} variant="modern">
+      <Sec label={getCategoryLabels(data.category).sectionCoupleLabel} index="02" t={t} variant="modern">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="modern" />
@@ -808,6 +843,7 @@ function RomanticLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
   return (
     <>
       <div
@@ -848,7 +884,7 @@ function RomanticLayout({
           className="inv-hero-in text-3xl"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
-          우리, 결혼해요
+          {data.category === "wedding" ? "우리, 결혼해요" : labels.heroPhrase}
         </p>
         <div
           className="inv-hero-in mx-auto mt-6 overflow-hidden border-4"
@@ -867,11 +903,17 @@ function RomanticLayout({
           className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
           style={{ fontFamily: t.headingFont }}
         >
-          {data.groomName}
-          <span className="inv-heartbeat mx-2" style={{ color: t.accent }}>
-            ♡
-          </span>
-          {data.brideName}
+          {labels.showPerson2 ? (
+            <>
+              {data.groomName}
+              <span className="inv-heartbeat mx-2" style={{ color: t.accent }}>
+                ♡
+              </span>
+              {data.brideName}
+            </>
+          ) : (
+            data.groomName
+          )}
         </h1>
         <div
           className="inv-hero-in-delay mx-auto mt-3 flex items-center justify-center gap-2"
@@ -897,7 +939,7 @@ function RomanticLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="romantic" />
-      <Sec label="GROOM & BRIDE" t={t} variant="romantic">
+      <Sec label={labels.sectionCoupleLabel} t={t} variant="romantic">
         <CoupleInner data={data} t={t} arch preview={preview} />
       </Sec>
       <Divider t={t} variant="romantic" />
@@ -921,7 +963,7 @@ function RomanticLayout({
           <Divider t={t} variant="romantic" />
           <Sec label="ACCOUNT" t={t} variant="romantic">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
-              마음 전하실 곳
+              {getCategoryLabels(data.category).accountsLabel}
             </h3>
             <AccountInner data={data} t={t} />
           </Sec>
@@ -942,6 +984,7 @@ function BotanicalLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
   return (
     <div className="p-3">
       <div
@@ -953,7 +996,7 @@ function BotanicalLayout({
             className="inv-hero-in font-cormorant text-[10px] tracking-[0.45em]"
             style={{ color: t.accent }}
           >
-            THE MARRIAGE OF
+            {data.category === "wedding" ? "THE MARRIAGE OF" : labels.heroKicker}
           </p>
           <div
             className="inv-hero-in relative mx-auto mt-6 w-fit rounded-full p-1.5"
@@ -987,7 +1030,7 @@ function BotanicalLayout({
           <GreetingInner data={data} t={t} />
         </Sec>
         <Divider t={t} variant="botanical" />
-        <Sec label="GROOM & BRIDE" t={t} variant="botanical">
+        <Sec label={labels.sectionCoupleLabel} t={t} variant="botanical">
           <CoupleInner data={data} t={t} preview={preview} />
         </Sec>
         <Divider t={t} variant="botanical" />
@@ -1011,7 +1054,7 @@ function BotanicalLayout({
             <Divider t={t} variant="botanical" />
             <Sec label="ACCOUNT" t={t} variant="botanical">
               <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
-                마음 전하실 곳
+                {getCategoryLabels(data.category).accountsLabel}
               </h3>
               <AccountInner data={data} t={t} />
             </Sec>
@@ -1033,6 +1076,7 @@ function StarlightLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
   // 별 위치 (고정 배열 — 렌더마다 동일)
   const stars = [
     { left: "6%", top: "8%", size: 3, delay: 0 },
@@ -1081,13 +1125,13 @@ function StarlightLayout({
           className="inv-hero-in text-2xl"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
-          우리, 결혼합니다
+          {data.category === "wedding" ? "우리, 결혼합니다" : labels.heroPhrase}
         </p>
         <p
           className="inv-hero-in font-cormorant mt-2 text-[10px] tracking-[0.5em]"
           style={{ color: t.sub }}
         >
-          WEDDING INVITATION
+          {labels.heroKicker}
         </p>
         {/* 금빛 링 + 글로우 사진 */}
         <div
@@ -1121,7 +1165,7 @@ function StarlightLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="starlight" />
-      <Sec label="GROOM & BRIDE" t={t} variant="starlight">
+      <Sec label={labels.sectionCoupleLabel} t={t} variant="starlight">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="starlight" />
@@ -1145,7 +1189,7 @@ function StarlightLayout({
           <Divider t={t} variant="starlight" />
           <Sec label="ACCOUNT" t={t} variant="starlight">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
-              마음 전하실 곳
+              {getCategoryLabels(data.category).accountsLabel}
             </h3>
             <AccountInner data={data} t={t} />
           </Sec>
@@ -1166,6 +1210,7 @@ function CinemaLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
   return (
     <>
       {/* 필름 화보 히어로 — 이름 + 화보 사진 + 필카 감성 날짜 스탬프 */}
@@ -1177,18 +1222,22 @@ function CinemaLayout({
           >
             {data.groomName}
           </p>
-          <span
-            className="font-cormorant text-base italic"
-            style={{ color: t.accent }}
-          >
-            and
-          </span>
-          <p
-            className="inv-hero-in text-[22px] leading-tight"
-            style={{ fontFamily: t.headingFont, color: t.ink }}
-          >
-            {data.brideName}
-          </p>
+          {labels.showPerson2 && (
+            <>
+              <span
+                className="font-cormorant text-base italic"
+                style={{ color: t.accent }}
+              >
+                and
+              </span>
+              <p
+                className="inv-hero-in text-[22px] leading-tight"
+                style={{ fontFamily: t.headingFont, color: t.ink }}
+              >
+                {data.brideName}
+              </p>
+            </>
+          )}
         </div>
       </div>
       <div className="relative mt-8 overflow-hidden">
@@ -1243,7 +1292,7 @@ function CinemaLayout({
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="cinema" />
-      <Sec label="GROOM & BRIDE" t={t} variant="cinema">
+      <Sec label={labels.sectionCoupleLabel} t={t} variant="cinema">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="cinema" />
@@ -1267,7 +1316,7 @@ function CinemaLayout({
           <Divider t={t} variant="cinema" />
           <Sec label="ACCOUNT" t={t} variant="cinema">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
-              마음 전하실 곳
+              {getCategoryLabels(data.category).accountsLabel}
             </h3>
             <AccountInner data={data} t={t} />
           </Sec>
@@ -1328,11 +1377,17 @@ function Footer({
             className="text-xl tracking-wide"
             style={{ fontFamily: t.headingFont, color: mainColor }}
           >
-            {data.groomName}
-            <span className="mx-2 text-[0.8em]" style={{ color: subColor }}>
-              ♡
-            </span>
-            {data.brideName}
+            {getCategoryLabels(data.category).showPerson2 ? (
+              <>
+                {data.groomName}
+                <span className="mx-2 text-[0.8em]" style={{ color: subColor }}>
+                  ♡
+                </span>
+                {data.brideName}
+              </>
+            ) : (
+              data.groomName
+            )}
           </p>
           {fp && (
             <p

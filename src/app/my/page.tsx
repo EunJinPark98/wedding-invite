@@ -20,6 +20,7 @@ export default async function MyPage() {
   const items: MyInvitation[] = invitations.map((inv) => ({
     slug: inv.slug,
     templateName: getTheme(inv.template).name,
+    category: inv.data?.category ?? "wedding",
     groomName: inv.data?.groomName ?? "",
     brideName: inv.data?.brideName ?? "",
     weddingDate: inv.data?.weddingDate ?? "",

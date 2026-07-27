@@ -1,5 +1,9 @@
 // 모바일 청첩장 데이터 모델
 
+// 초대장 종류 — 결혼 외 인생 이벤트로 확장
+export const CATEGORY_IDS = ["wedding", "doljanchi", "senior", "birthday"] as const;
+export type Category = (typeof CATEGORY_IDS)[number];
+
 export const TEMPLATE_IDS = [
   "classic",
   "modern",
@@ -42,7 +46,9 @@ export interface Account {
 }
 
 export interface InvitationData {
-  // 신랑/신부
+  // 초대장 종류 (기본 "wedding")
+  category: Category;
+  // 신랑/신부 (다른 카테고리에서는 주인공/아기/생일 주인공으로 재사용)
   groomName: string;
   brideName: string;
   // 혼주
@@ -93,6 +99,9 @@ export interface Invitation {
 export const normalizeData = (
   d: Partial<InvitationData> | null | undefined
 ): InvitationData => ({
+  category: CATEGORY_IDS.includes(d?.category as Category)
+    ? (d!.category as Category)
+    : "wedding",
   groomName: d?.groomName ?? "",
   brideName: d?.brideName ?? "",
   groomFather: d?.groomFather ?? "",
@@ -125,35 +134,106 @@ export const normalizeData = (
   footerMessage: d?.footerMessage ?? "",
 });
 
-export const emptyInvitation = (): InvitationData => ({
-  groomName: "김선일",
-  brideName: "박은진",
-  groomFather: "김아버지",
-  groomMother: "박어머니",
-  brideFather: "박아버지",
-  brideMother: "엄어머니",
-  weddingDate: "2026-10-10",
-  weddingTime: "오후 1시",
-  venueName: "그랜드 웨딩홀",
-  venueHall: "3층 그랜드볼룸",
-  venueAddress: "서울특별시 강남구 테헤란로 123",
-  greetingTitle: "소중한 분들을 초대합니다",
-  greetingMessage:
-    "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
-  fontHeading: "default",
-  fontBody: "default",
-  // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
-  mainPhotoUrl: SAMPLE_MAIN_PHOTO,
-  heroMotion: "zoomin",
-  groomPhotoUrl: "",
-  bridePhotoUrl: "",
-  // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
-  gallery: ["", "", ""],
-  groomPhone: "010-1234-5678",
-  bridePhone: "010-8765-4321",
-  accounts: [
-    { side: "신랑측", name: "김선일", bank: "국민은행", number: "123-456-7890" },
-    { side: "신부측", name: "박은진", bank: "신한은행", number: "987-654-3210" },
-  ],
-  footerMessage: "",
-});
+// 카테고리별 인물/문구 샘플값 (에디터 초기 상태 + 템플릿 카드 미리보기용)
+const CATEGORY_SAMPLE: Record<
+  Category,
+  {
+    groomName: string;
+    brideName: string;
+    groomFather: string;
+    groomMother: string;
+    brideFather: string;
+    brideMother: string;
+    greetingTitle: string;
+    greetingMessage: string;
+    accountLabel: string;
+  }
+> = {
+  wedding: {
+    groomName: "김선일",
+    brideName: "박은진",
+    groomFather: "김아버지",
+    groomMother: "박어머니",
+    brideFather: "박아버지",
+    brideMother: "엄어머니",
+    greetingTitle: "소중한 분들을 초대합니다",
+    greetingMessage:
+      "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
+    accountLabel: "축의금",
+  },
+  doljanchi: {
+    groomName: "김하람",
+    brideName: "",
+    groomFather: "김아빠",
+    groomMother: "박엄마",
+    brideFather: "",
+    brideMother: "",
+    greetingTitle: "우리 아이의 첫 생일에 초대합니다",
+    greetingMessage:
+      "건강하게 자라준 하람이의 첫 생일을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
+    accountLabel: "축하금",
+  },
+  senior: {
+    groomName: "김대한",
+    brideName: "",
+    groomFather: "",
+    groomMother: "",
+    brideFather: "",
+    brideMother: "",
+    greetingTitle: "칠순을 축하하는 자리에 초대합니다",
+    greetingMessage:
+      "그동안 걸어오신 길에 존경과 감사를 담아\n작은 자리를 마련했습니다.\n오셔서 축복해 주시면 큰 힘이 되겠습니다.",
+    accountLabel: "축하금",
+  },
+  birthday: {
+    groomName: "김민준",
+    brideName: "",
+    groomFather: "",
+    groomMother: "",
+    brideFather: "",
+    brideMother: "",
+    greetingTitle: "생일을 축하하는 자리에 초대합니다",
+    greetingMessage:
+      "소중한 하루를 함께 나누고 싶어\n작은 자리를 마련했습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
+    accountLabel: "축하금",
+  },
+};
+
+export const emptyInvitation = (category: Category = "wedding"): InvitationData => {
+  const s = CATEGORY_SAMPLE[category];
+  return {
+    category,
+    groomName: s.groomName,
+    brideName: s.brideName,
+    groomFather: s.groomFather,
+    groomMother: s.groomMother,
+    brideFather: s.brideFather,
+    brideMother: s.brideMother,
+    weddingDate: "2026-10-10",
+    weddingTime: "오후 1시",
+    venueName: "그랜드 웨딩홀",
+    venueHall: "3층 그랜드볼룸",
+    venueAddress: "서울특별시 강남구 테헤란로 123",
+    greetingTitle: s.greetingTitle,
+    greetingMessage: s.greetingMessage,
+    fontHeading: "default",
+    fontBody: "default",
+    // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
+    mainPhotoUrl: SAMPLE_MAIN_PHOTO,
+    heroMotion: "zoomin",
+    groomPhotoUrl: "",
+    bridePhotoUrl: "",
+    // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
+    gallery: ["", "", ""],
+    groomPhone: "010-1234-5678",
+    bridePhone: "010-8765-4321",
+    accounts:
+      category === "wedding"
+        ? [
+            { side: "신랑측", name: "김선일", bank: "국민은행", number: "123-456-7890" },
+            { side: "신부측", name: "박은진", bank: "신한은행", number: "987-654-3210" },
+          ]
+        : [{ side: "신랑측", name: s.groomName, bank: "국민은행", number: "123-456-7890" }],
+    footerMessage: "",
+  };
+};

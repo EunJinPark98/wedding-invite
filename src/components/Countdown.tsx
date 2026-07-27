@@ -26,11 +26,15 @@ export default function Countdown({
   t,
   groomName,
   brideName,
+  showPerson2 = true,
+  eventLabel = "결혼식",
 }: {
   iso: string;
   t: TemplateTheme;
   groomName: string;
   brideName: string;
+  showPerson2?: boolean;
+  eventLabel?: string;
 }) {
   const [time, setTime] = useState<ReturnType<typeof remain>>(null);
   const [mounted, setMounted] = useState(false);
@@ -83,7 +87,7 @@ export default function Countdown({
         ))}
       </div>
       <p className="mt-5 text-[13px]" style={{ color: t.sub }}>
-        {groomName} · {brideName}의 결혼식이{" "}
+        {showPerson2 ? `${groomName} · ${brideName}` : groomName}의 {eventLabel}까지{" "}
         <span className="font-medium" style={{ color: t.accent }}>
           {time.days}일
         </span>{" "}
