@@ -365,32 +365,44 @@ body {
   }
 }
 
-/* 로맨틱: 꽃잎이 흩날리는 히어로 */
-@keyframes inv-petal-fall {
+/* 로맨틱: 꽃잎 하나가 좌우로 휘날리며 떨어지는 히어로 */
+@keyframes inv-petal-flutter {
   0% {
-    transform: translateY(-8%) rotate(0deg);
+    transform: translate(-6px, -10%) rotate(-8deg);
     opacity: 0;
   }
-  12% {
+  8% {
+    opacity: 0.9;
+  }
+  22% {
+    transform: translate(22px, 14%) rotate(35deg);
+  }
+  38% {
+    transform: translate(-8px, 30%) rotate(-20deg);
+  }
+  54% {
+    transform: translate(20px, 50%) rotate(30deg);
+  }
+  70% {
+    transform: translate(-18px, 68%) rotate(-25deg);
+  }
+  86% {
+    transform: translate(12px, 88%) rotate(18deg);
     opacity: 0.85;
   }
-  85% {
-    opacity: 0.7;
-  }
   100% {
-    transform: translateY(105%) rotate(200deg);
+    transform: translate(-6px, 108%) rotate(-10deg);
     opacity: 0;
   }
 }
-.inv-petal {
+.inv-petal-flutter {
   position: absolute;
   top: 0;
-  height: 100%;
   pointer-events: none;
-  animation: inv-petal-fall linear infinite;
+  animation: inv-petal-flutter 9s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .inv-petal {
+  .inv-petal-flutter {
     display: none;
   }
 }
