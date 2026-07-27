@@ -1326,6 +1326,889 @@ function CinemaLayout({
   );
 }
 
+/* ════════ 카테고리 전용 템플릿 공통 본문 ════════
+   (인사말 → 주인공 → 날짜 → 장소 → 갤러리 → 계좌) */
+function CommonBody({
+  data,
+  t,
+  variant,
+  preview = false,
+  arch = false,
+  heart = false,
+  rounded = "rounded-xl",
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  variant: TemplateId;
+  preview?: boolean;
+  arch?: boolean;
+  heart?: boolean;
+  rounded?: string;
+}) {
+  const labels = getCategoryLabels(data.category);
+  return (
+    <>
+      <Sec label="INVITATION" t={t} variant={variant}>
+        <GreetingInner data={data} t={t} />
+      </Sec>
+      <Divider t={t} variant={variant} />
+      <Sec label={labels.sectionCoupleLabel} t={t} variant={variant}>
+        <CoupleInner data={data} t={t} arch={arch} preview={preview} />
+      </Sec>
+      <Divider t={t} variant={variant} />
+      <Sec label="THE DAY" t={t} variant={variant}>
+        <DateInner data={data} t={t} heart={heart} />
+      </Sec>
+      <Divider t={t} variant={variant} />
+      <Sec label="LOCATION" t={t} variant={variant}>
+        <LocationInner data={data} t={t} />
+      </Sec>
+      {showGallery(data, preview) && (
+        <>
+          <Divider t={t} variant={variant} />
+          <Sec label="GALLERY" t={t} variant={variant}>
+            <GalleryInner data={data} t={t} rounded={rounded} preview={preview} />
+          </Sec>
+        </>
+      )}
+      {data.accounts.filter((a) => a.number).length > 0 && (
+        <>
+          <Divider t={t} variant={variant} />
+          <Sec label="ACCOUNT" t={t} variant={variant}>
+            <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
+              {labels.accountsLabel}
+            </h3>
+            <AccountInner data={data} t={t} />
+          </Sec>
+        </>
+      )}
+    </>
+  );
+}
+
+/* ════════ 돌잔치 전용 레이아웃 ════════ */
+
+// 돌1) 곰돌이 — 포근한 베이지, 풍선과 곰인형이 함께하는 첫 생일
+function DolBearLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  return (
+    <>
+      <div
+        className="relative overflow-hidden px-8 pb-14 pt-14 text-center"
+        style={{
+          background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 85%)`,
+        }}
+      >
+        {/* 두둥실 떠오르는 풍선 */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {[
+            { left: "6%", size: 24, dur: 11, delay: 0 },
+            { left: "18%", size: 18, dur: 13, delay: 4 },
+            { left: "76%", size: 22, dur: 12, delay: 2 },
+            { left: "88%", size: 17, dur: 14, delay: 6 },
+            { left: "48%", size: 15, dur: 15, delay: 8 },
+          ].map((b, i) => (
+            <span
+              key={i}
+              className="inv-balloon"
+              style={{
+                left: b.left,
+                fontSize: b.size,
+                opacity: 0,
+                animationDuration: `${b.dur}s`,
+                animationDelay: `${b.delay}s`,
+              }}
+            >
+              🎈
+            </span>
+          ))}
+        </div>
+        <p
+          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          style={{ color: t.accent }}
+        >
+          FIRST BIRTHDAY
+        </p>
+        <p className="inv-hero-in mt-4 text-4xl" aria-hidden>
+          <span className="inv-bob">🧸</span>
+        </p>
+        {/* 흰 테두리 + 점선 링 동그란 사진 */}
+        <div
+          className="inv-hero-in mx-auto mt-5 rounded-full border border-dashed p-2.5"
+          style={{ borderColor: `${t.accent}77`, width: "fit-content" }}
+        >
+          <div
+            className="overflow-hidden rounded-full border-[6px]"
+            style={{
+              width: "216px",
+              height: "216px",
+              borderColor: "#fff",
+              boxShadow: `0 16px 34px -14px ${t.accent}66`,
+            }}
+          >
+            <Photo data={data} t={t} className="h-full w-full" kenburns />
+          </div>
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-7 text-[1.7rem] tracking-wide"
+          style={{ fontFamily: t.headingFont, color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        <p
+          className="inv-hero-in-delay mt-1.5 text-[15px]"
+          style={{ color: t.sub }}
+        >
+          우리 아이의 첫 번째 생일
+        </p>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-4 inline-block rounded-full px-5 py-1.5 font-cormorant text-sm tracking-[0.25em]"
+            style={{ background: "#fff", color: t.accent }}
+          >
+            {p.year}. {String(p.month).padStart(2, "0")}.{" "}
+            {String(p.day).padStart(2, "0")}
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="dolbear" preview={preview} rounded="rounded-2xl" />
+    </>
+  );
+}
+
+// 돌2) 구름 위 아기 — 파스텔 하늘·무지개·흐르는 구름
+function DolCloudLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const stars = [
+    { left: "12%", top: "30%", size: 4, delay: 0 },
+    { left: "85%", top: "24%", size: 3, delay: 1.1 },
+    { left: "22%", top: "62%", size: 3, delay: 2 },
+    { left: "78%", top: "58%", size: 4, delay: 0.6 },
+    { left: "50%", top: "12%", size: 3, delay: 1.6 },
+  ];
+  return (
+    <>
+      <div
+        className="relative overflow-hidden px-8 pb-14 pt-12 text-center"
+        style={{
+          background: `linear-gradient(180deg, ${t.accentSoft} 0%, #fdf3f7 60%, ${t.pageBg} 100%)`,
+        }}
+      >
+        {/* 흐르는 구름 + 반짝이는 별 */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {[
+            { top: "6%", size: 34, dur: 26, delay: -6 },
+            { top: "16%", size: 24, dur: 32, delay: -20 },
+            { top: "40%", size: 28, dur: 29, delay: -12 },
+          ].map((c, i) => (
+            <span
+              key={i}
+              className="inv-cloud"
+              style={{
+                top: c.top,
+                left: 0,
+                fontSize: c.size,
+                opacity: 0,
+                animationDuration: `${c.dur}s`,
+                animationDelay: `${c.delay}s`,
+              }}
+            >
+              ☁️
+            </span>
+          ))}
+          {stars.map((s, i) => (
+            <span
+              key={`s${i}`}
+              className="inv-twinkle"
+              style={{
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                background: "#ffd66e",
+                boxShadow: "0 0 6px 1px rgba(255,214,110,0.8)",
+                animationDelay: `${s.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+        <p
+          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          style={{ color: t.accent }}
+        >
+          FIRST BIRTHDAY
+        </p>
+        {/* 무지개 아치 */}
+        <svg
+          viewBox="0 0 120 62"
+          className="inv-hero-in mx-auto mt-4 w-36"
+          aria-hidden
+        >
+          {["#f7a6b8", "#f8ce7b", "#a8d8a0", "#8fc3ef"].map((c, i) => (
+            <path
+              key={c}
+              d={`M ${10 + i * 7} 60 A ${50 - i * 7} ${50 - i * 7} 0 0 1 ${110 - i * 7} 60`}
+              fill="none"
+              stroke={c}
+              strokeWidth={6}
+              strokeLinecap="round"
+            />
+          ))}
+        </svg>
+        <div
+          className="inv-hero-in mx-auto -mt-9 overflow-hidden rounded-full border-[6px]"
+          style={{
+            width: "200px",
+            height: "200px",
+            borderColor: "#fff",
+            boxShadow: `0 16px 34px -14px ${t.accent}66`,
+          }}
+        >
+          <Photo data={data} t={t} className="h-full w-full" kenburns />
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-7 text-[1.7rem] tracking-wide"
+          style={{ fontFamily: t.headingFont, color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        <p
+          className="inv-hero-in-delay mt-1.5 text-[15px]"
+          style={{ color: t.sub }}
+        >
+          구름 위를 걷는 첫 생일에 초대해요
+        </p>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-3.5 font-cormorant text-base tracking-[0.3em]"
+            style={{ color: t.sub }}
+          >
+            {p.year}. {String(p.month).padStart(2, "0")}.{" "}
+            {String(p.day).padStart(2, "0")}
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="dolcloud" preview={preview} rounded="rounded-2xl" />
+    </>
+  );
+}
+
+// 돌3) 색동 — 색동 저고리 무드의 전통 돌잔치
+function DolHanbokLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const saekdong =
+    "linear-gradient(90deg, #3f6b8f 0 20%, #e5a13d 20% 40%, #c25b4e 40% 60%, #6f8c6a 60% 80%, #e9c8d8 80% 100%)";
+  const obang = ["#3f6b8f", "#e5a13d", "#c25b4e", "#6f8c6a", "#54382f"];
+  return (
+    <>
+      {/* 색동 띠 */}
+      <div className="h-3 w-full" style={{ background: saekdong }} aria-hidden />
+      <div className="px-8 pb-12 pt-12 text-center">
+        <p
+          className="inv-hero-in text-[13px] tracking-[0.35em]"
+          style={{ color: t.accent, fontFamily: t.headingFont }}
+        >
+          돌잔치에 초대합니다
+        </p>
+        {/* 전통 이중 프레임 사진 */}
+        <div
+          className="inv-hero-in mx-auto mt-7 p-2"
+          style={{ border: `1px solid ${t.line}`, width: "fit-content" }}
+        >
+          <div
+            className="overflow-hidden"
+            style={{
+              width: "228px",
+              height: "300px",
+              border: `3px solid ${t.accent}`,
+              borderRadius: "4px",
+            }}
+          >
+            <Photo data={data} t={t} className="h-full w-full" kenburns />
+          </div>
+        </div>
+        {/* 오방색 점 구분 장식 */}
+        <div
+          className="inv-hero-in-delay mt-6 flex items-center justify-center gap-2"
+          aria-hidden
+        >
+          {obang.map((c) => (
+            <span
+              key={c}
+              className="inline-block h-1.5 w-1.5 rounded-full"
+              style={{ background: c }}
+            />
+          ))}
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-4 text-[1.7rem] tracking-[0.1em]"
+          style={{ fontFamily: t.headingFont, color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        <p
+          className="inv-hero-in-delay mt-1.5 text-[14px]"
+          style={{ color: t.sub }}
+        >
+          첫 돌을 맞이했습니다
+        </p>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-3 text-[15px] tracking-[0.2em]"
+            style={{ color: t.sub, fontFamily: t.headingFont }}
+          >
+            {p.year}년 {p.month}월 {p.day}일
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="dolhanbok" preview={preview} />
+    </>
+  );
+}
+
+/* ════════ 칠순 · 팔순 전용 레이아웃 ════════ */
+
+// 수1) 수연 — 자주빛과 금빛의 격조 있는 수연례
+function SeniorGoldLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const gold = "#d8b46a";
+  return (
+    <>
+      <div
+        className="relative overflow-hidden px-8 pb-14 pt-12 text-center"
+        style={{
+          background: "linear-gradient(180deg, #5a2530 0%, #6d2e3b 100%)",
+        }}
+      >
+        {/* 상하 금빛 이중 헤어라인 */}
+        <div className="absolute inset-x-6 top-4" aria-hidden>
+          <div className="h-px" style={{ background: `${gold}88` }} />
+          <div className="mt-1 h-px" style={{ background: `${gold}44` }} />
+        </div>
+        <div className="absolute inset-x-6 bottom-4" aria-hidden>
+          <div className="h-px" style={{ background: `${gold}44` }} />
+          <div className="mt-1 h-px" style={{ background: `${gold}88` }} />
+        </div>
+        <p className="inv-hero-in mt-2 text-2xl" aria-hidden>
+          <span className="inv-sway" style={{ color: gold }}>
+            ✿
+          </span>
+        </p>
+        <p
+          className="inv-hero-in mt-3 font-cormorant text-[10px] tracking-[0.5em]"
+          style={{ color: `${gold}cc` }}
+        >
+          70TH · 80TH CELEBRATION
+        </p>
+        <h1
+          className="inv-hero-in mt-4 text-[1.55rem] tracking-[0.25em]"
+          style={{ fontFamily: t.headingFont, color: gold }}
+        >
+          수연례에 모십니다
+        </h1>
+        {/* 금빛 이중 링 사진 */}
+        <div
+          className="inv-hero-in mx-auto mt-7 rounded-full p-1"
+          style={{ border: `1px solid ${gold}99`, width: "fit-content" }}
+        >
+          <div
+            className="overflow-hidden rounded-full border-2"
+            style={{ width: "208px", height: "208px", borderColor: gold }}
+          >
+            <Photo data={data} t={t} className="h-full w-full" kenburns />
+          </div>
+        </div>
+        <p
+          className="inv-hero-in-delay mt-7 text-[1.5rem] tracking-[0.15em]"
+          style={{ fontFamily: t.headingFont, color: "#f6ead3" }}
+        >
+          {data.groomName}
+        </p>
+        {p && (
+          <p
+            className="inv-hero-in-delay mb-3 mt-3 text-sm tracking-[0.25em]"
+            style={{ color: `${gold}bb` }}
+          >
+            {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="seniorgold" preview={preview} />
+    </>
+  );
+}
+
+// 수2) 모란 — 탐스러운 모란 꽃잎이 흩날리는 화사한 잔치
+function SeniorBloomLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const labels = getCategoryLabels(data.category);
+  return (
+    <>
+      <div
+        className="relative overflow-hidden px-8 pb-12 pt-12 text-center"
+        style={{
+          background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 75%)`,
+        }}
+      >
+        {/* 흩날리는 모란 꽃잎 */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {[
+            { left: "10%", size: 14, dur: 12, delay: 0 },
+            { left: "28%", size: 11, dur: 14, delay: 5 },
+            { left: "52%", size: 12, dur: 13, delay: 9 },
+            { left: "72%", size: 15, dur: 12, delay: 2 },
+            { left: "90%", size: 11, dur: 15, delay: 6 },
+          ].map((f, i) => (
+            <span
+              key={i}
+              className="inv-petal"
+              style={{
+                left: f.left,
+                fontSize: f.size,
+                color: t.accent,
+                opacity: 0,
+                animationDuration: `${f.dur}s`,
+                animationDelay: `${f.delay}s`,
+              }}
+            >
+              ✿
+            </span>
+          ))}
+        </div>
+        <p
+          className="inv-hero-in text-[26px]"
+          style={{ fontFamily: "var(--font-brush)", color: t.accent }}
+        >
+          {labels.heroPhrase}
+        </p>
+        {/* 아치형 사진 + 안쪽 헤어라인 */}
+        <div
+          className="inv-hero-in relative mx-auto mt-6 overflow-hidden"
+          style={{
+            width: "236px",
+            height: "310px",
+            borderTopLeftRadius: "120px",
+            borderTopRightRadius: "120px",
+            borderBottomLeftRadius: "10px",
+            borderBottomRightRadius: "10px",
+            boxShadow: `0 18px 40px -14px ${t.accent}55`,
+          }}
+        >
+          <Photo data={data} t={t} className="h-full w-full" kenburns />
+          <div
+            className="pointer-events-none absolute inset-2 border border-white/70"
+            style={{
+              borderTopLeftRadius: "112px",
+              borderTopRightRadius: "112px",
+              borderBottomLeftRadius: "6px",
+              borderBottomRightRadius: "6px",
+            }}
+            aria-hidden
+          />
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-7 text-[1.6rem] tracking-[0.12em]"
+          style={{ fontFamily: t.headingFont, color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        <div
+          className="inv-hero-in-delay mx-auto mt-3 flex items-center justify-center gap-2"
+          aria-hidden
+        >
+          <span className="h-px w-8" style={{ background: t.line }} />
+          <span className="text-[10px]" style={{ color: t.accent }}>
+            ✿
+          </span>
+          <span className="h-px w-8" style={{ background: t.line }} />
+        </div>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-2.5 text-sm tracking-[0.22em]"
+            style={{ color: t.sub }}
+          >
+            {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="seniorbloom" arch preview={preview} rounded="rounded-2xl" />
+    </>
+  );
+}
+
+// 수3) 송학 — 소나무·학처럼 푸른 장수 기원 (딥 그린 다크 히어로)
+function SeniorPineLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const gold = t.accent;
+  const sparks = [
+    { left: "10%", top: "14%", size: 3, delay: 0 },
+    { left: "24%", top: "8%", size: 2, delay: 1.2 },
+    { left: "76%", top: "10%", size: 2.5, delay: 0.5 },
+    { left: "90%", top: "20%", size: 3, delay: 1.8 },
+    { left: "8%", top: "62%", size: 2, delay: 2.3 },
+    { left: "92%", top: "70%", size: 2.5, delay: 0.9 },
+  ];
+  return (
+    <>
+      <div
+        className="relative overflow-hidden px-8 pb-14 pt-14 text-center"
+        style={{
+          background: "linear-gradient(180deg, #16261f 0%, #24382e 100%)",
+        }}
+      >
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {sparks.map((s, i) => (
+            <span
+              key={i}
+              className="inv-twinkle"
+              style={{
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                background: "#e9cf8f",
+                boxShadow: "0 0 6px 1px rgba(233,207,143,0.7)",
+                animationDelay: `${s.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+        <p
+          className="inv-hero-in text-[26px]"
+          style={{ fontFamily: t.headingFont, color: gold }}
+        >
+          壽
+        </p>
+        <p
+          className="inv-hero-in mt-2 font-cormorant text-[10px] tracking-[0.5em]"
+          style={{ color: "#9db4a6" }}
+        >
+          LONG LIFE &amp; HAPPINESS
+        </p>
+        <h1
+          className="inv-hero-in mt-4 text-[1.45rem] tracking-[0.2em]"
+          style={{ fontFamily: t.headingFont, color: "#eef3ea" }}
+        >
+          장수를 기원하는 자리
+        </h1>
+        {/* 금빛 글로우 링 사진 */}
+        <div
+          className="inv-hero-in inv-glow mx-auto mt-8 rounded-full p-1.5"
+          style={{ border: `1px solid ${gold}88`, width: "fit-content" }}
+        >
+          <div
+            className="overflow-hidden rounded-full"
+            style={{ width: "206px", height: "206px" }}
+          >
+            <Photo data={data} t={t} className="h-full w-full" kenburns />
+          </div>
+        </div>
+        <p
+          className="inv-hero-in-delay mt-7 text-[1.5rem] tracking-[0.15em]"
+          style={{ fontFamily: t.headingFont, color: gold }}
+        >
+          {data.groomName}
+        </p>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-3 text-sm tracking-[0.25em]"
+            style={{ color: "#9db4a6" }}
+          >
+            {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="seniorpine" preview={preview} />
+    </>
+  );
+}
+
+/* ════════ 생일 전용 레이아웃 ════════ */
+
+// 생1) 파티팝 — 알록달록 컨페티가 쏟아지는 파티
+function BdayPopLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const confetti = [
+    { left: "5%", color: "#f26d5f", dur: 6, delay: 0 },
+    { left: "15%", color: "#ffd166", dur: 7.5, delay: 2 },
+    { left: "27%", color: "#5fb7c9", dur: 6.5, delay: 4 },
+    { left: "38%", color: "#9b8cf2", dur: 8, delay: 1 },
+    { left: "50%", color: "#f2a3c0", dur: 6, delay: 3 },
+    { left: "62%", color: "#ffd166", dur: 7, delay: 5 },
+    { left: "73%", color: "#f26d5f", dur: 6.8, delay: 0.5 },
+    { left: "84%", color: "#5fb7c9", dur: 7.6, delay: 2.5 },
+    { left: "94%", color: "#9b8cf2", dur: 6.2, delay: 4.5 },
+  ];
+  return (
+    <>
+      <div className="relative overflow-hidden px-8 pb-12 pt-14 text-center">
+        {/* 쏟아지는 컨페티 */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {confetti.map((c, i) => (
+            <span
+              key={i}
+              className="inv-confetti"
+              style={{
+                left: c.left,
+                width: 7,
+                height: 12,
+                borderRadius: 2,
+                background: c.color,
+                opacity: 0,
+                animationDuration: `${c.dur}s`,
+                animationDelay: `${c.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+        <p className="inv-hero-in text-3xl" aria-hidden>
+          <span className="inv-bob">🎉</span>
+        </p>
+        <p
+          className="inv-hero-in mt-3 font-cormorant text-[13px] font-semibold tracking-[0.45em]"
+          style={{ color: t.accent }}
+        >
+          HAPPY BIRTHDAY
+        </p>
+        <h1
+          className="inv-hero-in mt-3 text-[2.1rem] font-extrabold tracking-tight"
+          style={{ color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        {/* 살짝 기울어진 폴라로이드풍 사진 */}
+        <div
+          className="inv-hero-in mx-auto mt-7 -rotate-2 overflow-hidden rounded-[26px] border-[6px]"
+          style={{
+            width: "248px",
+            height: "300px",
+            borderColor: "#fff",
+            boxShadow: `0 20px 44px -16px ${t.accent}77`,
+          }}
+        >
+          <Photo data={data} t={t} className="h-full w-full" kenburns />
+        </div>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-7 inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.15em]"
+            style={{ background: t.accentSoft, color: t.accent }}
+          >
+            {p.year}. {String(p.month).padStart(2, "0")}.{" "}
+            {String(p.day).padStart(2, "0")} {p.wkEn}
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="bdaypop" preview={preview} rounded="rounded-2xl" />
+    </>
+  );
+}
+
+// 생2) 네온 나이트 — 네온사인이 깜빡이는 다크 파티
+function BdayNeonLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  const stars = [
+    { left: "8%", top: "10%", size: 3, delay: 0, color: "#5fd9e7" },
+    { left: "20%", top: "26%", size: 2, delay: 1.3, color: "#ff5fa2" },
+    { left: "80%", top: "14%", size: 2.5, delay: 0.4, color: "#5fd9e7" },
+    { left: "92%", top: "30%", size: 3, delay: 1.9, color: "#ff5fa2" },
+    { left: "12%", top: "68%", size: 2, delay: 2.4, color: "#ff5fa2" },
+    { left: "88%", top: "74%", size: 2.5, delay: 0.8, color: "#5fd9e7" },
+  ];
+  return (
+    <>
+      <div className="relative overflow-hidden px-8 pb-14 pt-16 text-center">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {stars.map((s, i) => (
+            <span
+              key={i}
+              className="inv-twinkle"
+              style={{
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                background: s.color,
+                boxShadow: `0 0 6px 1px ${s.color}`,
+                animationDelay: `${s.delay}s`,
+              }}
+            />
+          ))}
+        </div>
+        <p
+          className="inv-hero-in inv-neon font-cormorant text-[22px] font-semibold tracking-[0.4em]"
+          style={{ color: "#ff5fa2" }}
+        >
+          HAPPY
+        </p>
+        <p
+          className="inv-hero-in inv-neon font-cormorant text-[22px] font-semibold tracking-[0.4em]"
+          style={{ color: "#5fd9e7", animationDelay: "0.9s" }}
+        >
+          BIRTHDAY
+        </p>
+        {/* 네온 링 사진 */}
+        <div
+          className="inv-hero-in inv-neon-ring mx-auto mt-8 rounded-full p-1"
+          style={{ border: "1px solid rgba(255,95,162,0.7)", width: "fit-content" }}
+        >
+          <div
+            className="overflow-hidden rounded-full"
+            style={{ width: "204px", height: "204px" }}
+          >
+            <Photo data={data} t={t} className="h-full w-full" kenburns />
+          </div>
+        </div>
+        <h1
+          className="inv-hero-in-delay mt-8 text-[1.8rem] font-bold tracking-wide"
+          style={{ color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        {p && (
+          <p
+            className="inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
+            style={{ color: t.sub, fontFamily: "monospace" }}
+          >
+            {p.year}.{String(p.month).padStart(2, "0")}.
+            {String(p.day).padStart(2, "0")} {p.wkEn}
+          </p>
+        )}
+      </div>
+      <CommonBody data={data} t={t} variant="bdayneon" preview={preview} rounded="rounded-2xl" />
+    </>
+  );
+}
+
+// 생3) 미니멀 데이 — 큼직한 타이포와 여백, 알약형 사진
+function BdayMinimalLayout({
+  data,
+  t,
+  preview = false,
+}: {
+  data: InvitationData;
+  t: TemplateTheme;
+  preview?: boolean;
+}) {
+  const p = dateParts(data.weddingDate);
+  return (
+    <>
+      <div className="px-8 pb-12 pt-16 text-center">
+        <div
+          className="inv-hero-in mx-auto h-px w-10"
+          style={{ background: t.accent }}
+          aria-hidden
+        />
+        <p
+          className="inv-hero-in mt-5 font-cormorant text-[11px] font-semibold tracking-[0.5em]"
+          style={{ color: t.accent }}
+        >
+          BIRTHDAY INVITATION
+        </p>
+        <h1
+          className="inv-hero-in mt-4 text-[2.4rem] font-extrabold leading-tight tracking-tight"
+          style={{ color: t.ink }}
+        >
+          {data.groomName}
+        </h1>
+        {p && (
+          <p
+            className="inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
+            style={{ color: t.sub }}
+          >
+            {p.year}.{String(p.month).padStart(2, "0")}.
+            {String(p.day).padStart(2, "0")}
+          </p>
+        )}
+        {/* 알약(캡슐)형 사진 */}
+        <div
+          className="inv-hero-in-delay mx-auto mt-8 overflow-hidden"
+          style={{
+            width: "224px",
+            height: "324px",
+            borderRadius: "999px",
+            outline: `1px solid ${t.line}`,
+            outlineOffset: "10px",
+            boxShadow: `0 18px 40px -16px ${t.accent}55`,
+          }}
+        >
+          <Photo data={data} t={t} className="h-full w-full" kenburns />
+        </div>
+        <p
+          className="inv-hero-in-delay mt-9 text-[15px]"
+          style={{ color: t.sub }}
+        >
+          소중한 하루, 함께 축하해 주세요
+        </p>
+      </div>
+      <CommonBody data={data} t={t} variant="bdayminimal" preview={preview} rounded="rounded-sm" />
+    </>
+  );
+}
+
 /* ════════ 푸터 ════════ */
 function Footer({
   data,
@@ -1338,12 +2221,21 @@ function Footer({
   fp: ReturnType<typeof dateParts>;
   template: TemplateId;
 }) {
-  // 별빛 템플릿은 본문과 같은 네이비로 이어지고, 글씨는 금빛으로
+  // 다크 템플릿(별빛·네온)은 본문과 같은 어두운 배경으로 이어지고, 글씨는 액센트로
   const isStar = template === "starlight";
-  const bg = isStar ? t.pageBg : t.ink;
-  const mainColor = isStar ? t.accent : t.pageBg;
-  const subColor = isStar ? "rgba(217,191,112,0.6)" : "rgba(255,255,255,0.55)";
-  const lineColor = isStar ? "rgba(217,191,112,0.3)" : "rgba(255,255,255,0.2)";
+  const isNeon = template === "bdayneon";
+  const bg = isStar || isNeon ? t.pageBg : t.ink;
+  const mainColor = isStar || isNeon ? t.accent : t.pageBg;
+  const subColor = isStar
+    ? "rgba(217,191,112,0.6)"
+    : isNeon
+      ? "rgba(255,95,162,0.55)"
+      : "rgba(255,255,255,0.55)";
+  const lineColor = isStar
+    ? "rgba(217,191,112,0.3)"
+    : isNeon
+      ? "rgba(255,95,162,0.3)"
+      : "rgba(255,255,255,0.2)";
   const message = data.footerMessage.trim();
 
   return (
@@ -1352,7 +2244,9 @@ function Footer({
       style={
         isStar
           ? { background: bg, borderTop: "1px solid rgba(217,191,112,0.25)" }
-          : { background: bg }
+          : isNeon
+            ? { background: bg, borderTop: "1px solid rgba(255,95,162,0.25)" }
+            : { background: bg }
       }
     >
       <p
@@ -1412,6 +2306,32 @@ function Footer({
 }
 
 /* ════════ 엔트리 ════════ */
+// 템플릿 id → 레이아웃 컴포넌트
+const LAYOUTS: Record<
+  TemplateId,
+  (props: {
+    data: InvitationData;
+    t: TemplateTheme;
+    preview?: boolean;
+  }) => React.JSX.Element
+> = {
+  classic: ClassicLayout,
+  modern: ModernLayout,
+  romantic: RomanticLayout,
+  botanical: BotanicalLayout,
+  starlight: StarlightLayout,
+  cinema: CinemaLayout,
+  dolbear: DolBearLayout,
+  dolcloud: DolCloudLayout,
+  dolhanbok: DolHanbokLayout,
+  seniorgold: SeniorGoldLayout,
+  seniorbloom: SeniorBloomLayout,
+  seniorpine: SeniorPineLayout,
+  bdaypop: BdayPopLayout,
+  bdayneon: BdayNeonLayout,
+  bdayminimal: BdayMinimalLayout,
+};
+
 export default function InvitationView({
   template,
   data: rawData,
@@ -1439,12 +2359,10 @@ export default function InvitationView({
       className="mx-auto min-h-full w-full max-w-md"
       style={{ background: t.pageBg, color: t.ink, fontFamily: t.bodyFont }}
     >
-      {template === "classic" && <ClassicLayout data={data} t={t} preview={preview} />}
-      {template === "modern" && <ModernLayout data={data} t={t} preview={preview} />}
-      {template === "romantic" && <RomanticLayout data={data} t={t} preview={preview} />}
-      {template === "botanical" && <BotanicalLayout data={data} t={t} preview={preview} />}
-      {template === "starlight" && <StarlightLayout data={data} t={t} preview={preview} />}
-      {template === "cinema" && <CinemaLayout data={data} t={t} preview={preview} />}
+      {(() => {
+        const Layout = LAYOUTS[template] ?? ClassicLayout;
+        return <Layout data={data} t={t} preview={preview} />;
+      })()}
 
       <Footer data={data} t={t} fp={fp} template={template} />
     </div>

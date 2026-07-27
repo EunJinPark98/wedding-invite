@@ -4,7 +4,7 @@ import EditorClient from "@/components/EditorClient";
 import { countInvitationsByUser, getInvitationOwned } from "@/lib/store";
 import { authEnabled, getUser } from "@/lib/supabase/server";
 
-export const metadata = { title: "청첩장 만들기" };
+export const metadata = { title: "초대장 만들기" };
 
 export default async function EditorPage({
   searchParams,

@@ -73,7 +73,7 @@ export async function PATCH(
     const updated = await updateInvitation(slug, auth.userId, template, data);
     if (!updated) {
       return NextResponse.json(
-        { error: "청첩장을 찾을 수 없어요." },
+        { error: "초대장을 찾을 수 없어요." },
         { status: 404 }
       );
     }
@@ -99,7 +99,7 @@ export async function DELETE(
     const deleted = await deleteInvitation(slug, auth.userId);
     if (!deleted) {
       return NextResponse.json(
-        { error: "청첩장을 찾을 수 없어요." },
+        { error: "초대장을 찾을 수 없어요." },
         { status: 404 }
       );
     }

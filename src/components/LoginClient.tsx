@@ -77,7 +77,7 @@ export default function LoginClient() {
             별빛 초대장
           </h1>
           <p className="mt-5 text-sm leading-6 text-gray-500">
-            로그인하고 나만의 청첩장을
+            로그인하고 나만의 초대장을
             <br />
             만들어 보세요.
           </p>
@@ -118,7 +118,7 @@ export default function LoginClient() {
           {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
           <p className="mt-6 text-[11px] leading-5 text-gray-400">
-            모든 기능 무료 · 계정당 청첩장 1개 · 수정은 언제든지
+            모든 기능 무료 · 계정당 초대장 1개 · 수정은 언제든지
           </p>
         </div>
 

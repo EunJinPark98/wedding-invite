@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
 import AuthStatus from "./AuthStatus";
 import KakaoShareButton from "./KakaoShareButton";
-import { TEMPLATES, FONTS } from "@/lib/templates";
+import { getTemplatesByCategory, FONTS } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
@@ -203,18 +203,23 @@ export default function EditorClient({
 } = {}) {
   const params = useSearchParams();
   const isEdit = Boolean(editSlug);
-  const startTemplate =
-    initialTemplate ?? ((params.get("template") as TemplateId) || "classic");
   // 신규 제작 시 ?category=로 초대장 종류 결정 (수정 모드는 기존 데이터의 category를 따름)
   const categoryParam = params.get("category") as Category | null;
   const category: Category =
     initialData?.category ??
     (categoryParam && CATEGORY_IDS.includes(categoryParam) ? categoryParam : "wedding");
   const labels = getCategoryLabels(category);
+  // 이 카테고리 전용 템플릿만 선택 가능
+  const catTemplates = getTemplatesByCategory(category);
 
-  const [template, setTemplate] = useState<TemplateId>(
-    TEMPLATES.some((t) => t.id === startTemplate) ? startTemplate : "classic"
-  );
+  const [template, setTemplate] = useState<TemplateId>(() => {
+    // 수정 모드는 저장된 템플릿 그대로, 신규는 URL 값이 이 카테고리 것일 때만 사용
+    if (initialTemplate) return initialTemplate;
+    const fromUrl = params.get("template") as TemplateId | null;
+    return fromUrl && catTemplates.some((t) => t.id === fromUrl)
+      ? fromUrl
+      : catTemplates[0].id;
+  });
   const [data, setData] = useState<InvitationData>(() =>
     initialData ? normalizeData(initialData) : emptyInvitation(category)
   );
@@ -379,14 +384,14 @@ export default function EditorClient({
             style={{ fontFamily: "var(--font-gowun)" }}
           >
             {isEdit
-              ? "수정 내용은 저장 즉시 청첩장에 반영돼요."
+              ? `수정 내용은 저장 즉시 ${labels.noun}에 반영돼요.`
               : "입력한 내용이 미리보기에 실시간으로 반영돼요."}
           </p>
         </div>
 
         <Group title="템플릿" step={1}>
           <div className="grid grid-cols-2 gap-3">
-            {TEMPLATES.map((t) => {
+            {catTemplates.map((t) => {
               const selected = template === t.id;
               return (
                 <button
@@ -768,7 +773,7 @@ export default function EditorClient({
           onClick={openConfirm}
           className="w-full rounded-2xl bg-gradient-to-r from-gold-400 to-gold-500 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
         >
-          {isEdit ? "수정 내용 저장하기" : "청첩장 제작하기"}
+          {isEdit ? "수정 내용 저장하기" : `${labels.noun} 제작하기`}
         </button>
         {photoWarn && needMainPhoto ? (
           <p className="text-center text-sm font-medium text-red-500">
@@ -778,7 +783,7 @@ export default function EditorClient({
           <p className="text-center text-xs text-gray-400">
             {isEdit
               ? "저장 전에 미리보기로 한 번 더 확인할 수 있어요."
-              : "제작 전에 미리보기로 한 번 더 확인할 수 있어요. 청첩장은 계정당 1개만 만들 수 있어요."}
+              : `제작 전에 미리보기로 한 번 더 확인할 수 있어요. ${labels.noun}은 계정당 1개만 만들 수 있어요.`}
           </p>
         )}
       </div>
@@ -829,11 +834,11 @@ export default function EditorClient({
               💌
             </div>
             <h2 className="text-lg font-bold text-gray-800">
-              {isEdit ? "수정이 완료됐어요!" : "청첩장이 완성됐어요!"}
+              {isEdit ? "수정이 완료됐어요!" : `${labels.noun}이 완성됐어요!`}
             </h2>
             <p className="mt-1 text-sm text-gray-500">
               {isEdit
-                ? "수정 내용이 청첩장에 반영됐어요. 링크는 그대로예요."
+                ? `수정 내용이 ${labels.noun}에 반영됐어요. 링크는 그대로예요.`
                 : "아래 링크를 공유하세요."}
             </p>
             <div className="mt-4 break-all rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700">

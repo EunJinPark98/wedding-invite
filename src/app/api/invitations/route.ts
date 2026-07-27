@@ -80,7 +80,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            "청첩장은 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 청첩장을 삭제해 주세요.",
+            "초대장은 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 초대장을 삭제해 주세요.",
           code: "LIMIT_REACHED",
         },
         { status: 409 }

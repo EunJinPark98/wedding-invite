@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TEMPLATES } from "@/lib/templates";
+import { getTemplatesByCategory } from "@/lib/templates";
 import { CATEGORIES, getCategoryMeta } from "@/lib/categories";
 import { emptyInvitation, CATEGORY_IDS, type Category } from "@/lib/types";
 import InvitationView from "@/components/InvitationView";
@@ -15,6 +15,8 @@ export default async function Home({
     ? (rawCategory as Category)
     : "wedding";
   const catMeta = getCategoryMeta(category);
+  // 선택한 카테고리 전용 템플릿만 노출
+  const templates = getTemplatesByCategory(category);
   // 카드 미리보기용 샘플 (갤러리·계좌는 비워 히어로만 가볍게 보여줌)
   const SAMPLE = { ...emptyInvitation(category), gallery: [], accounts: [] };
 
@@ -55,23 +57,25 @@ export default async function Home({
         <div className="pointer-events-none absolute -left-24 top-44 h-72 w-72 rounded-full bg-gold-100/40 blur-3xl" />
         <div className="relative mx-auto max-w-3xl px-6 pb-20 pt-20 text-center">
           <p className="font-cormorant text-sm tracking-[0.5em] text-gold-400">
-            MOBILE WEDDING INVITATION
+            MOBILE INVITATION
           </p>
           <h1
             className="mt-6 text-[1.9rem] leading-[1.4] text-ink sm:text-5xl sm:leading-[1.3]"
             style={{ fontFamily: "var(--font-song)" }}
           >
-            별처럼 빛나는 시작,
+            별처럼 빛나는 순간,
             <br />
-            가장 우리다운 청첩장으로
+            마음을 담은 초대장으로
           </h1>
           <p
             className="mx-auto mt-7 max-w-md text-base leading-7 text-gray-500"
             style={{ fontFamily: "var(--font-gowun)" }}
           >
-            디자인을 고르고 내용을 채우면, 하나뿐인 청첩장이 완성돼요.
+            결혼식·돌잔치·칠순·생일까지, 디자인을 고르고
             <br />
-            반짝이는 시작을 카톡 링크로 바로 전하세요.
+            내용을 채우면 하나뿐인 초대장이 완성돼요.
+            <br />
+            소중한 날을 카톡 링크로 바로 전하세요.
           </p>
           <div className="mx-auto mt-10 flex max-w-[280px] flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center">
             <Link
@@ -149,7 +153,7 @@ export default async function Home({
         </p>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2">
-          {TEMPLATES.map((t) => (
+          {templates.map((t) => (
             <div
               key={t.id}
               className="group overflow-hidden rounded-[28px] border border-gray-100 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition hover:-translate-y-1 hover:shadow-[0_16px_44px_rgba(0,0,0,0.1)]"
@@ -199,9 +203,9 @@ export default async function Home({
         </h2>
         <div className="grid gap-6 text-center sm:grid-cols-3">
           {[
-            ["01", "템플릿 선택", "마음에 드는 디자인을 고르세요"],
+            ["01", "템플릿 선택", "어떤 날인지 고르고 마음에 드는 디자인을 선택하세요"],
             ["02", "내용 입력", "이름, 일시, 장소, 인사말을 작성하세요"],
-            ["03", "링크 공유", "완성된 청첩장 링크를 공유하세요"],
+            ["03", "링크 공유", "완성된 초대장 링크를 공유하세요"],
           ].map(([n, title, desc]) => (
             <div
               key={n}

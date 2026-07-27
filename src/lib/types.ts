@@ -5,12 +5,25 @@ export const CATEGORY_IDS = ["wedding", "doljanchi", "senior", "birthday"] as co
 export type Category = (typeof CATEGORY_IDS)[number];
 
 export const TEMPLATE_IDS = [
+  // 결혼 청첩장
   "classic",
   "modern",
   "romantic",
   "botanical",
   "starlight",
   "cinema",
+  // 돌잔치 전용
+  "dolbear",
+  "dolcloud",
+  "dolhanbok",
+  // 칠순 · 팔순 전용
+  "seniorgold",
+  "seniorbloom",
+  "seniorpine",
+  // 생일 전용
+  "bdaypop",
+  "bdayneon",
+  "bdayminimal",
 ] as const;
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
 

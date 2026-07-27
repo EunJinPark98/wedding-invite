@@ -40,6 +40,8 @@ export const getCategoryMeta = (id: string) =>
 // (레이아웃에서 category === "wedding"일 때 기존 로직을 그대로 타도록) 기존 청첩장이
 // 한 글자도 바뀌지 않도록 함.
 export interface CategoryLabels {
+  // 이 카테고리 초대장의 호칭 (결혼="청첩장", 그 외="초대장")
+  noun: string;
   // 에디터
   editorTitle: string;
   groupTitle: string; // 3단계 그룹 제목
@@ -72,6 +74,7 @@ export function getCategoryLabels(category: Category): CategoryLabels {
   switch (category) {
     case "doljanchi":
       return {
+        noun: "초대장",
         editorTitle: "돌잔치 초대장 만들기",
         groupTitle: "아기 정보",
         personLabel: "아기 이름",
@@ -99,6 +102,7 @@ export function getCategoryLabels(category: Category): CategoryLabels {
       };
     case "senior":
       return {
+        noun: "초대장",
         editorTitle: "칠순 · 팔순 초대장 만들기",
         groupTitle: "주인공 정보",
         personLabel: "주인공 성함",
@@ -126,6 +130,7 @@ export function getCategoryLabels(category: Category): CategoryLabels {
       };
     case "birthday":
       return {
+        noun: "초대장",
         editorTitle: "생일 초대장 만들기",
         groupTitle: "주인공 정보",
         personLabel: "생일 주인공 이름",
@@ -154,6 +159,7 @@ export function getCategoryLabels(category: Category): CategoryLabels {
     case "wedding":
     default:
       return {
+        noun: "청첩장",
         editorTitle: "청첩장 만들기",
         groupTitle: "신랑 · 신부",
         personLabel: "신랑 이름",

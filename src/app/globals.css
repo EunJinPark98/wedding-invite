@@ -395,6 +395,185 @@ body {
   }
 }
 
+/* ── 돌잔치: 두둥실 떠오르는 풍선 ── */
+@keyframes inv-balloon-rise {
+  0% {
+    transform: translateY(110%) translateX(0) rotate(-3deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(45%) translateX(10px) rotate(4deg);
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-25%) translateX(-6px) rotate(-4deg);
+    opacity: 0;
+  }
+}
+.inv-balloon {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  animation: inv-balloon-rise ease-in-out infinite;
+}
+/* 인형·이모지 둥실둥실 (제자리) */
+@keyframes inv-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(3deg);
+  }
+}
+.inv-bob {
+  display: inline-block;
+  animation: inv-bob 3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-balloon {
+    display: none;
+  }
+  .inv-bob {
+    animation: none;
+  }
+}
+
+/* ── 돌잔치: 하늘을 흐르는 구름 ── */
+@keyframes inv-cloud-drift {
+  0% {
+    transform: translateX(-30%);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(130%);
+    opacity: 0;
+  }
+}
+.inv-cloud {
+  position: absolute;
+  pointer-events: none;
+  animation: inv-cloud-drift linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-cloud {
+    display: none;
+  }
+}
+
+/* ── 생일: 쏟아지는 컨페티 (색종이 조각이 팔랑이며 낙하) ── */
+@keyframes inv-confetti-fall {
+  0% {
+    transform: translateY(-10%) rotateZ(0deg) rotateX(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(48%) rotateZ(160deg) rotateX(180deg);
+  }
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(108%) rotateZ(320deg) rotateX(360deg);
+    opacity: 0;
+  }
+}
+.inv-confetti {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  animation: inv-confetti-fall linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-confetti {
+    display: none;
+  }
+}
+
+/* ── 생일: 네온사인 깜빡임 ── */
+@keyframes inv-neon-flicker {
+  0%,
+  18%,
+  22%,
+  62%,
+  66%,
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 6px currentColor,
+      0 0 18px currentColor,
+      0 0 42px currentColor;
+  }
+  20%,
+  64% {
+    opacity: 0.55;
+    text-shadow: 0 0 4px currentColor;
+  }
+}
+.inv-neon {
+  animation: inv-neon-flicker 3.6s ease-in-out infinite;
+}
+/* 네온 링 (사진 테두리 글로우) */
+@keyframes inv-neon-ring {
+  0%,
+  100% {
+    box-shadow:
+      0 0 16px 2px rgba(255, 95, 162, 0.55),
+      0 0 34px 6px rgba(95, 217, 231, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 30px 6px rgba(255, 95, 162, 0.8),
+      0 0 60px 14px rgba(95, 217, 231, 0.4);
+  }
+}
+.inv-neon-ring {
+  animation: inv-neon-ring 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-neon,
+  .inv-neon-ring {
+    animation: none;
+  }
+}
+
+/* ── 수연례: 좌우로 살랑이는 장식 (노리개·꽃가지) ── */
+@keyframes inv-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+.inv-sway {
+  display: inline-block;
+  transform-origin: top center;
+  animation: inv-sway 3.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-sway {
+    animation: none;
+  }
+}
+
 /* 달력 예식일: 은은한 파동 */
 @keyframes inv-day-pulse {
   0% {

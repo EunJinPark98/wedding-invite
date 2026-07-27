@@ -99,12 +99,12 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
           마이페이지
         </h1>
         <p className="mt-2 text-sm text-gray-500">
-          청첩장은 계정당 1개만 만들 수 있어요. 수정은 언제든지 가능해요.
+          초대장은 계정당 1개만 만들 수 있어요. 수정은 언제든지 가능해요.
         </p>
 
         {notice === "limit" && (
           <div className="mt-5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
-            이미 만든 청첩장이 있어요. 새로 만들려면 아래에서 기존 청첩장을
+            이미 만든 초대장이 있어요. 새로 만들려면 아래에서 기존 초대장을
             삭제해 주세요.
           </div>
         )}
@@ -117,7 +117,7 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
         {items.length === 0 ? (
           <div className="mt-10 rounded-3xl border border-gold-100 bg-white p-12 text-center shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <p className="text-4xl">💌</p>
-            <p className="mt-4 text-gray-500">아직 만든 청첩장이 없어요.</p>
+            <p className="mt-4 text-gray-500">아직 만든 초대장이 없어요.</p>
             <Link
               href="/editor"
               className="mt-6 inline-block rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-7 py-3 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600"
@@ -157,7 +157,9 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                     </div>
                     <p className="mt-1.5 text-xs leading-5 text-gray-400">
                       {inv.templateName} 템플릿
-                      {inv.weddingDate && <> · 예식일 {inv.weddingDate}</>}
+                      {inv.weddingDate && (
+                        <> · {labels.dateFieldLabel} {inv.weddingDate}</>
+                      )}
                       <br />
                       게시 종료일: {fmtDate(inv.expiresAt)}
                     </p>
@@ -170,7 +172,7 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                     target="_blank"
                     className="rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600"
                   >
-                    청첩장 보기
+                    {labels.noun} 보기
                   </Link>
                   {!inv.expired && (
                     <KakaoShareButton
@@ -235,7 +237,7 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
               정말 삭제할까요?
             </h2>
             <p className="mt-2 text-sm leading-6 text-gray-500">
-              삭제한 청첩장은{" "}
+              삭제한 초대장은{" "}
               <strong className="text-red-500">복원할 수 없어요.</strong>
               <br />
               공유한 링크도 더 이상 열리지 않아요.

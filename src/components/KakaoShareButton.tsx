@@ -90,7 +90,7 @@ export default function KakaoShareButton({
       },
       buttons: [
         {
-          title: "청첩장 보기",
+          title: "초대장 보기",
           link: { mobileWebUrl: absUrl, webUrl: absUrl },
         },
       ],
