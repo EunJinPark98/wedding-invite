@@ -21,13 +21,13 @@ export default function Home() {
               className="h-8 w-8 rounded-full shadow-sm"
             />
             <span
-              className="text-lg text-ink"
+              className="text-sm text-ink sm:text-lg"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
             </span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <AuthStatus />
             <Link
               href="/editor"

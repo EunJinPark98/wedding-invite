@@ -284,12 +284,12 @@ function CoupleInner({
         const parents = [p.father, p.mother].map((s) => s.trim()).filter(Boolean);
         return (
           <div key={p.role} className="text-center">
-            {/* 신랑/신부 타이틀 (영문 스몰캡) */}
+            {/* 신랑/신부 타이틀 */}
             <p
-              className="inv-fade font-cormorant mb-4 text-lg font-medium tracking-[0.35em]"
-              style={{ color: t.ink }}
+              className="inv-fade mb-4 text-base tracking-[0.2em]"
+              style={{ fontFamily: t.headingFont, color: t.ink }}
             >
-              {p.role === "신랑" ? "GROOM" : "BRIDE"}
+              {p.role}
             </p>
             <ProfilePhoto src={p.photo} role={p.role} t={t} arch={arch} preview={preview} />
             {/* 이름 ↵ 전화·문자 */}
@@ -816,14 +816,12 @@ function RomanticLayout({
           background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 70%)`,
         }}
       >
-        {/* 흩날리는 꽃잎 */}
+        {/* 흩날리는 꽃잎 (오리지널) */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           {[
             { left: "8%", size: 13, dur: 11, delay: 0 },
             { left: "22%", size: 10, dur: 14, delay: 3 },
-            { left: "34%", size: 12, dur: 13, delay: 9 },
             { left: "46%", size: 11, dur: 12, delay: 6 },
-            { left: "58%", size: 13, dur: 14, delay: 1 },
             { left: "68%", size: 14, dur: 13, delay: 1.5 },
             { left: "84%", size: 10, dur: 15, delay: 4.5 },
             { left: "93%", size: 12, dur: 12, delay: 8 },
@@ -1081,7 +1079,7 @@ function StarlightLayout({
           className="inv-hero-in text-2xl"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
-          별빛 아래, 우리
+          우리, 결혼합니다
         </p>
         <p
           className="inv-hero-in font-cormorant mt-2 text-[10px] tracking-[0.5em]"
@@ -1168,9 +1166,9 @@ function CinemaLayout({
   const p = dateParts(data.weddingDate);
   return (
     <>
-      {/* 필름 화보 히어로 — 좌우 이름 + 화보 사진 + 필카 감성 날짜 스탬프 */}
+      {/* 필름 화보 히어로 — 이름 + 화보 사진 + 필카 감성 날짜 스탬프 */}
       <div className="px-6 pt-11">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center gap-5">
           <p
             className="inv-hero-in text-[22px] leading-tight"
             style={{ fontFamily: t.headingFont, color: t.ink }}

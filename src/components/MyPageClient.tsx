@@ -78,7 +78,7 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
               className="h-8 w-8 rounded-full shadow-sm"
             />
             <span
-              className="text-lg text-ink"
+              className="text-sm text-ink sm:text-lg"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장

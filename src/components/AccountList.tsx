@@ -46,7 +46,7 @@ export default function AccountList({
               </span>
             </p>
             <p
-              className="mt-1.5 truncate text-[15px] font-semibold tracking-wide"
+              className="mt-1.5 truncate text-[15px] font-normal tracking-wide"
               style={{ color: t.ink }}
             >
               {a.number}
