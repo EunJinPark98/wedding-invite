@@ -816,14 +816,38 @@ function RomanticLayout({
           background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 70%)`,
         }}
       >
-        {/* 꽃잎 하나가 좌우로 휘날리며 떨어지는 연출 */}
+        {/* 꽃잎(타원형) 여러 개가 회전하며 흩날리는 연출 */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <span
-            className="inv-petal-flutter"
-            style={{ left: "50%", fontSize: 15, color: t.accent, opacity: 0 }}
-          >
-            ❀
-          </span>
+          {[
+            { left: "8%", size: 15, dur: 11, delay: 0 },
+            { left: "22%", size: 12, dur: 14, delay: 3 },
+            { left: "34%", size: 14, dur: 13, delay: 9 },
+            { left: "46%", size: 13, dur: 12, delay: 6 },
+            { left: "58%", size: 15, dur: 14, delay: 1 },
+            { left: "68%", size: 16, dur: 13, delay: 1.5 },
+            { left: "84%", size: 12, dur: 15, delay: 4.5 },
+            { left: "93%", size: 14, dur: 12, delay: 8 },
+          ].map((f, i) => (
+            <span
+              key={i}
+              className="inv-petal"
+              style={{
+                left: f.left,
+                width: f.size,
+                height: f.size,
+                opacity: 0,
+                animationDuration: `${f.dur}s`,
+                animationDelay: `${f.delay}s`,
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="100%" height="100%">
+                <path
+                  d="M12 2C7 6 4 10 4 14a8 8 0 0 0 16 0c0-4-3-8-8-12z"
+                  fill={t.accent}
+                />
+              </svg>
+            </span>
+          ))}
         </div>
         <p
           className="inv-hero-in text-3xl"
