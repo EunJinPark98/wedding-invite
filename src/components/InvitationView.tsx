@@ -290,7 +290,7 @@ function LocationInner({
         {data.venueAddress}
       </p>
       <a
-        href={`https://map.kakao.com/?q=${encodeURIComponent(
+        href={`https://map.naver.com/p/search/${encodeURIComponent(
           data.venueAddress
         )}`}
         target="_blank"
@@ -301,7 +301,7 @@ function LocationInner({
           boxShadow: `0 8px 20px -8px ${t.accent}aa`,
         }}
       >
-        카카오맵에서 길찾기
+        네이버지도에서 길찾기
       </a>
     </div>
   );
@@ -768,7 +768,7 @@ function ModernLayout({
             {data.venueAddress}
           </p>
           <a
-            href={`https://map.kakao.com/?q=${encodeURIComponent(
+            href={`https://map.naver.com/p/search/${encodeURIComponent(
               data.venueAddress
             )}`}
             target="_blank"
@@ -776,7 +776,7 @@ function ModernLayout({
             className="mt-6 inline-block border px-6 py-2.5 text-sm"
             style={{ borderColor: t.ink, color: t.ink }}
           >
-            카카오맵에서 길찾기 →
+            네이버지도에서 길찾기 →
           </a>
         </div>
       </Sec>
