@@ -816,12 +816,14 @@ function RomanticLayout({
           background: `linear-gradient(180deg, ${t.accentSoft} 0%, ${t.pageBg} 70%)`,
         }}
       >
-        {/* 흩날리는 꽃잎 (오리지널) */}
+        {/* 흩날리는 꽃잎 */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           {[
             { left: "8%", size: 13, dur: 11, delay: 0 },
             { left: "22%", size: 10, dur: 14, delay: 3 },
+            { left: "34%", size: 12, dur: 13, delay: 9 },
             { left: "46%", size: 11, dur: 12, delay: 6 },
+            { left: "58%", size: 13, dur: 14, delay: 1 },
             { left: "68%", size: 14, dur: 13, delay: 1.5 },
             { left: "84%", size: 10, dur: 15, delay: 4.5 },
             { left: "93%", size: 12, dur: 12, delay: 8 },
