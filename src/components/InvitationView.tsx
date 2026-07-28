@@ -324,7 +324,7 @@ function CoupleInner({
             >
               {p.name}
             </p>
-            {p.tel && (
+            {labels.showContact && p.tel && (
               <div className="inv-fade mt-2.5 flex items-center justify-center gap-2">
                   <a
                     href={`tel:${p.tel}`}
@@ -451,9 +451,6 @@ function GalleryInner({
     if (!preview) return null;
     return (
       <>
-        <p className="mb-6 text-sm" style={{ color: t.sub }}>
-          우리의 모든 순간을 담았습니다
-        </p>
         <GalleryPlaceholder
           count={Math.max(data.gallery.length, 3)}
           t={t}
@@ -467,9 +464,6 @@ function GalleryInner({
   }
   return (
     <>
-      <p className="inv-fade mb-6 text-sm" style={{ color: t.sub }}>
-        우리의 모든 순간을 담았습니다
-      </p>
       <GalleryAlbum images={gallery} rounded={rounded} />
       <p className="inv-fade mt-4 text-xs" style={{ color: t.sub }}>
         사진을 누르면 크게 볼 수 있어요

@@ -242,8 +242,8 @@ const CATEGORY_SAMPLE: Record<
   doljanchi: {
     groomName: "김한별",
     brideName: "",
-    groomFather: "김아빠",
-    groomMother: "박엄마",
+    groomFather: "",
+    groomMother: "",
     brideFather: "",
     brideMother: "",
     greetingTitle: "우리 아이의 첫 생일에 초대합니다",

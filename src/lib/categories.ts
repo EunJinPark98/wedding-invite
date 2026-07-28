@@ -59,6 +59,7 @@ export interface CategoryLabels {
   photo2Label: string;
   showPerson2: boolean;
   showParents: boolean;
+  showContact: boolean; // 프로필에 전화·문자 버튼을 둘지
   parent1Label: string;
   parent2Label: string;
   dateSectionTitle: string;
@@ -98,17 +99,19 @@ export function getCategoryLabels(
         photo1Label: "아기 사진",
         photo2Label: "",
         showPerson2: false,
-        showParents: true,
-        parent1Label: "아빠 이름",
-        parent2Label: "엄마 이름",
+        // 아기는 소개 문구 없이 사진과 이름만 담백하게
+        showParents: false,
+        showContact: false,
+        parent1Label: "",
+        parent2Label: "",
         dateSectionTitle: "돌잔치 일시 · 장소",
         dateFieldLabel: "돌잔치 날짜",
         venueLabel: "돌잔치 장소",
         accountsGroupTitle: "축하 마음 전하실 곳 (계좌)",
         accountsLabel: "축하 마음 전하실 곳",
         sectionCoupleLabel: "우리 아이",
-        personTitle: "아기",
-        relation: "아이",
+        personTitle: "",
+        relation: "",
         heroKicker: "FIRST BIRTHDAY",
         heroKicker2: "THE FIRST BIRTHDAY",
         heroPhrase: "첫 생일을 축하해요",
@@ -129,6 +132,7 @@ export function getCategoryLabels(
         photo2Label: "",
         showPerson2: false,
         showParents: false,
+        showContact: true,
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: `${age.label} 일시 · 장소`,
@@ -159,6 +163,7 @@ export function getCategoryLabels(
         photo2Label: "",
         showPerson2: false,
         showParents: false,
+        showContact: true,
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: "파티 일시 · 장소",
@@ -190,6 +195,7 @@ export function getCategoryLabels(
         photo2Label: "신부 사진 (선택)",
         showPerson2: true,
         showParents: true,
+        showContact: true,
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: "예식 일시 · 장소",

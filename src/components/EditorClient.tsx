@@ -561,22 +561,24 @@ export default function EditorClient({
               </div>
             )}
           </div>
-          <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
-            <Field
-              label={labels.contact1Label}
-              value={data.groomPhone}
-              onChange={(v) => set("groomPhone", v)}
-              placeholder="010-0000-0000"
-            />
-            {labels.showPerson2 && (
+          {labels.showContact && (
+            <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
               <Field
-                label={labels.contact2Label}
-                value={data.bridePhone}
-                onChange={(v) => set("bridePhone", v)}
+                label={labels.contact1Label}
+                value={data.groomPhone}
+                onChange={(v) => set("groomPhone", v)}
                 placeholder="010-0000-0000"
               />
-            )}
-          </div>
+              {labels.showPerson2 && (
+                <Field
+                  label={labels.contact2Label}
+                  value={data.bridePhone}
+                  onChange={(v) => set("bridePhone", v)}
+                  placeholder="010-0000-0000"
+                />
+              )}
+            </div>
+          )}
           {labels.showParents && (
             <div className="grid grid-cols-2 gap-3">
               {labels.showPerson2 ? (
@@ -625,8 +627,9 @@ export default function EditorClient({
             </div>
           )}
           <p className="text-xs text-gray-400">
-            사진을 올리면 프로필 섹션이 생기고, 연락처를 입력하면 이름 옆에
-            전화·문자 버튼이 붙어요.
+            사진을 올리면 프로필 섹션이 생겨요.
+            {labels.showContact &&
+              " 연락처를 입력하면 이름 옆에 전화·문자 버튼이 붙어요."}
             {labels.showParents && " 부모님 성함은 비우면 표시되지 않아요."}
           </p>
         </Group>
