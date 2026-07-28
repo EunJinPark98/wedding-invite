@@ -44,9 +44,10 @@ export default async function Home({
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
             <AuthStatus />
+            {/* 모바일은 헤더가 좁아 숨김 — 히어로의 제작 버튼으로 유도 */}
             <Link
               href="/editor"
-              className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600"
+              className="hidden rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600 sm:inline-block"
             >
               만들기
             </Link>
@@ -68,13 +69,13 @@ export default async function Home({
           >
             별처럼 빛나는 순간,
             <br />
-            마음을 담은 초대장으로
+            직접 만든 초대장으로
           </h1>
           <p
             className="mx-auto mt-7 max-w-md text-base leading-7 text-gray-500"
             style={{ fontFamily: "var(--font-gowun)" }}
           >
-            결혼식·돌잔치·칠순·생일까지, 디자인을 고르고
+            결혼식·돌잔치·칠순·팔순·생일까지, 디자인을 고르고
             <br />
             내용을 채우면 하나뿐인 초대장이 완성돼요.
             <br />

@@ -56,24 +56,11 @@ export default function AuthStatus() {
       <span className="max-w-[80px] truncate font-medium text-gray-600 sm:max-w-[160px]">
         {name ? `${name}님` : email}
       </span>
-      {/* 모바일은 헤더가 좁아 아이콘으로, 데스크톱은 글자로 */}
       <Link
         href="/my"
-        aria-label="마이페이지"
-        title="마이페이지"
-        className="flex items-center text-gray-400 transition hover:text-gold-600"
+        className="text-xs text-gray-400 transition hover:text-gold-600"
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden
-          className="sm:hidden"
-        >
-          <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" />
-        </svg>
-        <span className="hidden text-xs sm:inline">마이페이지</span>
+        마이페이지
       </Link>
       <button
         type="button"

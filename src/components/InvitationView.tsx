@@ -513,6 +513,10 @@ function Label({
   variant: TemplateId;
   index?: string;
 }) {
+  // 한글 라벨은 영문 장식 서체(Cormorant)에 글리프가 없어 대체 글꼴로 떨어지고
+  // 넓은 자간까지 겹쳐 어색해진다 → 템플릿 서체에 좁은 자간으로 렌더링
+  const isKorean = /[가-힣]/.test(text);
+
   if (variant === "modern") {
     return (
       <div className="inv-fade mb-5 flex items-baseline gap-3">
@@ -522,8 +526,15 @@ function Label({
           </span>
         )}
         <span
-          className="font-cormorant text-[15px] font-semibold tracking-[0.3em]"
-          style={{ color: t.ink }}
+          className={
+            isKorean
+              ? "text-[15px] font-medium tracking-[0.12em]"
+              : "font-cormorant text-[15px] font-semibold tracking-[0.3em]"
+          }
+          style={{
+            color: t.ink,
+            ...(isKorean ? { fontFamily: t.headingFont } : null),
+          }}
         >
           {text}
         </span>
@@ -535,8 +546,15 @@ function Label({
   return (
     <div className="inv-fade mb-6 text-center">
       <span
-        className="font-cormorant text-[16px] font-medium tracking-[0.45em]"
-        style={{ color: t.accent }}
+        className={
+          isKorean
+            ? "text-[17px] tracking-[0.15em]"
+            : "font-cormorant text-[16px] font-medium tracking-[0.45em]"
+        }
+        style={{
+          color: t.accent,
+          ...(isKorean ? { fontFamily: t.headingFont } : null),
+        }}
       >
         {text}
       </span>
@@ -2857,7 +2875,7 @@ function BdayCakeLayout({
           className="inv-hero-in-delay mt-1.5 text-[14px]"
           style={{ color: t.sub }}
         >
-          촛불을 함께 꺼주실래요?
+          생일을 함께 해주세요.
         </p>
         {p && (
           <p
