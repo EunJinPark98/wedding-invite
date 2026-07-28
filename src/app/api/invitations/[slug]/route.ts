@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
-import { deleteInvitation, updateInvitation } from "@/lib/store";
+import {
+  deleteInvitation,
+  updateInvitation,
+  getInvitationOwned,
+} from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
+import { getTheme } from "@/lib/templates";
+import { getCategoryLabels } from "@/lib/categories";
 import { MAX_GALLERY, isSamplePhoto, TEMPLATE_IDS } from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
@@ -47,7 +53,31 @@ export async function PATCH(
       { status: 400 }
     );
   }
-  if (!data || !data.groomName?.trim() || !data.brideName?.trim()) {
+  // 수정으로 초대장 종류를 바꿀 수는 없다 (종류당 1개 제한 우회 방지)
+  const existing = await getInvitationOwned(slug, auth.userId);
+  if (!existing) {
+    return NextResponse.json(
+      { error: "초대장을 찾을 수 없어요." },
+      { status: 404 }
+    );
+  }
+  const category = getTheme(existing.template).category;
+  if (getTheme(template).category !== category) {
+    return NextResponse.json(
+      { error: "초대장 종류는 변경할 수 없어요." },
+      { status: 400 }
+    );
+  }
+  const labels = getCategoryLabels(category);
+
+  // 이름 필수 검사 (신부 이름은 두 사람이 등장하는 결혼 청첩장에서만)
+  if (!data || !data.groomName?.trim()) {
+    return NextResponse.json(
+      { error: `${labels.personLabel}은(는) 필수입니다.` },
+      { status: 400 }
+    );
+  }
+  if (labels.showPerson2 && !data.brideName?.trim()) {
     return NextResponse.json(
       { error: "신랑/신부 이름은 필수입니다." },
       { status: 400 }
@@ -70,7 +100,10 @@ export async function PATCH(
   }
 
   try {
-    const updated = await updateInvitation(slug, auth.userId, template, data);
+    const updated = await updateInvitation(slug, auth.userId, template, {
+      ...data,
+      category,
+    });
     if (!updated) {
       return NextResponse.json(
         { error: "초대장을 찾을 수 없어요." },

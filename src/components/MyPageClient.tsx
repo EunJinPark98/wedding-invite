@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthStatus from "./AuthStatus";
 import KakaoShareButton from "./KakaoShareButton";
-import { getCategoryLabels } from "@/lib/categories";
+import {
+  getCategoryLabels,
+  getCategoryMeta,
+  CATEGORIES,
+} from "@/lib/categories";
 import type { Category } from "@/lib/types";
 
 export interface MyInvitation {
@@ -34,6 +38,12 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
   const router = useRouter();
   const params = useSearchParams();
   const notice = params.get("notice");
+  // 제한 안내에 어떤 종류인지 표시
+  const limitCategory = params.get("category");
+  const limitLabel = limitCategory ? getCategoryMeta(limitCategory).label : null;
+  // 아직 만들지 않은 종류 (종류당 1개 제한)
+  const usedCategories = new Set(items.map((i) => i.category));
+  const available = CATEGORIES.filter((c) => !usedCategories.has(c.id));
   const [deleting, setDeleting] = useState<string | null>(null); // 삭제 확인 모달 대상 slug
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,13 +110,34 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
           마이페이지
         </h1>
         <p className="mt-2 text-sm text-gray-500">
-          초대장은 계정당 1개만 만들 수 있어요. 수정은 언제든지 가능해요.
+          초대장은 종류마다 1개씩, 최대 {CATEGORIES.length}개까지 만들 수 있어요.
+          수정은 언제든지 가능해요.
         </p>
 
         {notice === "limit" && (
           <div className="mt-5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
-            이미 만든 초대장이 있어요. 새로 만들려면 아래에서 기존 초대장을
-            삭제해 주세요.
+            {limitLabel ? `${limitLabel}은 ` : "이 종류는 "}이미 만드셨어요. 새로
+            만들려면 아래에서 기존 초대장을 삭제해 주세요.
+          </div>
+        )}
+
+        {/* 아직 만들지 않은 종류 바로 만들기 */}
+        {available.length > 0 && (
+          <div className="mt-5 rounded-2xl border border-gold-100 bg-white p-4">
+            <p className="text-xs font-medium text-gray-500">
+              아직 만들지 않은 초대장
+            </p>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {available.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/editor?category=${c.id}`}
+                  className="rounded-full border border-gold-200 px-3.5 py-2 text-sm text-gold-600 transition hover:bg-gold-50"
+                >
+                  {c.emoji} {c.label} 만들기
+                </Link>
+              ))}
+            </div>
           </div>
         )}
         {error && (
@@ -120,7 +151,7 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
             <p className="text-4xl">💌</p>
             <p className="mt-4 text-gray-500">아직 만든 초대장이 없어요.</p>
             <Link
-              href="/editor"
+              href="/"
               className="mt-6 inline-block rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-7 py-3 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600"
             >
               무료로 제작하기

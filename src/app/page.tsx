@@ -5,6 +5,9 @@ import { emptyInvitation, CATEGORY_IDS, type Category } from "@/lib/types";
 import InvitationView from "@/components/InvitationView";
 import AuthStatus from "@/components/AuthStatus";
 
+// 카카오톡 채널 「별마마파파」 문의 링크
+const KAKAO_CHANNEL_URL = "http://pf.kakao.com/_GxfxbwX";
+
 export default async function Home({
   searchParams,
 }: {
@@ -256,13 +259,15 @@ export default async function Home({
             Instagram
           </a>
           <a
-            href="mailto:obliviscor29@naver.com"
+            href={KAKAO_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-1.5 rounded-full border border-gold-200 px-4 py-2 text-xs font-medium text-gold-600 transition hover:bg-gold-50"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+              <path d="M12 3C6.48 3 2 6.54 2 10.9c0 2.8 1.86 5.26 4.66 6.65l-.95 3.51c-.08.31.27.56.54.38l4.13-2.73c.53.05 1.07.08 1.62.08 5.52 0 10-3.54 10-7.9S17.52 3 12 3z" />
             </svg>
-            문의하기
+            카카오톡 문의
           </a>
         </div>
 

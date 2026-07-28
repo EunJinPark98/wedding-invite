@@ -2,8 +2,13 @@ import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
-import { normalizeData } from "./types";
-import type { Invitation, InvitationData, TemplateId } from "./types";
+import { normalizeData, CATEGORY_IDS } from "./types";
+import type {
+  Category,
+  Invitation,
+  InvitationData,
+  TemplateId,
+} from "./types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY =
@@ -130,18 +135,24 @@ export async function listInvitationsByUser(
   );
 }
 
-// 계정이 만든 청첩장 수 (계정당 1개 제한 검사용)
-export async function countInvitationsByUser(userId: string): Promise<number> {
+/**
+ * 계정이 이미 만든 초대장의 종류 목록 (카테고리당 1개 제한 검사용).
+ * category가 없는 과거 데이터는 결혼 청첩장으로 본다.
+ */
+export async function getUsedCategories(userId: string): Promise<Category[]> {
   if (useSupabase) {
-    const { count, error } = await supabase()
+    const { data, error } = await supabase()
       .from("invitations")
-      .select("slug", { count: "exact", head: true })
+      .select("data")
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
-    return count ?? 0;
+    return (data ?? []).map((r) => {
+      const c = (r.data as InvitationData | null)?.category;
+      return CATEGORY_IDS.includes(c as Category) ? (c as Category) : "wedding";
+    });
   }
-  // 로컬 폴백은 계정 개념이 없어 항상 0 (개발용)
-  return 0;
+  // 로컬 폴백은 계정 개념이 없어 항상 빈 목록 (개발용)
+  return [];
 }
 
 // 소유자 확인 포함 단건 조회 (수정 화면 로드용)

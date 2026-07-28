@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
 import AuthStatus from "./AuthStatus";
 import KakaoShareButton from "./KakaoShareButton";
-import { getTemplatesByCategory, FONTS } from "@/lib/templates";
+import { getTemplatesByCategory, findTheme, FONTS } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
@@ -205,10 +205,12 @@ export default function EditorClient({
 } = {}) {
   const params = useSearchParams();
   const isEdit = Boolean(editSlug);
-  // 신규 제작 시 ?category=로 초대장 종류 결정 (수정 모드는 기존 데이터의 category를 따름)
+  // 신규 제작 시 초대장 종류 결정 (수정 모드는 기존 데이터의 category를 따름).
+  // 템플릿을 지정해 들어왔다면 그 템플릿이 속한 종류를 우선한다.
   const categoryParam = params.get("category") as Category | null;
   const category: Category =
     initialData?.category ??
+    findTheme(params.get("template"))?.category ??
     (categoryParam && CATEGORY_IDS.includes(categoryParam) ? categoryParam : "wedding");
   // 이 카테고리 전용 템플릿만 선택 가능
   const catTemplates = getTemplatesByCategory(category);
@@ -828,7 +830,7 @@ export default function EditorClient({
           <p className="text-center text-xs text-gray-400">
             {isEdit
               ? "저장 전에 미리보기로 한 번 더 확인할 수 있어요."
-              : `제작 전에 미리보기로 한 번 더 확인할 수 있어요. ${labels.noun}은 계정당 1개만 만들 수 있어요.`}
+              : `제작 전에 미리보기로 한 번 더 확인할 수 있어요. ${labels.noun}은 종류마다 1개씩 만들 수 있어요.`}
           </p>
         )}
       </div>

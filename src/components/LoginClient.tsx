@@ -118,7 +118,7 @@ export default function LoginClient() {
           {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
           <p className="mt-6 text-[11px] leading-5 text-gray-400">
-            모든 기능 무료 · 계정당 초대장 1개 · 수정은 언제든지
+            모든 기능 무료 · 종류마다 1개씩 · 수정은 언제든지
           </p>
         </div>
 

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { customAlphabet } from "nanoid";
-import { saveInvitation, countInvitationsByUser } from "@/lib/store";
+import { saveInvitation, getUsedCategories } from "@/lib/store";
 import { getUser, authEnabled } from "@/lib/supabase/server";
+import { getTheme } from "@/lib/templates";
+import { getCategoryMeta, getCategoryLabels } from "@/lib/categories";
 import {
   MAX_GALLERY,
   PERIOD_OPTIONS,
@@ -33,7 +35,18 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  if (!data || !data.groomName?.trim() || !data.brideName?.trim()) {
+  // 저장할 종류 — 본문의 category가 아니라 템플릿을 기준으로 삼는다
+  const category = getTheme(template).category;
+  const labels = getCategoryLabels(category);
+
+  // 이름 필수 검사 (신부 이름은 두 사람이 등장하는 결혼 청첩장에서만)
+  if (!data || !data.groomName?.trim()) {
+    return NextResponse.json(
+      { error: `${labels.personLabel}은(는) 필수입니다.` },
+      { status: 400 }
+    );
+  }
+  if (labels.showPerson2 && !data.brideName?.trim()) {
     return NextResponse.json(
       { error: "신랑/신부 이름은 필수입니다." },
       { status: 400 }
@@ -64,7 +77,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // 로그인 필수 + 계정당 1개 제한 (Supabase 미설정 로컬 개발 모드는 통과)
+  // 로그인 필수 + 종류당 1개 제한 (Supabase 미설정 로컬 개발 모드는 통과)
   let userId: string | null = null;
   if (authEnabled) {
     const user = await getUser();
@@ -75,13 +88,14 @@ export async function POST(req: Request) {
       );
     }
     userId = user.id;
-    const count = await countInvitationsByUser(userId);
-    if (count >= 1) {
+    const used = await getUsedCategories(userId);
+    if (used.includes(category)) {
+      const label = getCategoryMeta(category).label;
       return NextResponse.json(
         {
-          error:
-            "초대장은 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 초대장을 삭제해 주세요.",
+          error: `${label}은 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 ${label}을 삭제해 주세요.`,
           code: "LIMIT_REACHED",
+          category,
         },
         { status: 409 }
       );
@@ -93,7 +107,8 @@ export async function POST(req: Request) {
     const expires = new Date();
     expires.setMonth(expires.getMonth() + months);
     const expiresAt = expires.toISOString();
-    await saveInvitation(slug, template, data, expiresAt, userId);
+    // 종류는 템플릿을 기준으로 고정 — 본문의 category만 바꿔 제한을 우회하지 못하게
+    await saveInvitation(slug, template, { ...data, category }, expiresAt, userId);
     return NextResponse.json({ slug, expiresAt });
   } catch (e) {
     const message = e instanceof Error ? e.message : "저장 중 오류가 발생했습니다.";

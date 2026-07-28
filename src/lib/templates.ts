@@ -398,6 +398,10 @@ export const getTemplatesByCategory = (category: Category): TemplateTheme[] =>
 export const getTheme = (id: string): TemplateTheme =>
   THEMES[id as TemplateId] ?? THEMES.classic;
 
+// 존재하는 템플릿일 때만 반환 (id로 카테고리를 되짚을 때 사용)
+export const findTheme = (id: string | null | undefined): TemplateTheme | null =>
+  (id && THEMES[id as TemplateId]) || null;
+
 /* ───────── 글꼴 선택 ───────── */
 export interface FontOption {
   id: string;
