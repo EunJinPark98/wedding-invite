@@ -136,20 +136,30 @@ export async function listInvitationsByUser(
 }
 
 /**
- * 계정이 이미 만든 초대장의 종류 목록 (카테고리당 1개 제한 검사용).
+ * 계정이 지금 쓰고 있는 초대장의 종류 목록 (종류당 1개 제한 검사용).
+ * 게시 기간이 끝난 초대장은 자리를 비워주므로 제외한다.
  * category가 없는 과거 데이터는 결혼 청첩장으로 본다.
  */
 export async function getUsedCategories(userId: string): Promise<Category[]> {
   if (useSupabase) {
     const { data, error } = await supabase()
       .from("invitations")
-      .select("data")
+      .select("data, expires_at")
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => {
-      const c = (r.data as InvitationData | null)?.category;
-      return CATEGORY_IDS.includes(c as Category) ? (c as Category) : "wedding";
-    });
+    const now = Date.now();
+    return (data ?? [])
+      .filter((r) => {
+        if (!r.expires_at) return true; // 무기한 (과거 데이터)
+        const t = new Date(r.expires_at).getTime();
+        return isNaN(t) || t >= now;
+      })
+      .map((r) => {
+        const c = (r.data as InvitationData | null)?.category;
+        return CATEGORY_IDS.includes(c as Category)
+          ? (c as Category)
+          : "wedding";
+      });
   }
   // 로컬 폴백은 계정 개념이 없어 항상 빈 목록 (개발용)
   return [];

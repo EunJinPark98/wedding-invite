@@ -687,7 +687,11 @@ export default function EditorClient({
               value={data.footerMessage}
               onChange={(e) => set("footerMessage", e.target.value)}
               rows={2}
-              placeholder="비워두면 두 분의 이름과 날짜가 표시돼요"
+              placeholder={
+                labels.showPerson2
+                  ? "비워두면 두 분의 이름과 날짜가 표시돼요"
+                  : "비워두면 이름과 날짜가 표시돼요"
+              }
               className={`${INPUT_CLASS} leading-7`}
             />
           </label>
@@ -717,7 +721,9 @@ export default function EditorClient({
             </div>
             {photoWarn && needMainPhoto && (
               <p className="mt-1.5 text-xs font-medium text-red-500">
-                미리보기에 보이는 사진은 예시예요. 두 분의 사진을 올려 주세요.
+                미리보기에 보이는 사진은 예시예요.{" "}
+                {labels.showPerson2 ? "두 분의" : "직접 찍은"} 사진을 올려
+                주세요.
               </p>
             )}
           </div>

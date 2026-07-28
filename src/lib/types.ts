@@ -65,10 +65,14 @@ export const MAX_GALLERY = 20;
 // 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 초대장 제작에는 사용 불가
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
 export const SAMPLE_BABY_PHOTO = "/baby.jpg";
+export const SAMPLE_BIRTHDAY_PHOTO = "/birthday.jpg";
+export const SAMPLE_SENIOR_PHOTO = "/grandmama.png";
 // 예시 사진 전체 — 제작 시 본인 사진으로 교체했는지 검사할 때 사용
 export const SAMPLE_PHOTOS: readonly string[] = [
   SAMPLE_MAIN_PHOTO,
   SAMPLE_BABY_PHOTO,
+  SAMPLE_BIRTHDAY_PHOTO,
+  SAMPLE_SENIOR_PHOTO,
 ];
 export const isSamplePhoto = (url: string | undefined | null) =>
   !!url && SAMPLE_PHOTOS.includes(url);
@@ -226,7 +230,7 @@ const CATEGORY_SAMPLE: Record<
     mainPhoto: SAMPLE_BABY_PHOTO,
   },
   senior: {
-    groomName: "김대한",
+    groomName: "김선일",
     brideName: "",
     groomFather: "",
     groomMother: "",
@@ -236,10 +240,10 @@ const CATEGORY_SAMPLE: Record<
     greetingMessage:
       "그동안 걸어오신 길에 존경과 감사를 담아\n작은 자리를 마련했습니다.\n오셔서 축복해 주시면 큰 힘이 되겠습니다.",
     accountLabel: "축하금",
-    mainPhoto: SAMPLE_MAIN_PHOTO,
+    mainPhoto: SAMPLE_SENIOR_PHOTO,
   },
   birthday: {
-    groomName: "김민준",
+    groomName: "박은진",
     brideName: "",
     groomFather: "",
     groomMother: "",
@@ -249,7 +253,7 @@ const CATEGORY_SAMPLE: Record<
     greetingMessage:
       "소중한 하루를 함께 나누고 싶어\n작은 자리를 마련했습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
     accountLabel: "축하금",
-    mainPhoto: SAMPLE_MAIN_PHOTO,
+    mainPhoto: SAMPLE_BIRTHDAY_PHOTO,
   },
 };
 

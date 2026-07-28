@@ -41,8 +41,10 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
   // 제한 안내에 어떤 종류인지 표시
   const limitCategory = params.get("category");
   const limitLabel = limitCategory ? getCategoryMeta(limitCategory).label : null;
-  // 아직 만들지 않은 종류 (종류당 1개 제한)
-  const usedCategories = new Set(items.map((i) => i.category));
+  // 아직 만들지 않은 종류 (게시가 끝난 초대장은 자리를 비워줌)
+  const usedCategories = new Set(
+    items.filter((i) => !i.expired).map((i) => i.category)
+  );
   const available = CATEGORIES.filter((c) => !usedCategories.has(c.id));
   const [deleting, setDeleting] = useState<string | null>(null); // 삭제 확인 모달 대상 slug
   const [busy, setBusy] = useState(false);
@@ -111,7 +113,8 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
         </h1>
         <p className="mt-2 text-sm text-gray-500">
           초대장은 종류마다 1개씩, 최대 {CATEGORIES.length}개까지 만들 수 있어요.
-          수정은 언제든지 가능해요.
+          수정은 언제든지 가능하고, 게시 기간이 끝나면 그 자리에 새로 만들 수
+          있어요.
         </p>
 
         {notice === "limit" && (
