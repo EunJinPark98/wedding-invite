@@ -77,14 +77,37 @@ export const SAMPLE_PHOTOS: readonly string[] = [
 export const isSamplePhoto = (url: string | undefined | null) =>
   !!url && SAMPLE_PHOTOS.includes(url);
 
-// 청첩장 운영(공개) 기간 선택지 — 모두 무료
-export const PERIOD_OPTIONS = [
-  { months: 1, label: "1개월" },
-  { months: 3, label: "3개월" },
-  { months: 6, label: "6개월" },
-  { months: 12, label: "1년" },
-] as const;
-export type PeriodMonths = (typeof PERIOD_OPTIONS)[number]["months"];
+/**
+ * 게시 종료 시각 — 행사 다음 날 0시(한국시간)부터 자동 비공개.
+ * 예: 예식일 2026-10-10 → 10월 10일까지 열리고 10월 11일에 사라짐.
+ * 잘못된 날짜면 null.
+ */
+export function expiryFromEventDate(eventDate: string | undefined): string | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((eventDate ?? "").trim());
+  if (!m) return null;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const day = new Date(Date.UTC(y, mo - 1, d));
+  // 2026-02-31처럼 존재하지 않는 날짜는 값이 굴러가므로 걸러낸다
+  if (
+    day.getUTCFullYear() !== y ||
+    day.getUTCMonth() !== mo - 1 ||
+    day.getUTCDate() !== d
+  ) {
+    return null;
+  }
+  day.setUTCDate(day.getUTCDate() + 1);
+  const next = `${day.getUTCFullYear()}-${String(day.getUTCMonth() + 1).padStart(2, "0")}-${String(day.getUTCDate()).padStart(2, "0")}`;
+  return new Date(`${next}T00:00:00+09:00`).toISOString();
+}
+
+/** 게시가 닫히는 날(행사 다음 날)을 안내용으로 표시. 보는 사람의 시간대와 무관. */
+export function expiryDateLabel(eventDate: string | undefined): string | null {
+  if (!expiryFromEventDate(eventDate)) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((eventDate ?? "").trim());
+  const day = new Date(Date.UTC(Number(m![1]), Number(m![2]) - 1, Number(m![3])));
+  day.setUTCDate(day.getUTCDate() + 1);
+  return `${day.getUTCFullYear()}년 ${day.getUTCMonth() + 1}월 ${day.getUTCDate()}일`;
+}
 
 export interface Account {
   side: "신랑측" | "신부측";

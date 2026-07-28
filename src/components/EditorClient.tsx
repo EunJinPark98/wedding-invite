@@ -15,14 +15,13 @@ import {
   CATEGORY_IDS,
   HERO_MOTIONS,
   MAX_GALLERY,
-  PERIOD_OPTIONS,
   SENIOR_AGES,
+  expiryDateLabel,
   isSamplePhoto,
   seniorGreetingTitle,
   type Account,
   type Category,
   type InvitationData,
-  type PeriodMonths,
   type TemplateId,
 } from "@/lib/types";
 
@@ -234,13 +233,15 @@ export default function EditorClient({
   const [copied, setCopied] = useState(false);
   const [confirming, setConfirming] = useState(false); // 제작 전 확인 모달
   const [showPreview, setShowPreview] = useState(false); // 모바일 전체화면 미리보기
-  const [period, setPeriod] = useState<PeriodMonths>(3); // 운영 기간(개월)
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
   const photoSectionRef = useRef<HTMLDivElement>(null);
 
   // 예시 사진 그대로거나 비어있으면 본인 대표 사진 등록 필요
   const needMainPhoto = !data.mainPhotoUrl || isSamplePhoto(data.mainPhotoUrl);
+
+  // 게시 종료일 — 고르는 게 아니라 행사 다음 날로 자동 결정
+  const expiryDate = expiryDateLabel(data.weddingDate);
 
   function openConfirm() {
     if (needMainPhoto) {
@@ -310,7 +311,7 @@ export default function EditorClient({
     setSubmitting(true);
     setError(null);
     try {
-      // 수정 모드는 PATCH(운영 기간 변경 없음), 신규는 POST
+      // 수정 모드는 PATCH, 신규는 POST (게시 종료일은 서버가 행사일로 계산)
       const res = await fetch(
         isEdit ? `/api/invitations/${editSlug}` : "/api/invitations",
         {
@@ -319,7 +320,7 @@ export default function EditorClient({
           body: JSON.stringify(
             isEdit
               ? { template, data }
-              : { template, data, periodMonths: period }
+              : { template, data }
           ),
         }
       );
@@ -660,6 +661,11 @@ export default function EditorClient({
             value={data.venueAddress}
             onChange={(v) => set("venueAddress", v)}
           />
+          <p className="text-xs text-gray-400">
+            {expiryDate
+              ? `이 날짜를 기준으로 ${expiryDate}에 링크가 자동으로 닫혀요.`
+              : "이 날짜를 기준으로 다음 날 링크가 자동으로 닫혀요."}
+          </p>
         </Group>
 
         <Group title="인사말" step={5}>
@@ -897,9 +903,10 @@ export default function EditorClient({
             <div className="mt-4 break-all rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700">
               {result}
             </div>
-            {resultExpires && (
+            {resultExpires && expiryDate && (
               <p className="mt-2 text-xs text-gray-400">
-                {fmtDate(resultExpires)}까지 공개 · 이후 자동 비공개
+                {labels.dateFieldLabel} 당일까지 공개 · {expiryDate}에 자동
+                비공개
               </p>
             )}
             <KakaoShareButton
@@ -969,7 +976,7 @@ export default function EditorClient({
         </div>
       )}
 
-      {/* 제작 확인 모달 (미리보기 + 운영 기간 + 한 번 더 확인) */}
+      {/* 제작 확인 모달 (미리보기 + 게시 종료 안내 + 한 번 더 확인) */}
       {confirming && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-3 sm:p-5">
           <div className="mx-auto flex min-h-0 w-full max-w-[460px] flex-1 flex-col rounded-2xl bg-white p-4 shadow-2xl sm:p-5">
@@ -979,7 +986,7 @@ export default function EditorClient({
             <p className="mb-3 mt-1 text-center text-xs text-gray-500">
               {isEdit
                 ? "하객에게 보이는 실제 모습이에요. 저장 즉시 반영돼요."
-                : "하객에게 보이는 실제 모습이에요. 확인 후 운영 기간을 선택하세요."}
+                : "하객에게 보이는 실제 모습이에요. 확인 후 제작해 주세요."}
             </p>
             <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
@@ -987,51 +994,25 @@ export default function EditorClient({
               </div>
             </div>
 
-            {isEdit ? (
-              /* 수정 모드 — 운영 기간은 변경 없음 */
-              <div className="mt-3.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-center text-xs leading-5 text-gold-600">
-                저장하면 하객에게 바로 반영돼요. 운영 기간과 링크는 그대로
-                유지돼요.
-              </div>
-            ) : (
-              /* 운영 기간 선택 */
-              <div className="mt-3.5">
-                <p className="mb-2 text-center text-xs font-semibold text-gray-600">
-                  운영 기간
-                </p>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {PERIOD_OPTIONS.map((p) => {
-                    const selected = period === p.months;
-                    return (
-                      <button
-                        key={p.months}
-                        type="button"
-                        onClick={() => setPeriod(p.months)}
-                        className={`rounded-xl border-2 py-2 text-sm font-medium transition ${
-                          selected
-                            ? "border-gold-400 bg-gold-50 text-gold-500"
-                            : "border-gray-200 text-gray-600 hover:border-gray-300"
-                        }`}
-                      >
-                        {p.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-1.5 text-center text-[11px] text-gray-400">
-                  <span className="font-medium text-gold-500">
-                    {fmtDate(
-                      (() => {
-                        const d = new Date();
-                        d.setMonth(d.getMonth() + period);
-                        return d.toISOString();
-                      })()
-                    )}
-                  </span>
-                  에 게시가 종료돼요 · 계정당 1개 · 제작 후에도 수정할 수 있어요
-                </p>
-              </div>
-            )}
+            {/* 게시 종료일은 행사 다음 날로 자동 결정 (선택 불필요) */}
+            <div className="mt-3.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-center text-xs leading-5 text-gold-600">
+              {expiryDate ? (
+                <>
+                  {labels.dateFieldLabel} 당일까지 볼 수 있고,
+                  <br />
+                  <span className="font-semibold">{expiryDate}</span>에 링크가
+                  자동으로 닫혀요.
+                </>
+              ) : (
+                <>{labels.dateFieldLabel}을 입력하면 게시 종료일이 정해져요.</>
+              )}
+              {isEdit && (
+                <>
+                  <br />
+                  저장하면 바로 반영되고, 링크는 그대로 유지돼요.
+                </>
+              )}
+            </div>
 
             {error && (
               <p className="mt-2 text-center text-sm text-red-500">{error}</p>

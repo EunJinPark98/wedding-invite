@@ -45,7 +45,7 @@ export default async function InvitationPage({
   const inv = await getInvitation(slug);
   if (!inv) notFound();
 
-  // 운영 기간이 지난 청첩장은 배포 중단
+  // 행사가 끝난 초대장은 배포 중단
   if (isExpired(inv)) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-cream p-6">
@@ -57,7 +57,7 @@ export default async function InvitationPage({
             게시 기간이 종료됐어요
           </h1>
           <p className="mt-3 text-sm leading-6 text-gray-500">
-            이 초대장은 설정된 운영 기간이 지나
+            이 초대장은 행사가 끝나
             <br />더 이상 공개되지 않습니다.
             <br />
             찾아주셔서 감사합니다.

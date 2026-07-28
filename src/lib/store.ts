@@ -192,12 +192,14 @@ export async function getInvitationOwned(
   return db[slug] ?? null;
 }
 
-// 청첩장 수정 (소유자 검증 포함) — 횟수 제한 없음
+// 초대장 수정 (소유자 검증 포함) — 횟수 제한 없음.
+// 행사 날짜를 바꾸면 게시 종료일(행사 다음 날)도 함께 옮긴다.
 export async function updateInvitation(
   slug: string,
   userId: string | null,
   template: TemplateId,
-  rawData: InvitationData
+  rawData: InvitationData,
+  expiresAt: string
 ): Promise<boolean> {
   const data = normalizeData(rawData);
 
@@ -206,7 +208,7 @@ export async function updateInvitation(
     if (!existing) return false;
     const { error } = await supabase()
       .from("invitations")
-      .update({ template, data })
+      .update({ template, data, expires_at: expiresAt })
       .eq("slug", slug)
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
@@ -216,7 +218,7 @@ export async function updateInvitation(
   const db = await readLocal();
   const inv = db[slug];
   if (!inv) return false;
-  db[slug] = { ...inv, template, data };
+  db[slug] = { ...inv, template, data, expiresAt };
   await writeLocal(db);
   return true;
 }

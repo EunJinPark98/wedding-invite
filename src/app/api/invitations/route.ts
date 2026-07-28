@@ -6,7 +6,7 @@ import { getTheme } from "@/lib/templates";
 import { getCategoryMeta, getCategoryLabels } from "@/lib/categories";
 import {
   MAX_GALLERY,
-  PERIOD_OPTIONS,
+  expiryFromEventDate,
   isSamplePhoto,
   TEMPLATE_IDS,
 } from "@/lib/types";
@@ -18,7 +18,7 @@ const nano = customAlphabet("23456789abcdefghijkmnpqrstuvwxyz", 8);
 const TEMPLATES: readonly TemplateId[] = TEMPLATE_IDS;
 
 export async function POST(req: Request) {
-  let body: { template?: string; data?: InvitationData; periodMonths?: number };
+  let body: { template?: string; data?: InvitationData };
   try {
     body = await req.json();
   } catch {
@@ -27,7 +27,6 @@ export async function POST(req: Request) {
 
   const template = body.template as TemplateId;
   const data = body.data;
-  const months = Number(body.periodMonths);
 
   if (!template || !TEMPLATES.includes(template)) {
     return NextResponse.json(
@@ -52,10 +51,11 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  const option = PERIOD_OPTIONS.find((p) => p.months === months);
-  if (!option) {
+  // 게시 종료일은 행사 다음 날로 자동 결정되므로 날짜가 반드시 필요하다
+  const expiresAt = expiryFromEventDate(data.weddingDate);
+  if (!expiresAt) {
     return NextResponse.json(
-      { error: "운영 기간을 선택해 주세요." },
+      { error: `${labels.dateFieldLabel}을 정확히 입력해 주세요.` },
       { status: 400 }
     );
   }
@@ -104,9 +104,6 @@ export async function POST(req: Request) {
 
   try {
     const slug = nano();
-    const expires = new Date();
-    expires.setMonth(expires.getMonth() + months);
-    const expiresAt = expires.toISOString();
     // 종류는 템플릿을 기준으로 고정 — 본문의 category만 바꿔 제한을 우회하지 못하게
     await saveInvitation(slug, template, { ...data, category }, expiresAt, userId);
     return NextResponse.json({ slug, expiresAt });

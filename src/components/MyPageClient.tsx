@@ -10,7 +10,7 @@ import {
   getCategoryMeta,
   CATEGORIES,
 } from "@/lib/categories";
-import type { Category } from "@/lib/types";
+import { expiryDateLabel, type Category } from "@/lib/types";
 
 export interface MyInvitation {
   slug: string;
@@ -113,8 +113,8 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
         </h1>
         <p className="mt-2 text-sm text-gray-500">
           초대장은 종류마다 1개씩, 최대 {CATEGORIES.length}개까지 만들 수 있어요.
-          수정은 언제든지 가능하고, 게시 기간이 끝나면 그 자리에 새로 만들 수
-          있어요.
+          수정은 언제든지 가능해요. 링크는 행사 다음 날 자동으로 닫히고, 그
+          자리에 새로 만들 수 있어요.
         </p>
 
         {notice === "limit" && (
@@ -196,7 +196,10 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                         <> · {labels.dateFieldLabel} {inv.weddingDate}</>
                       )}
                       <br />
-                      게시 종료일: {fmtDate(inv.expiresAt)}
+                      {inv.expired ? "게시 종료됨: " : "게시 종료 예정: "}
+                      {expiryDateLabel(inv.weddingDate) ??
+                        fmtDate(inv.expiresAt)}
+                      {!inv.expired && " (행사 다음 날 자동)"}
                     </p>
                   </div>
                 </div>

@@ -7,7 +7,12 @@ import {
 import { getUser, authEnabled } from "@/lib/supabase/server";
 import { getTheme } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
-import { MAX_GALLERY, isSamplePhoto, TEMPLATE_IDS } from "@/lib/types";
+import {
+  MAX_GALLERY,
+  expiryFromEventDate,
+  isSamplePhoto,
+  TEMPLATE_IDS,
+} from "@/lib/types";
 import type { InvitationData, TemplateId } from "@/lib/types";
 
 const TEMPLATES: readonly TemplateId[] = TEMPLATE_IDS;
@@ -27,7 +32,7 @@ async function requireUser(): Promise<
   return { userId: user.id };
 }
 
-// 발행 후 수정 — 횟수 제한 없음, 운영 기간은 변경 불가
+// 발행 후 수정 — 횟수 제한 없음. 날짜를 옮기면 게시 종료일도 함께 옮겨진다
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -89,6 +94,14 @@ export async function PATCH(
       { status: 400 }
     );
   }
+  // 날짜를 옮기면 게시 종료일(행사 다음 날)도 함께 따라간다
+  const expiresAt = expiryFromEventDate(data.weddingDate);
+  if (!expiresAt) {
+    return NextResponse.json(
+      { error: `${labels.dateFieldLabel}을 정확히 입력해 주세요.` },
+      { status: 400 }
+    );
+  }
   if (
     Array.isArray(data.gallery) &&
     data.gallery.filter(Boolean).length > MAX_GALLERY
@@ -100,17 +113,20 @@ export async function PATCH(
   }
 
   try {
-    const updated = await updateInvitation(slug, auth.userId, template, {
-      ...data,
-      category,
-    });
+    const updated = await updateInvitation(
+      slug,
+      auth.userId,
+      template,
+      { ...data, category },
+      expiresAt
+    );
     if (!updated) {
       return NextResponse.json(
         { error: "초대장을 찾을 수 없어요." },
         { status: 404 }
       );
     }
-    return NextResponse.json({ slug });
+    return NextResponse.json({ slug, expiresAt });
   } catch (e) {
     const message =
       e instanceof Error ? e.message : "수정 중 오류가 발생했습니다.";
