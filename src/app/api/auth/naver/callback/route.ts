@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseServer } from "@/lib/supabase/server";
+import {
+  SESSION_START_COOKIE,
+  sessionMarkerCookieOptions,
+} from "@/lib/session";
 
 /**
  * 네이버 OAuth 콜백.
@@ -141,6 +145,12 @@ export async function GET(req: Request) {
     const res = NextResponse.redirect(new URL(next, url.origin));
     res.cookies.delete("naver_oauth_state");
     res.cookies.delete("naver_oauth_next");
+    // 로그인 시각 기록 — 24시간이 지나면 proxy에서 세션을 정리한다
+    res.cookies.set(
+      SESSION_START_COOKIE,
+      String(Date.now()),
+      sessionMarkerCookieOptions
+    );
     return res;
   } catch (e) {
     console.error("[naver-login] exception:", e);

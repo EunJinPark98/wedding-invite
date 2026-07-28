@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { toSessionCookie } from "@/lib/session";
 
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -17,8 +18,9 @@ export async function supabaseServer() {
       },
       setAll(cookiesToSet) {
         try {
+          // 만료 시각을 지워 세션 쿠키로 발급 (브라우저를 닫으면 로그아웃)
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
+            cookieStore.set(name, value, toSessionCookie(options))
           );
         } catch {
           // Server Component에서 호출되면 set 불가 — Route Handler에서는 정상 동작
