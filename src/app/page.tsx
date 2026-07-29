@@ -4,6 +4,7 @@ import { CATEGORIES, getCategoryMeta } from "@/lib/categories";
 import { emptyInvitation, CATEGORY_IDS, type Category } from "@/lib/types";
 import InvitationView from "@/components/InvitationView";
 import AuthStatus from "@/components/AuthStatus";
+import ThemePickerButton from "@/components/ThemePickerButton";
 
 // 카카오톡 채널 「별마마파파」 문의 링크
 const KAKAO_CHANNEL_URL = "http://pf.kakao.com/_GxfxbwX";
@@ -82,12 +83,7 @@ export default async function Home({
             소중한 날을 카톡 링크로 바로 전하세요.
           </p>
           <div className="mx-auto mt-10 flex max-w-[280px] flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center">
-            <Link
-              href="/editor"
-              className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-8 py-4 text-center text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
-            >
-              무료로 제작하기
-            </Link>
+            <ThemePickerButton className="rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-8 py-4 text-center text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600" />
             <Link
               href="#templates"
               className="rounded-full border border-gold-300/70 bg-white/80 px-7 py-4 text-center text-base font-semibold text-gray-600 backdrop-blur transition hover:border-gold-400 hover:text-gold-600"
