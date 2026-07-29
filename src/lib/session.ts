@@ -17,6 +17,23 @@ export const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 // Supabase가 발급하는 인증 쿠키 접두사
 export const SUPABASE_COOKIE_PREFIX = "sb-";
 
+/**
+ * PKCE 로그인 중에만 잠깐 저장되는 code_verifier 쿠키의 접미사.
+ * (Supabase 저장 키가 `sb-<ref>-auth-token-code-verifier` 라서 접두사가 겹친다)
+ */
+const PKCE_VERIFIER_SUFFIX = "-code-verifier";
+
+/**
+ * "로그인된 세션"을 담은 Supabase 쿠키인지.
+ *
+ * code_verifier 는 이름만 sb- 로 시작할 뿐 아직 로그인이 끝나지 않았다는 표식이다.
+ * 이걸 세션 쿠키로 오인해 만료 정리 대상에 넣으면, 콜백에서 코드를 세션으로
+ * 교환할 때 검증값이 사라져 첫 로그인이 항상 실패한다.
+ */
+export const isSupabaseSessionCookie = (name: string): boolean =>
+  name.startsWith(SUPABASE_COOKIE_PREFIX) &&
+  !name.endsWith(PKCE_VERIFIER_SUFFIX);
+
 // 표식 쿠키도 세션 쿠키로 발급해 인증 쿠키와 생명주기를 맞춘다
 export const sessionMarkerCookieOptions = {
   path: "/",

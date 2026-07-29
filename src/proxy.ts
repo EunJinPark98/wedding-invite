@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
   SESSION_START_COOKIE,
-  SUPABASE_COOKIE_PREFIX,
   isSessionExpired,
+  isSupabaseSessionCookie,
 } from "@/lib/session";
 
 /**
@@ -10,11 +10,12 @@ import {
  * (브라우저를 닫았을 때의 로그아웃은 인증 쿠키를 세션 쿠키로 발급해 처리 — lib/session.ts)
  */
 export function proxy(request: NextRequest) {
+  // 로그인 진행 중에만 있는 code_verifier 는 세션이 아니므로 건드리지 않는다
   const authCookies = request.cookies
     .getAll()
-    .filter((c) => c.name.startsWith(SUPABASE_COOKIE_PREFIX));
+    .filter((c) => isSupabaseSessionCookie(c.name));
 
-  // 비로그인 요청은 그대로 통과
+  // 비로그인(로그인 진행 중 포함) 요청은 그대로 통과
   if (authCookies.length === 0) return NextResponse.next();
 
   const startedAt = request.cookies.get(SESSION_START_COOKIE)?.value;
