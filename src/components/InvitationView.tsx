@@ -1254,13 +1254,14 @@ function CinemaLayout({
       </div>
       <div className="relative mt-8 overflow-hidden">
         <Photo data={data} t={t} className="aspect-[3/4.2] w-full" kenburns />
-        {/* 세로쓰기 캡션 — 화보 무드 (사진 위 가독성용 흰색+그림자) */}
+        {/* 세로쓰기 캡션 — 화보 무드 (사진 위 가독성용 검정+흰색 후광) */}
         {data.venueName && (
           <p
-            className="absolute left-3.5 top-5 text-[12.5px] tracking-[0.25em] text-white"
+            className="absolute left-3.5 top-5 text-[12.5px] tracking-[0.25em] text-black"
             style={{
               writingMode: "vertical-rl",
-              textShadow: "0 1px 10px rgba(0,0,0,0.55)",
+              textShadow:
+                "0 1px 6px rgba(255,255,255,0.85), 0 0 10px rgba(255,255,255,0.6)",
             }}
           >
             {data.venueName} {data.venueHall}
@@ -1268,10 +1269,11 @@ function CinemaLayout({
         )}
         {p && (
           <p
-            className="absolute right-3.5 top-5 text-[12.5px] tracking-[0.28em] text-white"
+            className="absolute right-3.5 top-5 text-[12.5px] tracking-[0.28em] text-black"
             style={{
               writingMode: "vertical-rl",
-              textShadow: "0 1px 10px rgba(0,0,0,0.55)",
+              textShadow:
+                "0 1px 6px rgba(255,255,255,0.85), 0 0 10px rgba(255,255,255,0.6)",
             }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
