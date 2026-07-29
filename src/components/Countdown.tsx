@@ -87,7 +87,7 @@ export default function Countdown({
         ))}
       </div>
       <p className="mt-5 text-[13px]" style={{ color: t.sub }}>
-        {showPerson2 ? `${groomName} · ${brideName}` : groomName}의 {eventLabel}까지{" "}
+        {showPerson2 ? `${groomName} · ${brideName}` : groomName}님의 {eventLabel}까지{" "}
         <span className="font-medium" style={{ color: t.accent }}>
           {time.days}일
         </span>{" "}
