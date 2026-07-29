@@ -666,8 +666,9 @@ export default function EditorClient({
           />
           <p className="text-xs text-gray-400">
             {expiryDate
-              ? `이 날짜를 기준으로 ${expiryDate}에 링크가 자동으로 닫혀요.`
-              : "이 날짜를 기준으로 다음 날 링크가 자동으로 닫혀요."}
+              ? `${expiryDate}에 링크가 닫히고 사진까지 완전히 삭제돼요.`
+              : "행사 다음 날 링크가 닫히고 사진까지 완전히 삭제돼요."}{" "}
+            사진은 미리 따로 보관해 주세요.
           </p>
         </Group>
 
@@ -1003,8 +1004,8 @@ export default function EditorClient({
                 <>
                   {labels.dateFieldLabel} 당일까지 볼 수 있고,
                   <br />
-                  <span className="font-semibold">{expiryDate}</span>에 링크가
-                  자동으로 닫혀요.
+                  <span className="font-semibold">{expiryDate}</span>에 사진까지
+                  완전히 삭제돼요.
                 </>
               ) : (
                 <>{labels.dateFieldLabel}을 입력하면 게시 종료일이 정해져요.</>

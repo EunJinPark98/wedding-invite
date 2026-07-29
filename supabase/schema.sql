@@ -36,6 +36,8 @@ insert into storage.buckets (id, name, public)
   on conflict (id) do nothing;
 
 -- 누구나 사진 업로드(insert) / 조회(select) 가능. 수정·삭제는 막아둠.
+-- 초대장 삭제·만료 정리 시의 사진 삭제는 서버가 SUPABASE_SERVICE_ROLE_KEY 로 수행한다
+-- (service_role 은 RLS 를 우회하므로 별도 delete 정책을 열어두지 않는다).
 create policy "photos public upload"
   on storage.objects for insert
   with check (bucket_id = 'photos');

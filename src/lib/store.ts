@@ -2,6 +2,7 @@ import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
+import { deleteImages } from "./storage";
 import { normalizeData, CATEGORY_IDS } from "./types";
 import type {
   Category,
@@ -212,6 +213,7 @@ export async function updateInvitation(
       .eq("slug", slug)
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
+    await deleteImages(droppedPhotos(existing.data, data));
     return true;
   }
 
@@ -220,16 +222,39 @@ export async function updateInvitation(
   if (!inv) return false;
   db[slug] = { ...inv, template, data, expiresAt };
   await writeLocal(db);
+  await deleteImages(droppedPhotos(inv.data, data));
   return true;
 }
 
-// 삭제 (소유자 검증 포함) — 복원 불가
+// 수정으로 더 이상 쓰이지 않게 된 사진들 (교체·삭제된 것)
+function droppedPhotos(
+  before: InvitationData | null | undefined,
+  after: InvitationData
+): string[] {
+  const kept = new Set(photoUrlsOf(after));
+  return photoUrlsOf(before).filter((u) => !kept.has(u));
+}
+
+// 초대장에 담긴 모든 사진 URL (대표·프로필·갤러리)
+function photoUrlsOf(data: InvitationData | null | undefined): string[] {
+  if (!data) return [];
+  return [
+    data.mainPhotoUrl,
+    data.groomPhotoUrl,
+    data.bridePhotoUrl,
+    ...(Array.isArray(data.gallery) ? data.gallery : []),
+  ].filter(Boolean);
+}
+
+// 삭제 (소유자 검증 포함) — 복원 불가. 업로드한 사진도 저장소에서 함께 지운다.
 export async function deleteInvitation(
   slug: string,
   userId: string | null
 ): Promise<boolean> {
   if (useSupabase) {
     if (!userId) return false;
+    // 사진 URL은 행이 지워지기 전에 확보해 둔다
+    const existing = await getInvitationOwned(slug, userId);
     const { data, error } = await supabase()
       .from("invitations")
       .delete()
@@ -237,13 +262,56 @@ export async function deleteInvitation(
       .eq("user_id", userId)
       .select("slug");
     if (error) throw new Error(error.message);
-    return (data?.length ?? 0) > 0;
+    if ((data?.length ?? 0) === 0) return false;
+    // 행 삭제가 확정된 뒤에 사진 정리 (실패해도 삭제 자체는 성공 처리)
+    await deleteImages(photoUrlsOf(existing?.data));
+    return true;
   }
   const db = await readLocal();
-  if (!db[slug]) return false;
+  const inv = db[slug];
+  if (!inv) return false;
   delete db[slug];
   await writeLocal(db);
+  await deleteImages(photoUrlsOf(inv.data));
   return true;
+}
+
+/**
+ * 게시 기간이 끝난 초대장을 완전히 지운다 (DB 행 + 업로드된 사진).
+ * 하루 한 번 /api/cron/purge 에서 호출된다. 복구 불가.
+ */
+export async function purgeExpiredInvitations(): Promise<{
+  deleted: number;
+  images: number;
+}> {
+  const now = new Date().toISOString();
+
+  if (useSupabase) {
+    // 만료된 행을 지우면서 data를 함께 돌려받아 사진 경로를 확보
+    const { data, error } = await supabase()
+      .from("invitations")
+      .delete()
+      .not("expires_at", "is", null)
+      .lte("expires_at", now)
+      .select("slug, data");
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    const urls = rows.flatMap((r) =>
+      photoUrlsOf(r.data as InvitationData | null)
+    );
+    const images = await deleteImages(urls);
+    return { deleted: rows.length, images };
+  }
+
+  const db = await readLocal();
+  const expired = Object.values(db).filter(
+    (inv) => inv.expiresAt && new Date(inv.expiresAt).getTime() <= Date.now()
+  );
+  if (expired.length === 0) return { deleted: 0, images: 0 };
+  for (const inv of expired) delete db[inv.slug];
+  await writeLocal(db);
+  const images = await deleteImages(expired.flatMap((inv) => photoUrlsOf(inv.data)));
+  return { deleted: expired.length, images };
 }
 
 export const storageMode = useSupabase ? "supabase" : "local";

@@ -113,8 +113,9 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
         </h1>
         <p className="mt-2 text-sm text-gray-500">
           초대장은 종류마다 1개씩, 최대 {CATEGORIES.length}개까지 만들 수 있어요.
-          수정은 언제든지 가능해요. 링크는 행사 다음 날 자동으로 닫히고, 그
-          자리에 새로 만들 수 있어요.
+          수정은 언제든지 가능해요. <strong className="text-gray-600">행사 다음
+          날 링크가 닫히고 사진까지 완전히 삭제</strong>되니 사진은 미리 보관해
+          주세요. 삭제된 자리에는 새로 만들 수 있어요.
         </p>
 
         {notice === "limit" && (
@@ -196,10 +197,10 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
                         <> · {labels.dateFieldLabel} {inv.weddingDate}</>
                       )}
                       <br />
-                      {inv.expired ? "게시 종료됨: " : "게시 종료 예정: "}
+                      {inv.expired ? "삭제 예정: " : "자동 삭제일: "}
                       {expiryDateLabel(inv.weddingDate) ??
                         fmtDate(inv.expiresAt)}
-                      {!inv.expired && " (행사 다음 날 자동)"}
+                      {inv.expired && " (곧 정리돼요)"}
                     </p>
                   </div>
                 </div>

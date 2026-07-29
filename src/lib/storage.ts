@@ -56,4 +56,62 @@ export async function uploadImage(
   return `/uploads/${filename}`;
 }
 
+/**
+ * 업로드된 사진 URL에서 지울 대상 경로를 뽑는다.
+ * 우리가 올린 파일이 아니면(예시 사진, 외부 URL) null — 실수로 지우지 않도록.
+ */
+export function storagePathFromUrl(url: string | null | undefined): string | null {
+  const u = (url ?? "").trim();
+  if (!u) return null;
+  if (useSupabase) {
+    const marker = `/storage/v1/object/public/${BUCKET}/`;
+    const i = u.indexOf(marker);
+    if (i < 0) return null;
+    const p = u.slice(i + marker.length).split("?")[0];
+    return p ? decodeURIComponent(p) : null;
+  }
+  // 로컬 개발 모드: "/uploads/파일명"
+  if (!u.startsWith("/uploads/")) return null;
+  const name = u.slice("/uploads/".length).split("?")[0];
+  // 경로 탈출 방지
+  return name && !name.includes("/") && !name.includes("..") ? name : null;
+}
+
+/**
+ * 초대장에 딸린 사진들을 저장소에서 지운다.
+ * 삭제 흐름을 막지 않도록 실패는 던지지 않고 지운 개수만 돌려준다.
+ */
+export async function deleteImages(
+  urls: (string | null | undefined)[]
+): Promise<number> {
+  const paths = Array.from(
+    new Set(
+      urls.map(storagePathFromUrl).filter((p): p is string => Boolean(p))
+    )
+  );
+  if (paths.length === 0) return 0;
+
+  try {
+    if (useSupabase) {
+      const { error } = await supabase().storage.from(BUCKET).remove(paths);
+      if (error) throw new Error(error.message);
+      return paths.length;
+    }
+    const dir = path.join(process.cwd(), "public", "uploads");
+    let n = 0;
+    for (const name of paths) {
+      try {
+        await fs.unlink(path.join(dir, name));
+        n += 1;
+      } catch {
+        // 이미 없는 파일은 무시
+      }
+    }
+    return n;
+  } catch (e) {
+    console.error("[storage] 사진 삭제 실패:", e);
+    return 0;
+  }
+}
+
 export const uploadMode = useSupabase ? "supabase" : "local";
