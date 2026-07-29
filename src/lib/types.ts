@@ -227,8 +227,8 @@ const CATEGORY_SAMPLE: Record<
   }
 > = {
   wedding: {
-    groomName: "김선일",
-    brideName: "박은진",
+    groomName: "김신랑",
+    brideName: "박신부",
     groomFather: "김아버지",
     groomMother: "박어머니",
     brideFather: "박아버지",
@@ -240,7 +240,7 @@ const CATEGORY_SAMPLE: Record<
     mainPhoto: SAMPLE_MAIN_PHOTO,
   },
   doljanchi: {
-    groomName: "박은진",
+    groomName: "김아기",
     brideName: "",
     groomFather: "",
     groomMother: "",
@@ -248,12 +248,12 @@ const CATEGORY_SAMPLE: Record<
     brideMother: "",
     greetingTitle: "우리 아이의 첫 생일에 초대합니다",
     greetingMessage:
-      "건강하게 자라준 은진이의 첫 생일을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
+      "건강하게 자라준 아기의 첫 생일을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
     accountLabel: "축하금",
     mainPhoto: SAMPLE_BABY_PHOTO,
   },
   senior: {
-    groomName: "김선일",
+    groomName: "김별순",
     brideName: "",
     groomFather: "",
     groomMother: "",
@@ -312,8 +312,8 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     accounts:
       category === "wedding"
         ? [
-            { side: "신랑측", name: "김선일", bank: "국민은행", number: "123-456-7890" },
-            { side: "신부측", name: "박은진", bank: "신한은행", number: "987-654-3210" },
+            { side: "신랑측", name: "김신랑", bank: "국민은행", number: "123-456-7890" },
+            { side: "신부측", name: "박신부", bank: "신한은행", number: "987-654-3210" },
           ]
         : [{ side: "신랑측", name: s.groomName, bank: "국민은행", number: "123-456-7890" }],
     footerMessage: "",
