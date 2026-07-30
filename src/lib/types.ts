@@ -56,6 +56,7 @@ export const seniorGreetingTitle = (age: number) =>
  *   event     : 잔치 이름 — 제목·장소 라벨용 ("백일잔치 날짜")
  *   occasion  : 문장 속 표현 ("우리 아기 백일이에요")
  *   milestone : "~을 맞이했습니다" 처럼 예스러운 문장에 쓰는 표현
+ *   greeting  : 기본 인사말 제목 (종류마다 자연스러운 조사가 달라 통째로 둔다)
  *   kicker    : 히어로 영문 소문구
  */
 export const DOL_KINDS = [
@@ -65,6 +66,7 @@ export const DOL_KINDS = [
     event: "백일잔치",
     occasion: "백일",
     milestone: "백일",
+    greeting: "우리 아이의 백일잔치에 초대합니다",
     kicker: "100 DAYS",
     kicker2: "THE 100TH DAY",
   },
@@ -74,6 +76,7 @@ export const DOL_KINDS = [
     event: "돌잔치",
     occasion: "첫 생일",
     milestone: "첫 돌",
+    greeting: "우리 아이의 첫 생일에 초대합니다",
     kicker: "FIRST BIRTHDAY",
     kicker2: "THE FIRST BIRTHDAY",
   },
@@ -84,7 +87,7 @@ export const getDolKindMeta = (kind: string | undefined) =>
   DOL_KINDS.find((k) => k.id === kind) ?? DOL_KINDS[1];
 // 종류를 바꾸면 따라 바뀌는 기본 인사말 (사용자가 직접 고친 경우엔 유지)
 export const dolGreetingTitle = (kind: string | undefined) =>
-  `우리 아이의 ${getDolKindMeta(kind).occasion}에 초대합니다`;
+  getDolKindMeta(kind).greeting;
 export const dolGreetingMessage = (kind: string | undefined) =>
   `건강하게 자라준 아기의 ${getDolKindMeta(kind).occasion}을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.`;
 
@@ -287,6 +290,10 @@ const CATEGORY_SAMPLE: Record<
     greetingMessage: string;
     accountLabel: string;
     mainPhoto: string;
+    // 예시 장소 — 실제 영업 중인 업체 대신 공공시설을 쓴다
+    venueName: string;
+    venueHall: string;
+    venueAddress: string;
   }
 > = {
   wedding: {
@@ -301,6 +308,9 @@ const CATEGORY_SAMPLE: Record<
       "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
     accountLabel: "축의금",
     mainPhoto: SAMPLE_MAIN_PHOTO,
+    venueName: "서울시청 시민청",
+    venueHall: "지하 1층 태평홀",
+    venueAddress: "서울특별시 중구 세종대로 110",
   },
   doljanchi: {
     groomName: "김아기",
@@ -313,6 +323,9 @@ const CATEGORY_SAMPLE: Record<
     greetingMessage: dolGreetingMessage(DEFAULT_DOL_KIND),
     accountLabel: "축하금",
     mainPhoto: SAMPLE_BABY_PHOTO,
+    venueName: "서울여성플라자",
+    venueHall: "2층 다목적홀",
+    venueAddress: "서울특별시 동작구 여의대방로54길 18",
   },
   senior: {
     groomName: "김별순",
@@ -326,6 +339,9 @@ const CATEGORY_SAMPLE: Record<
       "그동안 걸어오신 길에 존경과 감사를 담아\n작은 자리를 마련했습니다.\n오셔서 축복해 주시면 큰 힘이 되겠습니다.",
     accountLabel: "축하금",
     mainPhoto: SAMPLE_SENIOR_PHOTO,
+    venueName: "세종문화회관",
+    venueHall: "3층 연회장",
+    venueAddress: "서울특별시 종로구 세종대로 175",
   },
   birthday: {
     groomName: "박은진",
@@ -339,6 +355,9 @@ const CATEGORY_SAMPLE: Record<
       "소중한 하루를 함께 나누고 싶어\n작은 자리를 마련했습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
     accountLabel: "축하금",
     mainPhoto: SAMPLE_BIRTHDAY_PHOTO,
+    venueName: "국립중앙박물관",
+    venueHall: "1층 으뜸홀",
+    venueAddress: "서울특별시 용산구 서빙고로 137",
   },
 };
 
@@ -356,9 +375,9 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     brideMother: s.brideMother,
     weddingDate: "2026-10-10",
     weddingTime: "오후 1시",
-    venueName: "그랜드 웨딩홀",
-    venueHall: "3층 그랜드볼룸",
-    venueAddress: "서울특별시 강남구 테헤란로 123",
+    venueName: s.venueName,
+    venueHall: s.venueHall,
+    venueAddress: s.venueAddress,
     greetingTitle: s.greetingTitle,
     greetingMessage: s.greetingMessage,
     fontHeading: "default",
