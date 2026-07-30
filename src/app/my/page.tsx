@@ -22,6 +22,7 @@ export default async function MyPage() {
     templateName: getTheme(inv.template).name,
     category: inv.data?.category ?? "wedding",
     seniorAge: inv.data?.seniorAge ?? 70,
+    dolKind: inv.data?.dolKind ?? "dol",
     groomName: inv.data?.groomName ?? "",
     brideName: inv.data?.brideName ?? "",
     weddingDate: inv.data?.weddingDate ?? "",

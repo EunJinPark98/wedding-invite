@@ -13,15 +13,19 @@ import {
   emptyInvitation,
   normalizeData,
   CATEGORY_IDS,
+  DOL_KINDS,
   FONT_SCALES,
   HERO_MOTIONS,
   MAX_GALLERY,
   SENIOR_AGES,
+  dolGreetingMessage,
+  dolGreetingTitle,
   expiryDateLabel,
   isSamplePhoto,
   seniorGreetingTitle,
   type Account,
   type Category,
+  type DolKind,
   type InvitationData,
   type TemplateId,
 } from "@/lib/types";
@@ -227,7 +231,7 @@ export default function EditorClient({
     initialData ? normalizeData(initialData) : emptyInvitation(category)
   );
   // 칠순 카테고리는 선택한 연세(70/80/90/100)에 따라 문구가 바뀜
-  const labels = getCategoryLabels(category, data.seniorAge);
+  const labels = getCategoryLabels(category, data.seniorAge, data.dolKind);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -271,6 +275,21 @@ export default function EditorClient({
         d.greetingTitle === seniorGreetingTitle(d.seniorAge)
           ? seniorGreetingTitle(age)
           : d.greetingTitle,
+    }));
+
+  // 백일/돌을 바꾸면 기본 인사말 제목도 따라감 (직접 고쳐 쓴 제목은 그대로 둠)
+  const setDolKind = (kind: DolKind) =>
+    setData((d) => ({
+      ...d,
+      dolKind: kind,
+      greetingTitle:
+        d.greetingTitle === dolGreetingTitle(d.dolKind)
+          ? dolGreetingTitle(kind)
+          : d.greetingTitle,
+      greetingMessage:
+        d.greetingMessage === dolGreetingMessage(d.dolKind)
+          ? dolGreetingMessage(kind)
+          : d.greetingMessage,
     }));
 
   const setAccount = (i: number, patch: Partial<Account>) =>
@@ -559,6 +578,39 @@ export default function EditorClient({
               </div>
             </div>
           )}
+          {/* 백일잔치 · 돌잔치 선택 — 초대장 문구가 통째로 바뀜 */}
+          {category === "doljanchi" && (
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                어떤 잔치인가요?
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {DOL_KINDS.map((k) => {
+                  const selected = data.dolKind === k.id;
+                  return (
+                    <button
+                      key={k.id}
+                      type="button"
+                      onClick={() => setDolKind(k.id)}
+                      aria-pressed={selected}
+                      className={`rounded-xl border-2 px-2 py-2.5 text-center transition ${
+                        selected
+                          ? "border-gold-400 bg-gold-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold text-gray-800">
+                        {k.label}
+                      </span>
+                      <span className="mt-0.5 block text-[11px] text-gray-400">
+                        {k.occasion}을 축하해요
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
             <Field
               label={labels.personLabel}
@@ -812,6 +864,8 @@ export default function EditorClient({
           </p>
         </Group>
 
+        {/* 생일은 축하금을 받는 자리가 아니라 계좌 단계를 두지 않는다 */}
+        {labels.showAccounts && (
         <Group title={labels.accountsGroupTitle} step={7}>
           <div className="space-y-3">
             {data.accounts.map((a, i) => (
@@ -869,6 +923,7 @@ export default function EditorClient({
             + 계좌 추가
           </button>
         </Group>
+        )}
 
         <button
           onClick={openConfirm}
@@ -903,8 +958,8 @@ export default function EditorClient({
 
       {/* 미리보기 — 모바일(우상단 미니, 탭하면 확대) */}
       <div
-        className="fixed right-3 top-16 z-40 overflow-hidden rounded-lg border-2 border-gray-800 bg-white shadow-lg md:hidden"
-        style={{ width: 72, height: 104 }}
+        className="fixed right-3 top-16 z-40 overflow-hidden rounded-xl border-2 border-gray-800 bg-white shadow-lg md:hidden"
+        style={{ width: 104, height: 150 }}
       >
         {/* 축소된 실시간 미리보기 (클릭은 위 오버레이가 처리) */}
         <div
@@ -912,7 +967,7 @@ export default function EditorClient({
           style={{
             width: 390,
             transformOrigin: "top left",
-            transform: `scale(${72 / 390})`,
+            transform: `scale(${104 / 390})`,
           }}
         >
           <InvitationView template={template} data={data} preview />
@@ -921,7 +976,7 @@ export default function EditorClient({
           type="button"
           onClick={() => setShowPreview(true)}
           aria-label="미리보기 크게 보기"
-          className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 via-transparent to-transparent pb-0.5 text-[9px] font-medium text-white"
+          className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 via-transparent to-transparent pb-1 text-[11px] font-medium text-white"
         >
           🔍 미리보기
         </button>

@@ -506,6 +506,14 @@ function showGallery(data: InvitationData, preview: boolean) {
   return preview || data.gallery.filter(Boolean).length > 0;
 }
 
+// 계좌 섹션 노출 여부 — 축의금을 받지 않는 종류(생일)는 아예 숨긴다
+function showAccounts(data: InvitationData) {
+  return (
+    labelsOf(data).showAccounts &&
+    data.accounts.filter((a) => a.number).length > 0
+  );
+}
+
 function AccountInner({
   data,
   t,
@@ -770,7 +778,7 @@ function ClassicLayout({
           </Sec>
         </>
       )}
-      {data.accounts.filter((a) => a.number).length > 0 && (
+      {showAccounts(data) && (
         <>
           <Divider t={t} variant="classic" />
           <Sec label="ACCOUNT" t={t} variant="classic">
@@ -861,7 +869,7 @@ function ModernLayout({
           </Sec>
         </>
       )}
-      {data.accounts.filter((a) => a.number).length > 0 && (
+      {showAccounts(data) && (
         <>
           <Divider t={t} variant="modern" />
           <Sec label="ACCOUNT" index="06" t={t} variant="modern">
@@ -999,7 +1007,7 @@ function RomanticLayout({
           </Sec>
         </>
       )}
-      {data.accounts.filter((a) => a.number).length > 0 && (
+      {showAccounts(data) && (
         <>
           <Divider t={t} variant="romantic" />
           <Sec label="ACCOUNT" t={t} variant="romantic">
@@ -1090,7 +1098,7 @@ function BotanicalLayout({
             </Sec>
           </>
         )}
-        {data.accounts.filter((a) => a.number).length > 0 && (
+        {showAccounts(data) && (
           <>
             <Divider t={t} variant="botanical" />
             <Sec label="ACCOUNT" t={t} variant="botanical">
@@ -1225,7 +1233,7 @@ function StarlightLayout({
           </Sec>
         </>
       )}
-      {data.accounts.filter((a) => a.number).length > 0 && (
+      {showAccounts(data) && (
         <>
           <Divider t={t} variant="starlight" />
           <Sec label="ACCOUNT" t={t} variant="starlight">
@@ -1354,7 +1362,7 @@ function CinemaLayout({
           </Sec>
         </>
       )}
-      {data.accounts.filter((a) => a.number).length > 0 && (
+      {showAccounts(data) && (
         <>
           <Divider t={t} variant="cinema" />
           <Sec label="ACCOUNT" t={t} variant="cinema">
@@ -1414,7 +1422,7 @@ function CommonBody({
           </Sec>
         </>
       )}
-      {data.accounts.filter((a) => a.number).length > 0 && (
+      {showAccounts(data) && (
         <>
           <Divider t={t} variant={variant} />
           <Sec label="ACCOUNT" t={t} variant={variant}>
@@ -1442,6 +1450,7 @@ function DolBearLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = labelsOf(data);
   return (
     <>
       <div
@@ -1478,7 +1487,7 @@ function DolBearLayout({
           className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
-          FIRST BIRTHDAY
+          {labels.heroKicker}
         </p>
         <p className="inv-hero-in mt-4 text-4xl" aria-hidden>
           <span className="inv-bob">🧸</span>
@@ -1510,7 +1519,7 @@ function DolBearLayout({
           className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
-          우리 아이의 첫 번째 생일
+          우리 아이의 {labels.dolOccasion}
         </p>
         {p && (
           <p
@@ -1538,6 +1547,7 @@ function DolCloudLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = labelsOf(data);
   const stars = [
     { left: "12%", top: "30%", size: 4, delay: 0 },
     { left: "85%", top: "24%", size: 3, delay: 1.1 },
@@ -1595,7 +1605,7 @@ function DolCloudLayout({
           className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
-          FIRST BIRTHDAY
+          {labels.heroKicker}
         </p>
         {/* 무지개 아치 */}
         <svg
@@ -1635,7 +1645,7 @@ function DolCloudLayout({
           className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
-          구름 위를 걷는 첫 생일에 초대해요
+          구름 위를 걷는 {labels.dolOccasion}에 초대해요
         </p>
         {p && (
           <p
@@ -1663,6 +1673,7 @@ function DolHanbokLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = labelsOf(data);
   const saekdong =
     "linear-gradient(90deg, #3f6b8f 0 20%, #e5a13d 20% 40%, #c25b4e 40% 60%, #6f8c6a 60% 80%, #e9c8d8 80% 100%)";
   const obang = ["#3f6b8f", "#e5a13d", "#c25b4e", "#6f8c6a", "#54382f"];
@@ -1675,7 +1686,7 @@ function DolHanbokLayout({
           className="inv-hero-in text-[calc(13px*var(--inv-fs))] tracking-[0.35em]"
           style={{ color: t.accent, fontFamily: t.headingFont }}
         >
-          돌잔치에 초대합니다
+          {labels.dolEvent}에 초대합니다
         </p>
         {/* 전통 이중 프레임 사진 */}
         <div
@@ -2382,14 +2393,15 @@ function DolStarLayout({
   t: TemplateTheme;
   preview?: boolean;
 }) {
+  const labels = labelsOf(data);
   return (
     <>
       <StarHero
         data={data}
         t={t}
         phrase="우리 집에 온 작은 별"
-        kicker="FIRST BIRTHDAY"
-        sub="첫 번째 생일에 초대해요"
+        kicker={labels.heroKicker}
+        sub={`${labels.dolOccasion}에 초대해요`}
       />
       <CommonBody data={data} t={t} variant="dolstar" preview={preview} rounded="rounded-2xl" />
     </>
@@ -2407,6 +2419,7 @@ function DolGardenLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = labelsOf(data);
   return (
     <>
       <div
@@ -2440,7 +2453,7 @@ function DolGardenLayout({
           className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
-          FIRST BIRTHDAY
+          {labels.heroKicker}
         </p>
         <p
           className="inv-hero-in mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.1em]"
@@ -2515,6 +2528,7 @@ function DolCrayonLayout({
   preview?: boolean;
 }) {
   const p = dateParts(data.weddingDate);
+  const labels = labelsOf(data);
   const crayons = ["#e8873c", "#f2c14e", "#78bcd6", "#8bc48a", "#e0798f"];
   return (
     <>
@@ -2540,7 +2554,7 @@ function DolCrayonLayout({
           className="inv-hero-in mt-4 text-[calc(15px*var(--inv-fs))] font-bold tracking-[0.1em]"
           style={{ color: t.accent }}
         >
-          우리 아기 첫 생일이에요!
+          우리 아기 {labels.dolOccasion}이에요!
         </p>
         {/* 스케치북에 테이프로 붙인 사진 */}
         <div className="relative mx-auto mt-7 w-fit">
@@ -2804,7 +2818,7 @@ function SeniorWarmLayout({
   );
 }
 
-// 생4) 별빛 생일 — 밤하늘에 소원을 비는 생일
+// 생4) 별빛 생일 — 별이 쏟아지는 밤하늘 무드의 생일
 function BdayStarLayout({
   data,
   t,
@@ -2819,7 +2833,7 @@ function BdayStarLayout({
       <StarHero
         data={data}
         t={t}
-        phrase="별에게 소원을 빌어요"
+        phrase="별처럼 빛나는 하루"
         kicker="HAPPY BIRTHDAY"
         sub="생일을 함께 축하해 주세요"
       />
@@ -3052,7 +3066,7 @@ function Footer({
 
   return (
     <footer
-      className="mt-10 px-8 pb-14 pt-16 text-center"
+      className="mt-8 px-8 pb-9 pt-10 text-center"
       style={
         isStar
           ? { background: bg, borderTop: `1px solid ${t.accent}40` }
@@ -3062,7 +3076,7 @@ function Footer({
       }
     >
       <p
-        className="font-cormorant mb-6 flex items-center justify-center gap-3 text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
+        className="font-cormorant mb-5 flex items-center justify-center gap-3 text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
         style={{ color: subColor }}
       >
         <span className="inline-block h-px w-8" style={{ background: lineColor }} />
@@ -3108,7 +3122,7 @@ function Footer({
       )}
       <a
         href="/"
-        className="mt-9 inline-block text-[calc(10px*var(--inv-fs))] tracking-wider transition"
+        className="mt-6 inline-block text-[calc(10px*var(--inv-fs))] tracking-wider transition"
         style={{ color: subColor }}
       >
         별빛 초대장 ✦ 별마마파파
