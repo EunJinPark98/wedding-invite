@@ -292,7 +292,7 @@ function ProfilePhoto({
 }
 
 /**
- * 아기 이름 옆 성별 표시.
+ * 아기 이름 아래 성별 표시.
  * 돌잔치·백일잔치에서 성별을 고른 경우에만 나온다.
  */
 function GenderMark({ data, t }: { data: InvitationData; t: TemplateTheme }) {
@@ -300,12 +300,14 @@ function GenderMark({ data, t }: { data: InvitationData; t: TemplateTheme }) {
   const mark = getBabyGenderMark(data.babyGender);
   if (!mark) return null;
   return (
-    <span
-      className="ml-2 inline-block rounded-full px-2 py-0.5 align-middle text-[calc(11px*var(--inv-fs))] font-normal tracking-normal"
-      style={{ background: t.accentSoft, color: t.accent }}
-    >
-      {mark}
-    </span>
+    <p className="inv-hero-in-delay mt-2 text-center">
+      <span
+        className="inline-block rounded-full px-2.5 py-0.5 text-[calc(11px*var(--inv-fs))] font-normal tracking-normal"
+        style={{ background: t.accentSoft, color: t.accent }}
+      >
+        {mark}
+      </span>
+    </p>
   );
 }
 
@@ -1543,8 +1545,8 @@ function DolBearLayout({
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
-          <GenderMark data={data} t={t} />
         </h1>
+        <GenderMark data={data} t={t} />
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -1670,8 +1672,8 @@ function DolCloudLayout({
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
-          <GenderMark data={data} t={t} />
         </h1>
+        <GenderMark data={data} t={t} />
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -1754,8 +1756,8 @@ function DolHanbokLayout({
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
-          <GenderMark data={data} t={t} />
         </h1>
+        <GenderMark data={data} t={t} />
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -2393,8 +2395,8 @@ function StarHero({
         style={{ fontFamily: t.headingFont, color: t.ink }}
       >
         {data.groomName}
-        <GenderMark data={data} t={t} />
       </h1>
+      <GenderMark data={data} t={t} />
       {sub && (
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
@@ -2524,8 +2526,8 @@ function DolGardenLayout({
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
-          <GenderMark data={data} t={t} />
         </h1>
+        <GenderMark data={data} t={t} />
         <div
           className="inv-hero-in-delay mx-auto mt-2.5 flex items-center justify-center gap-2"
           aria-hidden
@@ -2618,8 +2620,8 @@ function DolCrayonLayout({
           style={{ color: t.ink }}
         >
           {data.groomName}
-          <GenderMark data={data} t={t} />
         </h1>
+        <GenderMark data={data} t={t} />
         {p && (
           <p
             className="inv-hero-in-delay mt-2 inline-block rounded-full px-5 py-1.5 text-sm font-bold"
