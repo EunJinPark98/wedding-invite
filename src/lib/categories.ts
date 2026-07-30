@@ -23,7 +23,9 @@ export const CATEGORIES: {
     id: "senior",
     label: "칠순 · 팔순 잔치",
     emoji: "🌾",
-    tagline: "칠순부터 백수까지 빛나는 날",
+    // "빛나는 날" 사이는 줄바꿈 없는 공백 — 좁은 화면에서 "칠순부터 백수까지 /
+    // 빛나는 날"로 끊기고 "날"만 홀로 내려가지 않는다
+    tagline: "칠순부터 백수까지 빛나는 날",
   },
   {
     id: "birthday",
