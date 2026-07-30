@@ -456,6 +456,35 @@ export default function EditorClient({
               );
             })}
           </div>
+          <div ref={photoSectionRef}>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              대표 사진 <span className="text-gold-400">*필수</span>
+            </span>
+            <div
+              className={
+                photoWarn && needMainPhoto
+                  ? "rounded-xl ring-2 ring-red-400 ring-offset-2"
+                  : undefined
+              }
+            >
+              <ImageUpload
+                value={needMainPhoto ? "" : data.mainPhotoUrl}
+                onChange={(url) => {
+                  set("mainPhotoUrl", url);
+                  if (url) setPhotoWarn(false);
+                }}
+                label="클릭해서 대표 사진 업로드 (필수)"
+                className="h-52"
+              />
+            </div>
+            {photoWarn && needMainPhoto && (
+              <p className="mt-1.5 text-xs font-medium text-red-500">
+                미리보기에 보이는 사진은 예시예요.{" "}
+                {labels.showPerson2 ? "두 분의" : "직접 찍은"} 사진을 올려
+                주세요.
+              </p>
+            )}
+          </div>
           {/* 대표 사진 모션 — 템플릿과 함께 고르는 첫인상 연출 */}
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
@@ -826,36 +855,7 @@ export default function EditorClient({
           </label>
         </Group>
 
-        <Group title="사진" step={6}>
-          <div ref={photoSectionRef}>
-            <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              대표 사진 <span className="text-gold-400">*필수</span>
-            </span>
-            <div
-              className={
-                photoWarn && needMainPhoto
-                  ? "rounded-xl ring-2 ring-red-400 ring-offset-2"
-                  : undefined
-              }
-            >
-              <ImageUpload
-                value={needMainPhoto ? "" : data.mainPhotoUrl}
-                onChange={(url) => {
-                  set("mainPhotoUrl", url);
-                  if (url) setPhotoWarn(false);
-                }}
-                label="클릭해서 대표 사진 업로드 (필수)"
-                className="h-52"
-              />
-            </div>
-            {photoWarn && needMainPhoto && (
-              <p className="mt-1.5 text-xs font-medium text-red-500">
-                미리보기에 보이는 사진은 예시예요.{" "}
-                {labels.showPerson2 ? "두 분의" : "직접 찍은"} 사진을 올려
-                주세요.
-              </p>
-            )}
-          </div>
+        <Group title="갤러리" step={6}>
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               갤러리 사진{" "}
