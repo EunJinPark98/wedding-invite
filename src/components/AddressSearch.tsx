@@ -22,25 +22,59 @@ declare global {
   }
 }
 
-// 무료로 열려있는 공식 스크립트 (별도 키 없음)
-const SDK_URL = "https://t1.daum.net/postcode/api/mapsapi/postcode.v2.js";
+/**
+ * 우편번호 서비스 스크립트 (별도 키 없음).
+ * 같은 서비스를 여러 주소로 받을 수 있어, 막히거나 실패하면 다음 것을 시도한다.
+ */
+const SDK_URLS = [
+  "https://t1.daum.net/postcode/api/mapsapi/postcode.v2.js",
+  "https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js",
+  "https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js",
+];
+
+const ready = () => Boolean(window.daum?.Postcode);
+
+function injectScript(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`load failed: ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
+// onload 이후에도 전역이 조금 늦게 잡히는 경우가 있어 잠깐 기다려 준다
+function waitForReady(timeoutMs: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    const tick = () => {
+      if (ready()) return resolve(true);
+      if (Date.now() - started > timeoutMs) return resolve(false);
+      setTimeout(tick, 100);
+    };
+    tick();
+  });
+}
 
 // 스크립트를 1회만 로드 (KakaoShareButton 과 같은 방식)
 let sdkPromise: Promise<void> | null = null;
 function loadSdk(): Promise<void> {
-  if (window.daum?.Postcode) return Promise.resolve();
+  if (ready()) return Promise.resolve();
   if (!sdkPromise) {
-    sdkPromise = new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = SDK_URL;
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => {
-        sdkPromise = null;
-        reject(new Error("Postcode SDK load failed"));
-      };
-      document.head.appendChild(script);
-    });
+    sdkPromise = (async () => {
+      for (const url of SDK_URLS) {
+        try {
+          await injectScript(url);
+        } catch {
+          continue; // 이 주소는 막혔거나 없음 → 다음 주소로
+        }
+        if (await waitForReady(3000)) return;
+      }
+      sdkPromise = null; // 다음에 다시 시도할 수 있게
+      throw new Error("Postcode SDK unavailable");
+    })();
   }
   return sdkPromise;
 }
