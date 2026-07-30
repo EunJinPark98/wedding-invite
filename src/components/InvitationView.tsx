@@ -53,11 +53,15 @@ function dateParts(iso: string) {
     wkEn: WEEKDAYS_EN[d.getDay()],
   };
 }
-function formatKo(iso: string, time: string) {
+function formatKoDate(iso: string) {
   const p = dateParts(iso);
   if (!p) return iso;
-  return `${p.year}년 ${p.month}월 ${p.day}일 ${p.wkKo}요일 ${time}`;
+  return `${p.year}년 ${p.month}월 ${p.day}일 ${p.wkKo}요일`;
 }
+
+// 글꼴을 키우면 "날짜 + 시간"이 한 줄에 안 들어가 어중간하게 잘린다.
+// '크게'(1.1) 이상은 시간을 아예 다음 줄로 내려 깔끔하게 두 줄로 만든다.
+const BREAK_TIME_FROM_SCALE = 1.1;
 
 /* ════════ 공통 미니 달력 ════════ */
 function MiniCalendar({
@@ -204,7 +208,9 @@ function DateInner({
   return (
     <div className="text-center">
       <p className="inv-fade mb-7 text-lg" style={{ fontFamily: t.headingFont }}>
-        {formatKo(data.weddingDate, data.weddingTime)}
+        {formatKoDate(data.weddingDate)}
+        {data.fontScale >= BREAK_TIME_FROM_SCALE ? <br /> : " "}
+        {data.weddingTime}
       </p>
       {calendar && <MiniCalendar iso={data.weddingDate} t={t} heart={heart} />}
       {dday !== null && (
@@ -1728,7 +1734,7 @@ function DolHanbokLayout({
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
-          첫 돌을 맞이했습니다
+          {labels.dolMilestone}을 맞이했습니다
         </p>
         {p && (
           <p

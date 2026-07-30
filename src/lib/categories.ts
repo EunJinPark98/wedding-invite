@@ -81,6 +81,7 @@ export interface CategoryLabels {
   seniorHanja: string; // 七旬/八旬/九旬/百壽 (senior 전용, 그 외 "")
   dolEvent: string; // 백일잔치/돌잔치 (doljanchi 전용, 그 외 "")
   dolOccasion: string; // 문장 속 표현 — 백일/첫 생일 (doljanchi 전용, 그 외 "")
+  dolMilestone: string; // "~을 맞이했습니다" 용 — 백일/첫 돌 (doljanchi 전용, 그 외 "")
 }
 
 // seniorAge는 senior 카테고리에서만 의미가 있음 (70=칠순, 80=팔순, 90=구순, 100=백수)
@@ -128,6 +129,7 @@ export function getCategoryLabels(
         seniorHanja: "",
         dolEvent: dol.event,
         dolOccasion: dol.occasion,
+        dolMilestone: dol.milestone,
       };
     case "senior":
       return {
@@ -162,6 +164,7 @@ export function getCategoryLabels(
         seniorHanja: age.hanja,
         dolEvent: "",
         dolOccasion: "",
+        dolMilestone: "",
       };
     case "birthday":
       return {
@@ -197,6 +200,7 @@ export function getCategoryLabels(
         seniorHanja: "",
         dolEvent: "",
         dolOccasion: "",
+        dolMilestone: "",
       };
     case "wedding":
     default:
@@ -232,6 +236,7 @@ export function getCategoryLabels(
         seniorHanja: "",
         dolEvent: "",
         dolOccasion: "",
+        dolMilestone: "",
       };
   }
 }

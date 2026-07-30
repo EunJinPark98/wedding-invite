@@ -53,9 +53,10 @@ export const seniorGreetingTitle = (age: number) =>
 /**
  * 아기 잔치 종류 — 같은 돌잔치 템플릿을 백일잔치에도 쓸 수 있게 한다.
  * (칠순·팔순의 SENIOR_AGES 와 같은 방식)
- *   event    : 잔치 이름 — 제목·장소 라벨용 ("백일잔치 날짜")
- *   occasion : 문장 속 표현 ("우리 아기 백일이에요")
- *   kicker   : 히어로 영문 소문구
+ *   event     : 잔치 이름 — 제목·장소 라벨용 ("백일잔치 날짜")
+ *   occasion  : 문장 속 표현 ("우리 아기 백일이에요")
+ *   milestone : "~을 맞이했습니다" 처럼 예스러운 문장에 쓰는 표현
+ *   kicker    : 히어로 영문 소문구
  */
 export const DOL_KINDS = [
   {
@@ -63,6 +64,7 @@ export const DOL_KINDS = [
     label: "백일잔치",
     event: "백일잔치",
     occasion: "백일",
+    milestone: "백일",
     kicker: "100 DAYS",
     kicker2: "THE 100TH DAY",
   },
@@ -71,6 +73,7 @@ export const DOL_KINDS = [
     label: "돌잔치",
     event: "돌잔치",
     occasion: "첫 생일",
+    milestone: "첫 돌",
     kicker: "FIRST BIRTHDAY",
     kicker2: "THE FIRST BIRTHDAY",
   },
