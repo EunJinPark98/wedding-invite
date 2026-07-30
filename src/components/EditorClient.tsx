@@ -12,6 +12,7 @@ import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
   normalizeData,
+  BABY_GENDERS,
   CATEGORY_IDS,
   DOL_KINDS,
   FONT_SCALES,
@@ -625,6 +626,34 @@ export default function EditorClient({
               />
             )}
           </div>
+          {/* 아기 성별 — 초대장에서 이름 옆에 함께 표시 */}
+          {category === "doljanchi" && (
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                성별 (이름 옆에 표시돼요)
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {BABY_GENDERS.map((g) => {
+                  const selected = data.babyGender === g.id;
+                  return (
+                    <button
+                      key={g.id || "none"}
+                      type="button"
+                      onClick={() => set("babyGender", g.id)}
+                      aria-pressed={selected}
+                      className={`rounded-xl border-2 px-2 py-2.5 text-center text-sm font-semibold transition ${
+                        selected
+                          ? "border-gold-400 bg-gold-50 text-gray-800"
+                          : "border-gray-200 text-gray-800 hover:border-gray-300"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
             <div>
               <span className="mb-1.5 block text-xs font-medium text-gray-500">

@@ -91,6 +91,19 @@ export const dolGreetingTitle = (kind: string | undefined) =>
 export const dolGreetingMessage = (kind: string | undefined) =>
   `건강하게 자라준 아기의 ${getDolKindMeta(kind).occasion}을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.`;
 
+/**
+ * 아기 성별 — 돌잔치·백일잔치에서 이름 옆에 함께 보여준다.
+ * ""(빈 값)이면 표시하지 않는다.
+ */
+export const BABY_GENDERS = [
+  { id: "", label: "표시 안 함", mark: "" },
+  { id: "son", label: "아들", mark: "아들" },
+  { id: "daughter", label: "딸", mark: "딸" },
+] as const;
+export type BabyGender = (typeof BABY_GENDERS)[number]["id"];
+export const getBabyGenderMark = (id: string | undefined) =>
+  BABY_GENDERS.find((g) => g.id === id)?.mark ?? "";
+
 // 대표 사진 모션 (청첩장 업체에서 많이 쓰는 연출 4종)
 export const HERO_MOTIONS = [
   { id: "zoomin", label: "줌 인", desc: "천천히 확대" },
@@ -179,6 +192,8 @@ export interface InvitationData {
   seniorAge: number;
   // 아기 잔치 종류 (doljanchi 카테고리 전용 — baek=백일잔치, dol=돌잔치)
   dolKind: DolKind;
+  // 아기 성별 (doljanchi 카테고리 전용 — ""=표시 안 함, son=아들, daughter=딸)
+  babyGender: BabyGender;
   // 신랑/신부 (다른 카테고리에서는 주인공/아기/생일 주인공으로 재사용)
   groomName: string;
   brideName: string;
@@ -242,6 +257,10 @@ export const normalizeData = (
   dolKind: DOL_KINDS.some((k) => k.id === d?.dolKind)
     ? (d!.dolKind as DolKind)
     : DEFAULT_DOL_KIND,
+  // 목록에 없는 값이면 표시하지 않음으로 되돌린다
+  babyGender: BABY_GENDERS.some((g) => g.id === d?.babyGender)
+    ? (d!.babyGender as BabyGender)
+    : "",
   groomName: d?.groomName ?? "",
   brideName: d?.brideName ?? "",
   groomFather: d?.groomFather ?? "",
@@ -367,6 +386,8 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     category,
     seniorAge: 70,
     dolKind: DEFAULT_DOL_KIND,
+    // 예시 아기 사진이 여아 한복이라 기본값도 맞춰 둔다 (제작 시 직접 고름)
+    babyGender: category === "doljanchi" ? "daughter" : "",
     groomName: s.groomName,
     brideName: s.brideName,
     groomFather: s.groomFather,
