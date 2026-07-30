@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
 import AuthStatus from "./AuthStatus";
 import KakaoShareButton from "./KakaoShareButton";
+import AddressSearch from "./AddressSearch";
 import { getTemplatesByCategory, findTheme, FONTS } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
 import { fileToCompressedBlob } from "@/lib/image";
@@ -807,11 +808,25 @@ export default function EditorClient({
             value={data.venueHall}
             onChange={(v) => set("venueHall", v)}
           />
-          <Field
-            label="주소"
-            value={data.venueAddress}
-            onChange={(v) => set("venueAddress", v)}
-          />
+          <div>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              주소
+            </span>
+            <div className="flex flex-wrap items-start gap-2">
+              <input
+                value={data.venueAddress}
+                onChange={(e) => set("venueAddress", e.target.value)}
+                placeholder="주소 검색으로 채워 주세요"
+                className={`${INPUT_CLASS} min-w-0 flex-1`}
+              />
+              <AddressSearch
+                onSelect={(addr) => set("venueAddress", addr)}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-gray-400">
+              검색으로 넣으면 초대장 지도와 길찾기가 정확하게 잡혀요.
+            </p>
+          </div>
           <p className="text-xs text-gray-400">
             {expiryDate
               ? `${expiryDate}에 링크가 닫히고 사진까지 완전히 삭제돼요.`
