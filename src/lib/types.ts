@@ -386,8 +386,8 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     category,
     seniorAge: 70,
     dolKind: DEFAULT_DOL_KIND,
-    // 예시 아기 사진이 여아 한복이라 기본값도 맞춰 둔다 (제작 시 직접 고름)
-    babyGender: category === "doljanchi" ? "daughter" : "",
+    // 성별은 직접 고르는 항목이라 기본은 표시하지 않음
+    babyGender: "",
     groomName: s.groomName,
     brideName: s.brideName,
     groomFather: s.groomFather,
