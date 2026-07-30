@@ -939,7 +939,7 @@ export default function EditorClient({
           <p className="text-center text-xs text-gray-400">
             {isEdit
               ? "저장 전에 미리보기로 한 번 더 확인할 수 있어요."
-              : `제작 전에 미리보기로 한 번 더 확인할 수 있어요. ${labels.noun}은 종류마다 1개씩 만들 수 있어요.`}
+              : "제작 전에 미리보기로 한 번 더 확인할 수 있어요."}
           </p>
         )}
       </div>
