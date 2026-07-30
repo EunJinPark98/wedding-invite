@@ -68,7 +68,7 @@ export interface CategoryLabels {
   venueLabel: string;
   accountsGroupTitle: string;
   accountsLabel: string; // 뷰에서 계좌 섹션 소제목 "마음 전하실 곳"
-  showAccounts: boolean; // 축하금 계좌 섹션을 둘지 (생일은 두지 않음)
+  showAccounts: boolean; // 계좌 섹션을 둘지 (결혼 청첩장에만 둔다)
   // 뷰(청첩장 화면)
   sectionCoupleLabel: string; // "GROOM & BRIDE" 대응 섹션 제목
   personTitle: string; // 단일 인물 카드 위 타이틀 (showPerson2=false 전용)
@@ -115,9 +115,10 @@ export function getCategoryLabels(
         dateSectionTitle: `${dol.event} 일시 · 장소`,
         dateFieldLabel: `${dol.event} 날짜`,
         venueLabel: `${dol.event} 장소`,
-        accountsGroupTitle: "축하 마음 전하실 곳 (계좌)",
-        accountsLabel: "축하 마음 전하실 곳",
-        showAccounts: true,
+        accountsGroupTitle: "",
+        accountsLabel: "",
+        // 아기 잔치는 축하금 계좌 섹션을 두지 않는다
+        showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         relation: "",
@@ -150,9 +151,10 @@ export function getCategoryLabels(
         dateSectionTitle: `${age.label} 일시 · 장소`,
         dateFieldLabel: `${age.label} 날짜`,
         venueLabel: "잔치 장소",
-        accountsGroupTitle: "마음 전하실 곳 (계좌)",
-        accountsLabel: "마음 전하실 곳",
-        showAccounts: true,
+        accountsGroupTitle: "",
+        accountsLabel: "",
+        // 수연도 축하금 계좌 섹션을 두지 않는다
+        showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         relation: "",
