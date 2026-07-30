@@ -376,14 +376,21 @@ function CoupleInner({
                 {p.role}
               </p>
             )}
-            <ProfilePhoto src={p.photo} role={p.role || "대표"} t={t} arch={arch} preview={preview} />
-            {/* 이름 ↵ 전화·문자 */}
+            <ProfilePhoto
+              src={p.photo}
+              role={p.role || labels.personPhotoRole}
+              t={t}
+              arch={arch}
+              preview={preview}
+            />
+            {/* 이름 ↵ 성별 ↵ 전화·문자 */}
             <p
               className="inv-fade mt-5 text-lg"
               style={{ fontFamily: t.headingFont, color: t.ink }}
             >
               {p.name}
             </p>
+            <GenderMark data={data} t={t} />
             {labels.showContact && p.tel && (
               <div className="inv-fade mt-2.5 flex items-center justify-center gap-2">
                   <a
@@ -1546,7 +1553,6 @@ function DolBearLayout({
         >
           {data.groomName}
         </h1>
-        <GenderMark data={data} t={t} />
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -1673,7 +1679,6 @@ function DolCloudLayout({
         >
           {data.groomName}
         </h1>
-        <GenderMark data={data} t={t} />
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -1757,7 +1762,6 @@ function DolHanbokLayout({
         >
           {data.groomName}
         </h1>
-        <GenderMark data={data} t={t} />
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -2396,7 +2400,6 @@ function StarHero({
       >
         {data.groomName}
       </h1>
-      <GenderMark data={data} t={t} />
       {sub && (
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
@@ -2527,7 +2530,6 @@ function DolGardenLayout({
         >
           {data.groomName}
         </h1>
-        <GenderMark data={data} t={t} />
         <div
           className="inv-hero-in-delay mx-auto mt-2.5 flex items-center justify-center gap-2"
           aria-hidden
@@ -2621,7 +2623,6 @@ function DolCrayonLayout({
         >
           {data.groomName}
         </h1>
-        <GenderMark data={data} t={t} />
         {p && (
           <p
             className="inv-hero-in-delay mt-2 inline-block rounded-full px-5 py-1.5 text-sm font-bold"

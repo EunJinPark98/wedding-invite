@@ -74,6 +74,7 @@ export interface CategoryLabels {
   // 뷰(청첩장 화면)
   sectionCoupleLabel: string; // "GROOM & BRIDE" 대응 섹션 제목
   personTitle: string; // 단일 인물 카드 위 타이틀 (showPerson2=false 전용)
+  personPhotoRole: string; // 프로필 사진 빈 슬롯 문구 "OO 사진" (showPerson2=false 전용)
   relation: string; // "OOO·OOO의 {relation}" (showPerson2=false 전용)
   heroKicker: string; // 클래식 소문구 / 별빛 소문구
   heroKicker2: string; // 모던 헤드라인
@@ -123,6 +124,7 @@ export function getCategoryLabels(
         showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
+        personPhotoRole: "아기",
         relation: "",
         heroKicker: dol.kicker,
         heroKicker2: dol.kicker2,
@@ -159,6 +161,7 @@ export function getCategoryLabels(
         showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
+        personPhotoRole: "주인공",
         relation: "",
         heroKicker: `${age.age}TH BIRTHDAY CELEBRATION`,
         heroKicker2: "THE CELEBRATION DAY",
@@ -195,6 +198,7 @@ export function getCategoryLabels(
         showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
+        personPhotoRole: "주인공",
         relation: "",
         heroKicker: "HAPPY BIRTHDAY",
         heroKicker2: "THE BIRTHDAY",
@@ -231,6 +235,7 @@ export function getCategoryLabels(
         showAccounts: true,
         sectionCoupleLabel: "신랑 신부",
         personTitle: "",
+        personPhotoRole: "",
         relation: "",
         heroKicker: "WEDDING INVITATION",
         heroKicker2: "THE WEDDING DAY",
