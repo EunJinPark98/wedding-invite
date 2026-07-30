@@ -50,6 +50,41 @@ export const getSeniorAgeMeta = (age: number) =>
 export const seniorGreetingTitle = (age: number) =>
   `${getSeniorAgeMeta(age).label} 잔치에 초대합니다`;
 
+/**
+ * 아기 잔치 종류 — 같은 돌잔치 템플릿을 백일잔치에도 쓸 수 있게 한다.
+ * (칠순·팔순의 SENIOR_AGES 와 같은 방식)
+ *   event    : 잔치 이름 — 제목·장소 라벨용 ("백일잔치 날짜")
+ *   occasion : 문장 속 표현 ("우리 아기 백일이에요")
+ *   kicker   : 히어로 영문 소문구
+ */
+export const DOL_KINDS = [
+  {
+    id: "baek",
+    label: "백일잔치",
+    event: "백일잔치",
+    occasion: "백일",
+    kicker: "100 DAYS",
+    kicker2: "THE 100TH DAY",
+  },
+  {
+    id: "dol",
+    label: "돌잔치",
+    event: "돌잔치",
+    occasion: "첫 생일",
+    kicker: "FIRST BIRTHDAY",
+    kicker2: "THE FIRST BIRTHDAY",
+  },
+] as const;
+export type DolKind = (typeof DOL_KINDS)[number]["id"];
+export const DEFAULT_DOL_KIND: DolKind = "dol";
+export const getDolKindMeta = (kind: string | undefined) =>
+  DOL_KINDS.find((k) => k.id === kind) ?? DOL_KINDS[1];
+// 종류를 바꾸면 따라 바뀌는 기본 인사말 (사용자가 직접 고친 경우엔 유지)
+export const dolGreetingTitle = (kind: string | undefined) =>
+  `우리 아이의 ${getDolKindMeta(kind).occasion}에 초대합니다`;
+export const dolGreetingMessage = (kind: string | undefined) =>
+  `건강하게 자라준 아기의 ${getDolKindMeta(kind).occasion}을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.`;
+
 // 대표 사진 모션 (청첩장 업체에서 많이 쓰는 연출 4종)
 export const HERO_MOTIONS = [
   { id: "zoomin", label: "줌 인", desc: "천천히 확대" },
@@ -136,6 +171,8 @@ export interface InvitationData {
   category: Category;
   // 수연 연세 (senior 카테고리 전용 — 70=칠순, 80=팔순, 90=구순, 100=백수)
   seniorAge: number;
+  // 아기 잔치 종류 (doljanchi 카테고리 전용 — baek=백일잔치, dol=돌잔치)
+  dolKind: DolKind;
   // 신랑/신부 (다른 카테고리에서는 주인공/아기/생일 주인공으로 재사용)
   groomName: string;
   brideName: string;
@@ -195,6 +232,10 @@ export const normalizeData = (
   seniorAge: SENIOR_AGES.some((s) => s.age === d?.seniorAge)
     ? (d!.seniorAge as number)
     : 70,
+  // 값이 없는 과거 돌잔치 초대장은 그대로 돌잔치로 열린다
+  dolKind: DOL_KINDS.some((k) => k.id === d?.dolKind)
+    ? (d!.dolKind as DolKind)
+    : DEFAULT_DOL_KIND,
   groomName: d?.groomName ?? "",
   brideName: d?.brideName ?? "",
   groomFather: d?.groomFather ?? "",
@@ -265,9 +306,8 @@ const CATEGORY_SAMPLE: Record<
     groomMother: "",
     brideFather: "",
     brideMother: "",
-    greetingTitle: "우리 아이의 첫 생일에 초대합니다",
-    greetingMessage:
-      "건강하게 자라준 아기의 첫 생일을\n소중한 분들과 함께 축하하고 싶습니다.\n오셔서 자리를 빛내주시면 감사하겠습니다.",
+    greetingTitle: dolGreetingTitle(DEFAULT_DOL_KIND),
+    greetingMessage: dolGreetingMessage(DEFAULT_DOL_KIND),
     accountLabel: "축하금",
     mainPhoto: SAMPLE_BABY_PHOTO,
   },
@@ -304,6 +344,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
   return {
     category,
     seniorAge: 70,
+    dolKind: DEFAULT_DOL_KIND,
     groomName: s.groomName,
     brideName: s.brideName,
     groomFather: s.groomFather,
@@ -330,7 +371,10 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     groomPhone: "010-1234-5678",
     bridePhone: "010-8765-4321",
     accounts:
-      category === "wedding"
+      // 생일은 축하금 섹션 자체를 두지 않는다
+      category === "birthday"
+        ? []
+        : category === "wedding"
         ? [
             { side: "신랑측", name: "김신랑", bank: "국민은행", number: "123-456-7890" },
             { side: "신부측", name: "박신부", bank: "신한은행", number: "987-654-3210" },

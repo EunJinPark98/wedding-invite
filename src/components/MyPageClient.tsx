@@ -17,6 +17,7 @@ export interface MyInvitation {
   templateName: string;
   category: Category;
   seniorAge: number;
+  dolKind: string;
   groomName: string;
   brideName: string;
   weddingDate: string;
@@ -164,7 +165,11 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
         ) : (
           <div className="mt-8 space-y-5">
             {items.map((inv) => {
-              const labels = getCategoryLabels(inv.category, inv.seniorAge);
+              const labels = getCategoryLabels(
+                inv.category,
+                inv.seniorAge,
+                inv.dolKind
+              );
               return (
               <div
                 key={inv.slug}

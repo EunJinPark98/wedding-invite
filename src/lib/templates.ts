@@ -346,7 +346,7 @@ export const THEMES: Record<TemplateId, TemplateTheme> = {
     id: "bdaystar",
     category: "birthday",
     name: "별빛 생일",
-    description: "밤하늘에 소원을 비는 별빛 가득한 생일",
+    description: "별이 쏟아지는 밤하늘처럼 빛나는 생일",
     accent: "#e0c477",
     accentSoft: "#242a48",
     line: "#3c4468",

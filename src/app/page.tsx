@@ -76,7 +76,7 @@ export default async function Home({
             className="mx-auto mt-7 max-w-md text-base leading-7 text-gray-500"
             style={{ fontFamily: "var(--font-gowun)" }}
           >
-            결혼식·돌잔치·칠순·팔순·생일까지, 디자인을 고르고
+            결혼식·백일·돌잔치·칠순·팔순·생일까지, 디자인을 고르고
             <br />
             내용을 채우면 하나뿐인 초대장이 완성돼요.
             <br />

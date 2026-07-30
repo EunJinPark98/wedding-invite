@@ -1,4 +1,4 @@
-import { getSeniorAgeMeta, type Category } from "./types";
+import { getDolKindMeta, getSeniorAgeMeta, type Category } from "./types";
 
 // 메인 페이지 카테고리 선택 카드
 export const CATEGORIES: {
@@ -15,9 +15,9 @@ export const CATEGORIES: {
   },
   {
     id: "doljanchi",
-    label: "돌잔치 초대장",
+    label: "백일 · 돌잔치",
     emoji: "🎂",
-    tagline: "아이의 첫 생일을 함께해요",
+    tagline: "아이의 첫 잔치를 함께해요",
   },
   {
     id: "senior",
@@ -36,11 +36,12 @@ export const CATEGORIES: {
 export const getCategoryMeta = (id: string) =>
   CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[0];
 
-// 초대장 데이터에서 바로 라벨을 뽑는 헬퍼 (칠순 연세까지 함께 반영)
+// 초대장 데이터에서 바로 라벨을 뽑는 헬퍼 (칠순 연세·아기 잔치 종류까지 함께 반영)
 export const labelsOf = (d: {
   category: Category;
   seniorAge?: number;
-}): CategoryLabels => getCategoryLabels(d.category, d.seniorAge);
+  dolKind?: string;
+}): CategoryLabels => getCategoryLabels(d.category, d.seniorAge, d.dolKind);
 
 // 카테고리별 문구/필드 라벨. wedding 값은 기존 하드코딩 문구와 완전히 동일하게 유지해
 // (레이아웃에서 category === "wedding"일 때 기존 로직을 그대로 타도록) 기존 청첩장이
@@ -67,6 +68,7 @@ export interface CategoryLabels {
   venueLabel: string;
   accountsGroupTitle: string;
   accountsLabel: string; // 뷰에서 계좌 섹션 소제목 "마음 전하실 곳"
+  showAccounts: boolean; // 축하금 계좌 섹션을 둘지 (생일은 두지 않음)
   // 뷰(청첩장 화면)
   sectionCoupleLabel: string; // "GROOM & BRIDE" 대응 섹션 제목
   personTitle: string; // 단일 인물 카드 위 타이틀 (showPerson2=false 전용)
@@ -77,20 +79,25 @@ export interface CategoryLabels {
   countdownLabel: string; // 카운트다운 문구 "OOO의 {countdownLabel}까지"
   seniorLabel: string; // 칠순/팔순/구순/백수 (senior 전용, 그 외 "")
   seniorHanja: string; // 七旬/八旬/九旬/百壽 (senior 전용, 그 외 "")
+  dolEvent: string; // 백일잔치/돌잔치 (doljanchi 전용, 그 외 "")
+  dolOccasion: string; // 문장 속 표현 — 백일/첫 생일 (doljanchi 전용, 그 외 "")
 }
 
 // seniorAge는 senior 카테고리에서만 의미가 있음 (70=칠순, 80=팔순, 90=구순, 100=백수)
 export function getCategoryLabels(
   category: Category,
-  seniorAge: number = 70
+  seniorAge: number = 70,
+  dolKind?: string
 ): CategoryLabels {
   // 칠순/팔순/구순/백수 — 선택한 연세에 따라 문구가 통째로 바뀜
   const age = getSeniorAgeMeta(seniorAge);
+  // 백일잔치/돌잔치 — 선택한 종류에 따라 문구가 통째로 바뀜
+  const dol = getDolKindMeta(dolKind);
   switch (category) {
     case "doljanchi":
       return {
         noun: "초대장",
-        editorTitle: "돌잔치 초대장 만들기",
+        editorTitle: `${dol.event} 초대장 만들기`,
         groupTitle: "아기 정보",
         personLabel: "아기 이름",
         person2Label: "",
@@ -104,20 +111,23 @@ export function getCategoryLabels(
         showContact: false,
         parent1Label: "",
         parent2Label: "",
-        dateSectionTitle: "돌잔치 일시 · 장소",
-        dateFieldLabel: "돌잔치 날짜",
-        venueLabel: "돌잔치 장소",
+        dateSectionTitle: `${dol.event} 일시 · 장소`,
+        dateFieldLabel: `${dol.event} 날짜`,
+        venueLabel: `${dol.event} 장소`,
         accountsGroupTitle: "축하 마음 전하실 곳 (계좌)",
         accountsLabel: "축하 마음 전하실 곳",
+        showAccounts: true,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         relation: "",
-        heroKicker: "FIRST BIRTHDAY",
-        heroKicker2: "THE FIRST BIRTHDAY",
-        heroPhrase: "첫 생일을 축하해요",
-        countdownLabel: "첫 생일",
+        heroKicker: dol.kicker,
+        heroKicker2: dol.kicker2,
+        heroPhrase: `${dol.occasion}을 축하해요`,
+        countdownLabel: dol.occasion,
         seniorLabel: "",
         seniorHanja: "",
+        dolEvent: dol.event,
+        dolOccasion: dol.occasion,
       };
     case "senior":
       return {
@@ -140,6 +150,7 @@ export function getCategoryLabels(
         venueLabel: "잔치 장소",
         accountsGroupTitle: "마음 전하실 곳 (계좌)",
         accountsLabel: "마음 전하실 곳",
+        showAccounts: true,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         relation: "",
@@ -149,6 +160,8 @@ export function getCategoryLabels(
         countdownLabel: `${age.label} 잔치`,
         seniorLabel: age.label,
         seniorHanja: age.hanja,
+        dolEvent: "",
+        dolOccasion: "",
       };
     case "birthday":
       return {
@@ -169,8 +182,10 @@ export function getCategoryLabels(
         dateSectionTitle: "파티 일시 · 장소",
         dateFieldLabel: "생일 파티 날짜",
         venueLabel: "파티 장소",
-        accountsGroupTitle: "마음 전하실 곳 (계좌)",
-        accountsLabel: "마음 전하실 곳",
+        accountsGroupTitle: "",
+        accountsLabel: "",
+        // 생일은 축하금을 받는 자리가 아니라 계좌 섹션을 두지 않는다
+        showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         relation: "",
@@ -180,6 +195,8 @@ export function getCategoryLabels(
         countdownLabel: "생일",
         seniorLabel: "",
         seniorHanja: "",
+        dolEvent: "",
+        dolOccasion: "",
       };
     case "wedding":
     default:
@@ -203,6 +220,7 @@ export function getCategoryLabels(
         venueLabel: "예식장 이름",
         accountsGroupTitle: "마음 전하실 곳 (계좌)",
         accountsLabel: "마음 전하실 곳",
+        showAccounts: true,
         sectionCoupleLabel: "신랑 신부",
         personTitle: "",
         relation: "",
@@ -212,6 +230,8 @@ export function getCategoryLabels(
         countdownLabel: "결혼식",
         seniorLabel: "",
         seniorHanja: "",
+        dolEvent: "",
+        dolOccasion: "",
       };
   }
 }
