@@ -53,7 +53,7 @@ export default function MapSection({
           href={`https://map.naver.com/p/search/${encodeURIComponent(addr)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex items-center justify-center gap-1.5 border py-3 text-[12.5px] transition ${rounded}`}
+          className={`flex items-center justify-center gap-1.5 border py-3 text-[calc(12.5px*var(--inv-fs))] transition ${rounded}`}
           style={{ borderColor: `${t.accent}88`, color: t.accent }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -65,7 +65,7 @@ export default function MapSection({
           href={`https://map.kakao.com/?q=${encodeURIComponent(addr)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex items-center justify-center gap-1.5 border py-3 text-[12.5px] transition ${rounded}`}
+          className={`flex items-center justify-center gap-1.5 border py-3 text-[calc(12.5px*var(--inv-fs))] transition ${rounded}`}
           style={{ borderColor: `${t.accent}88`, color: t.accent }}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -77,7 +77,7 @@ export default function MapSection({
       <button
         type="button"
         onClick={copyAddress}
-        className={`mt-2 flex w-full items-center justify-center gap-1.5 border py-3 text-[12.5px] transition ${rounded}`}
+        className={`mt-2 flex w-full items-center justify-center gap-1.5 border py-3 text-[calc(12.5px*var(--inv-fs))] transition ${rounded}`}
         style={{ borderColor: t.line, color: t.sub }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

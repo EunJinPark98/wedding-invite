@@ -57,27 +57,28 @@ export default function Countdown({
 
   return (
     <div className="inv-fade mt-8">
-      <div className="mx-auto flex max-w-[280px] items-start justify-center">
+      <div className="mx-auto flex max-w-[calc(280px*var(--inv-fs))] items-start justify-center">
         {cells.map((c, i) => (
           <div key={c.label} className="flex items-start">
             {i > 0 && (
               <span
-                className="font-cormorant px-2.5 pt-1 text-lg font-light"
+                className="font-cormorant px-1.5 pt-1 text-lg font-light"
                 style={{ color: t.line }}
               >
                 :
               </span>
             )}
-            <div className="w-11 text-center">
+            {/* 칸 너비도 글꼴 배율을 따라가야 DAYS·HOURS 라벨이 줄바꿈되지 않는다 */}
+            <div className="w-[calc(2.75rem*var(--inv-fs))] text-center">
               <p
                 key={`${c.label}-${c.value}`}
-                className="inv-tick font-cormorant text-[26px] font-light leading-none tabular-nums"
+                className="inv-tick font-cormorant text-[calc(26px*var(--inv-fs))] font-light leading-none tabular-nums"
                 style={{ color: t.ink }}
               >
                 {String(c.value).padStart(2, "0")}
               </p>
               <p
-                className="font-cormorant mt-1.5 text-[8px] tracking-[0.25em]"
+                className="font-cormorant mt-1.5 text-[calc(8px*var(--inv-fs))] tracking-[0.25em]"
                 style={{ color: t.sub }}
               >
                 {c.label}
@@ -86,7 +87,7 @@ export default function Countdown({
           </div>
         ))}
       </div>
-      <p className="mt-5 text-[13px]" style={{ color: t.sub }}>
+      <p className="mt-5 text-[calc(13px*var(--inv-fs))]" style={{ color: t.sub }}>
         {showPerson2 ? `${groomName} · ${brideName}` : groomName}님의 {eventLabel}까지{" "}
         <span className="font-medium" style={{ color: t.accent }}>
           {time.days}일
