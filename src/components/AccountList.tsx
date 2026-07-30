@@ -39,7 +39,7 @@ export default function AccountList({
             <p className="flex items-center gap-1.5">
               {showSide && (
                 <span
-                  className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                  className="rounded-full px-2 py-0.5 text-[calc(10px*var(--inv-fs))] font-semibold text-white"
                   style={{ background: t.accent }}
                 >
                   {a.side}
@@ -50,7 +50,7 @@ export default function AccountList({
               </span>
             </p>
             <p
-              className="mt-1.5 truncate text-[15px] font-normal tracking-wide"
+              className="mt-1.5 truncate text-[calc(15px*var(--inv-fs))] font-normal tracking-wide"
               style={{ color: t.ink }}
             >
               {a.number}

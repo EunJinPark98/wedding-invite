@@ -13,6 +13,7 @@ import {
   emptyInvitation,
   normalizeData,
   CATEGORY_IDS,
+  FONT_SCALES,
   HERO_MOTIONS,
   MAX_GALLERY,
   SENIOR_AGES,
@@ -485,6 +486,43 @@ export default function EditorClient({
               value={data.fontBody}
               onChange={(id) => set("fontBody", id)}
             />
+          </div>
+          <div>
+            <span className="mb-2 block text-xs font-medium text-gray-500">
+              글꼴 크기
+            </span>
+            <div className="grid grid-cols-4 gap-2">
+              {FONT_SCALES.map((s) => {
+                const selected = data.fontScale === s.value;
+                return (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => set("fontScale", s.value)}
+                    aria-pressed={selected}
+                    className={`rounded-xl border-2 px-2 py-2.5 text-center transition ${
+                      selected
+                        ? "border-gold-400 bg-gold-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    {/* 배율을 글자 크기로 그대로 보여줘 고르기 전에 감을 잡게 함 */}
+                    <span
+                      className="block font-medium text-gray-800"
+                      style={{ fontSize: `${s.value}rem` }}
+                    >
+                      가
+                    </span>
+                    <span className="mt-0.5 block text-[11px] text-gray-400">
+                      {s.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1.5 text-[11px] text-gray-400">
+              사진과 여백은 그대로 두고 글자 크기만 조절돼요.
+            </p>
           </div>
         </Group>
 

@@ -59,6 +59,21 @@ export const HERO_MOTIONS = [
 ] as const;
 export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 
+/**
+ * 초대장 글꼴 크기 배율.
+ * 사진·여백은 그대로 두고 글자 크기만 배율만큼 키우거나 줄인다.
+ * (InvitationView 루트에서 --inv-fs 로 내려보내 하위 텍스트에 적용)
+ */
+export const FONT_SCALES = [
+  { value: 0.9, label: "작게" },
+  { value: 1, label: "보통" },
+  { value: 1.1, label: "크게" },
+  { value: 1.2, label: "아주 크게" },
+] as const;
+export const DEFAULT_FONT_SCALE = 1;
+export const isFontScale = (v: unknown): v is number =>
+  FONT_SCALES.some((s) => s.value === v);
+
 // 갤러리 사진 최대 장수 — 페이지 로딩 속도를 위한 기술적 한도 (요금제 아님)
 export const MAX_GALLERY = 20;
 
@@ -141,6 +156,8 @@ export interface InvitationData {
   // 글꼴 (FontId, "default"=템플릿 기본)
   fontHeading: string; // 메인(제목·이름)
   fontBody: string; // 서브(본문)
+  // 글꼴 크기 배율 (FONT_SCALES 중 하나, 1=보통)
+  fontScale: number;
   // 사진
   mainPhotoUrl: string;
   // 대표 사진 모션 (HeroMotion id)
@@ -193,6 +210,8 @@ export const normalizeData = (
   greetingMessage: d?.greetingMessage ?? "",
   fontHeading: d?.fontHeading ?? "default",
   fontBody: d?.fontBody ?? "default",
+  // 목록에 없는 값(과거 데이터·조작된 입력)은 기본 배율로 되돌린다
+  fontScale: isFontScale(d?.fontScale) ? d!.fontScale! : DEFAULT_FONT_SCALE,
   mainPhotoUrl: d?.mainPhotoUrl ?? "",
   heroMotion: HERO_MOTIONS.some((m) => m.id === d?.heroMotion)
     ? (d!.heroMotion as HeroMotion)
@@ -300,6 +319,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     greetingMessage: s.greetingMessage,
     fontHeading: "default",
     fontBody: "default",
+    fontScale: DEFAULT_FONT_SCALE,
     // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
     mainPhotoUrl: s.mainPhoto,
     heroMotion: "zoomin",

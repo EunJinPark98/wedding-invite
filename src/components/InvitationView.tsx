@@ -9,6 +9,35 @@ import MapSection from "./MapSection";
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
+/* ════════ 글꼴 크기 배율 ════════ */
+
+// Tailwind 기본 글자 크기(rem). text-sm 등은 `font-size: var(--text-sm)` 로
+// 컴파일되므로, 루트에서 이 변수를 덮어쓰면 하위 요소에 그대로 상속된다.
+const TW_TEXT_REM: Record<string, number> = {
+  xs: 0.75,
+  sm: 0.875,
+  base: 1,
+  lg: 1.125,
+  xl: 1.25,
+  "2xl": 1.5,
+  "3xl": 1.875,
+  "4xl": 2.25,
+};
+
+/**
+ * 글꼴 크기 배율을 CSS 변수로 내려보낸다. 사진·여백은 그대로 두고 글자만 커진다.
+ *   - `--inv-fs`  : 임의 크기 클래스 text-[calc(15px*var(--inv-fs))] 가 참조
+ *   - `--text-*`  : Tailwind 기본 크기 클래스(text-sm 등)가 참조
+ * 줄간격은 Tailwind가 비율(계산식)로 두므로 글자 크기를 따라 자동으로 늘어난다.
+ */
+function fontScaleVars(scale: number): React.CSSProperties {
+  const vars: Record<string, string> = { "--inv-fs": String(scale) };
+  for (const [name, rem] of Object.entries(TW_TEXT_REM)) {
+    vars[`--text-${name}`] = `calc(${rem}rem * var(--inv-fs))`;
+  }
+  return vars as React.CSSProperties;
+}
+
 function parseDate(iso: string) {
   const d = new Date(iso + "T00:00:00");
   return isNaN(d.getTime()) ? null : d;
@@ -69,7 +98,7 @@ function MiniCalendar({
           </span>
         </p>
         <p
-          className="font-cormorant mt-1 text-[9px] tracking-[0.4em]"
+          className="font-cormorant mt-1 text-[calc(9px*var(--inv-fs))] tracking-[0.4em]"
           style={{ color: t.accent }}
         >
           {MONTHS_EN[month]}
@@ -79,7 +108,7 @@ function MiniCalendar({
         {WEEKDAYS.map((w, i) => (
           <div
             key={w}
-            className="py-2 text-[11px] font-medium"
+            className="py-2 text-[calc(11px*var(--inv-fs))] font-medium"
             style={{ color: i === 0 ? t.accent : t.sub }}
           >
             {w}
@@ -107,7 +136,7 @@ function MiniCalendar({
                 >
                   {c}
                   {isDay && heart && (
-                    <span className="absolute -right-1 -top-1 text-[10px]">
+                    <span className="absolute -right-1 -top-1 text-[calc(10px*var(--inv-fs))]">
                       ♡
                     </span>
                   )}
@@ -134,13 +163,13 @@ function GreetingInner({
   return (
     <div className={align === "left" ? "text-left" : "text-center"}>
       <h2
-        className="inv-fade mb-8 text-[19px] leading-relaxed tracking-[0.04em]"
+        className="inv-fade mb-8 text-[calc(19px*var(--inv-fs))] leading-relaxed tracking-[0.04em]"
         style={{ fontFamily: t.headingFont }}
       >
         {data.greetingTitle}
       </h2>
       <p
-        className="inv-fade whitespace-pre-line text-[14px] leading-[2.2]"
+        className="inv-fade whitespace-pre-line text-[calc(14px*var(--inv-fs))] leading-[2.2]"
         style={{ color: t.sub }}
       >
         {data.greetingMessage}
@@ -246,7 +275,7 @@ function ProfilePhoto({
         color: t.sub,
       }}
     >
-      <span className="text-[11px]">{role} 사진</span>
+      <span className="text-[calc(11px*var(--inv-fs))]">{role} 사진</span>
     </div>
   );
 }
@@ -387,7 +416,7 @@ function LocationInner({
         </p>
       )}
       <p
-        className="inv-fade mx-auto mt-4 max-w-[260px] text-[13px] leading-6"
+        className="inv-fade mx-auto mt-4 max-w-[260px] text-[calc(13px*var(--inv-fs))] leading-6"
         style={{ color: t.sub }}
       >
         {data.venueAddress}
@@ -522,8 +551,8 @@ function Label({
         <span
           className={
             isKorean
-              ? "text-[15px] font-medium tracking-[0.12em]"
-              : "font-cormorant text-[15px] font-semibold tracking-[0.3em]"
+              ? "text-[calc(15px*var(--inv-fs))] font-medium tracking-[0.12em]"
+              : "font-cormorant text-[calc(15px*var(--inv-fs))] font-semibold tracking-[0.3em]"
           }
           style={{
             color: t.ink,
@@ -542,8 +571,8 @@ function Label({
       <span
         className={
           isKorean
-            ? "text-[17px] tracking-[0.15em]"
-            : "font-cormorant text-[16px] font-medium tracking-[0.45em]"
+            ? "text-[calc(17px*var(--inv-fs))] tracking-[0.15em]"
+            : "font-cormorant text-[calc(16px*var(--inv-fs))] font-medium tracking-[0.45em]"
         }
         style={{
           color: t.accent,
@@ -701,11 +730,11 @@ function ClassicLayout({
         <Photo data={data} t={t} className="h-[520px] w-full" kenburns />
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
         <div className="absolute inset-x-0 bottom-0 px-8 pb-11 text-center text-white">
-          <p className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em] text-white/80">
+          <p className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em] text-white/80">
             {labels.heroKicker}
           </p>
           <h1
-            className="inv-hero-in mt-4 text-[1.8rem] leading-snug tracking-[0.06em]"
+            className="inv-hero-in mt-4 text-[calc(1.8rem*var(--inv-fs))] leading-snug tracking-[0.06em]"
             style={{ fontFamily: t.headingFont }}
           >
             <NamesAmp data={data} t={t} heartColor="#e8c878" />
@@ -783,7 +812,7 @@ function ModernLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in mt-3 font-cormorant text-[3.2rem] leading-none tracking-tight"
+            className="inv-hero-in mt-3 font-cormorant text-[calc(3.2rem*var(--inv-fs))] leading-none tracking-tight"
             style={{ color: t.ink }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
@@ -932,7 +961,7 @@ function RomanticLayout({
           aria-hidden
         >
           <span className="h-px w-8" style={{ background: t.line }} />
-          <span className="text-[9px]" style={{ color: t.accent }}>
+          <span className="text-[calc(9px*var(--inv-fs))]" style={{ color: t.accent }}>
             ❀
           </span>
           <span className="h-px w-8" style={{ background: t.line }} />
@@ -1005,7 +1034,7 @@ function BotanicalLayout({
       >
         <div className="px-7 pt-14 text-center">
           <p
-            className="inv-hero-in font-cormorant text-[10px] tracking-[0.45em]"
+            className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.45em]"
             style={{ color: t.accent }}
           >
             {data.category === "wedding" ? "THE MARRIAGE OF" : labels.heroKicker}
@@ -1140,7 +1169,7 @@ function StarlightLayout({
           {data.category === "wedding" ? "우리, 결혼합니다" : labels.heroPhrase}
         </p>
         <p
-          className="inv-hero-in font-cormorant mt-2 text-[10px] tracking-[0.5em]"
+          className="inv-hero-in font-cormorant mt-2 text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.sub }}
         >
           {labels.heroKicker}
@@ -1229,7 +1258,7 @@ function CinemaLayout({
       <div className="px-6 pt-11">
         <div className="flex items-center justify-center gap-5">
           <p
-            className="inv-hero-in text-[22px] leading-tight"
+            className="inv-hero-in text-[calc(22px*var(--inv-fs))] leading-tight"
             style={{ fontFamily: t.headingFont, color: t.ink }}
           >
             {data.groomName}
@@ -1243,7 +1272,7 @@ function CinemaLayout({
                 and
               </span>
               <p
-                className="inv-hero-in text-[22px] leading-tight"
+                className="inv-hero-in text-[calc(22px*var(--inv-fs))] leading-tight"
                 style={{ fontFamily: t.headingFont, color: t.ink }}
               >
                 {data.brideName}
@@ -1257,7 +1286,7 @@ function CinemaLayout({
         {/* 세로쓰기 캡션 — 화보 무드 (사진 위 가독성용 검정+흰색 후광) */}
         {data.venueName && (
           <p
-            className="absolute left-3.5 top-5 text-[12.5px] tracking-[0.25em] text-black"
+            className="absolute left-3.5 top-5 text-[calc(12.5px*var(--inv-fs))] tracking-[0.25em] text-black"
             style={{
               writingMode: "vertical-rl",
               textShadow:
@@ -1269,7 +1298,7 @@ function CinemaLayout({
         )}
         {p && (
           <p
-            className="absolute right-3.5 top-5 text-[12.5px] tracking-[0.28em] text-black"
+            className="absolute right-3.5 top-5 text-[calc(12.5px*var(--inv-fs))] tracking-[0.28em] text-black"
             style={{
               writingMode: "vertical-rl",
               textShadow:
@@ -1284,7 +1313,7 @@ function CinemaLayout({
         {p && (
           <span
             aria-hidden
-            className="absolute bottom-4 right-4 text-[13px] tracking-[0.18em]"
+            className="absolute bottom-4 right-4 text-[calc(13px*var(--inv-fs))] tracking-[0.18em]"
             style={{
               fontFamily: "monospace",
               color: "#ffb03a",
@@ -1297,7 +1326,7 @@ function CinemaLayout({
         )}
       </div>
       <p
-        className="pt-10 text-center font-cormorant text-[19px] tracking-[0.3em]"
+        className="pt-10 text-center font-cormorant text-[calc(19px*var(--inv-fs))] tracking-[0.3em]"
         style={{ color: t.accent }}
       >
         <LetterReveal text="OUR MOMENT, FOREVER" />
@@ -1446,7 +1475,7 @@ function DolBearLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           FIRST BIRTHDAY
@@ -1472,13 +1501,13 @@ function DolBearLayout({
           </div>
         </div>
         <h1
-          className="inv-hero-in-delay mt-7 text-[1.7rem] tracking-wide"
+          className="inv-hero-in-delay mt-7 text-[calc(1.7rem*var(--inv-fs))] tracking-wide"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
         </h1>
         <p
-          className="inv-hero-in-delay mt-1.5 text-[15px]"
+          className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
           우리 아이의 첫 번째 생일
@@ -1563,7 +1592,7 @@ function DolCloudLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           FIRST BIRTHDAY
@@ -1597,13 +1626,13 @@ function DolCloudLayout({
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
         <h1
-          className="inv-hero-in-delay mt-7 text-[1.7rem] tracking-wide"
+          className="inv-hero-in-delay mt-7 text-[calc(1.7rem*var(--inv-fs))] tracking-wide"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
         </h1>
         <p
-          className="inv-hero-in-delay mt-1.5 text-[15px]"
+          className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
           구름 위를 걷는 첫 생일에 초대해요
@@ -1643,7 +1672,7 @@ function DolHanbokLayout({
       <div className="h-3 w-full" style={{ background: saekdong }} aria-hidden />
       <div className="px-8 pb-12 pt-12 text-center">
         <p
-          className="inv-hero-in text-[13px] tracking-[0.35em]"
+          className="inv-hero-in text-[calc(13px*var(--inv-fs))] tracking-[0.35em]"
           style={{ color: t.accent, fontFamily: t.headingFont }}
         >
           돌잔치에 초대합니다
@@ -1679,20 +1708,20 @@ function DolHanbokLayout({
           ))}
         </div>
         <h1
-          className="inv-hero-in-delay mt-4 text-[1.7rem] tracking-[0.1em]"
+          className="inv-hero-in-delay mt-4 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
         </h1>
         <p
-          className="inv-hero-in-delay mt-1.5 text-[14px]"
+          className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
           첫 돌을 맞이했습니다
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-[15px] tracking-[0.2em]"
+            className="inv-hero-in-delay mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.2em]"
             style={{ color: t.sub, fontFamily: t.headingFont }}
           >
             {p.year}년 {p.month}월 {p.day}일
@@ -1742,13 +1771,13 @@ function SeniorGoldLayout({
           </span>
         </p>
         <p
-          className="inv-hero-in mt-3 font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in mt-3 font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: `${gold}cc` }}
         >
           {labels.heroKicker}
         </p>
         <h1
-          className="inv-hero-in mt-4 text-[1.55rem] tracking-[0.25em]"
+          className="inv-hero-in mt-4 text-[calc(1.55rem*var(--inv-fs))] tracking-[0.25em]"
           style={{ fontFamily: t.headingFont, color: gold }}
         >
           {labels.seniorLabel}연에 모십니다
@@ -1766,7 +1795,7 @@ function SeniorGoldLayout({
           </div>
         </div>
         <p
-          className="inv-hero-in-delay mt-7 text-[1.5rem] tracking-[0.15em]"
+          className="inv-hero-in-delay mt-7 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.15em]"
           style={{ fontFamily: t.headingFont, color: "#f6ead3" }}
         >
           {data.groomName}
@@ -1831,7 +1860,7 @@ function SeniorBloomLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in text-[26px]"
+          className="inv-hero-in text-[calc(26px*var(--inv-fs))]"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
           {labels.heroPhrase}
@@ -1862,7 +1891,7 @@ function SeniorBloomLayout({
           />
         </div>
         <h1
-          className="inv-hero-in-delay mt-7 text-[1.6rem] tracking-[0.12em]"
+          className="inv-hero-in-delay mt-7 text-[calc(1.6rem*var(--inv-fs))] tracking-[0.12em]"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
@@ -1872,7 +1901,7 @@ function SeniorBloomLayout({
           aria-hidden
         >
           <span className="h-px w-8" style={{ background: t.line }} />
-          <span className="text-[10px]" style={{ color: t.accent }}>
+          <span className="text-[calc(10px*var(--inv-fs))]" style={{ color: t.accent }}>
             ✿
           </span>
           <span className="h-px w-8" style={{ background: t.line }} />
@@ -1938,19 +1967,19 @@ function SeniorPineLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in text-[26px] tracking-[0.15em]"
+          className="inv-hero-in text-[calc(26px*var(--inv-fs))] tracking-[0.15em]"
           style={{ fontFamily: t.headingFont, color: gold }}
         >
           {labels.seniorHanja}
         </p>
         <p
-          className="inv-hero-in mt-2 font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in mt-2 font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: "#9db4a6" }}
         >
           LONG LIFE &amp; HAPPINESS
         </p>
         <h1
-          className="inv-hero-in mt-4 text-[1.45rem] tracking-[0.2em]"
+          className="inv-hero-in mt-4 text-[calc(1.45rem*var(--inv-fs))] tracking-[0.2em]"
           style={{ fontFamily: t.headingFont, color: "#eef3ea" }}
         >
           장수를 기원하는 자리
@@ -1968,7 +1997,7 @@ function SeniorPineLayout({
           </div>
         </div>
         <p
-          className="inv-hero-in-delay mt-7 text-[1.5rem] tracking-[0.15em]"
+          className="inv-hero-in-delay mt-7 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.15em]"
           style={{ fontFamily: t.headingFont, color: gold }}
         >
           {data.groomName}
@@ -2037,13 +2066,13 @@ function BdayPopLayout({
           <span className="inv-bob">🎉</span>
         </p>
         <p
-          className="inv-hero-in mt-3 font-cormorant text-[13px] font-semibold tracking-[0.45em]"
+          className="inv-hero-in mt-3 font-cormorant text-[calc(13px*var(--inv-fs))] font-semibold tracking-[0.45em]"
           style={{ color: t.accent }}
         >
           HAPPY BIRTHDAY
         </p>
         <h1
-          className="inv-hero-in mt-3 text-[2.1rem] font-extrabold tracking-tight"
+          className="inv-hero-in mt-3 text-[calc(2.1rem*var(--inv-fs))] font-extrabold tracking-tight"
           style={{ color: t.ink }}
         >
           {data.groomName}
@@ -2115,13 +2144,13 @@ function BdayNeonLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in inv-neon font-cormorant text-[22px] font-semibold tracking-[0.4em]"
+          className="inv-hero-in inv-neon font-cormorant text-[calc(22px*var(--inv-fs))] font-semibold tracking-[0.4em]"
           style={{ color: "#ff5fa2" }}
         >
           HAPPY
         </p>
         <p
-          className="inv-hero-in inv-neon font-cormorant text-[22px] font-semibold tracking-[0.4em]"
+          className="inv-hero-in inv-neon font-cormorant text-[calc(22px*var(--inv-fs))] font-semibold tracking-[0.4em]"
           style={{ color: "#5fd9e7", animationDelay: "0.9s" }}
         >
           BIRTHDAY
@@ -2139,7 +2168,7 @@ function BdayNeonLayout({
           </div>
         </div>
         <h1
-          className="inv-hero-in-delay mt-8 text-[1.8rem] font-bold tracking-wide"
+          className="inv-hero-in-delay mt-8 text-[calc(1.8rem*var(--inv-fs))] font-bold tracking-wide"
           style={{ color: t.ink }}
         >
           {data.groomName}
@@ -2179,13 +2208,13 @@ function BdayMinimalLayout({
           aria-hidden
         />
         <p
-          className="inv-hero-in mt-5 font-cormorant text-[11px] font-semibold tracking-[0.5em]"
+          className="inv-hero-in mt-5 font-cormorant text-[calc(11px*var(--inv-fs))] font-semibold tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           BIRTHDAY INVITATION
         </p>
         <h1
-          className="inv-hero-in mt-4 text-[2.4rem] font-extrabold leading-tight tracking-tight"
+          className="inv-hero-in mt-4 text-[calc(2.4rem*var(--inv-fs))] font-extrabold leading-tight tracking-tight"
           style={{ color: t.ink }}
         >
           {data.groomName}
@@ -2214,7 +2243,7 @@ function BdayMinimalLayout({
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
         <p
-          className="inv-hero-in-delay mt-9 text-[15px]"
+          className="inv-hero-in-delay mt-9 text-[calc(15px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
           소중한 하루, 함께 축하해 주세요
@@ -2300,7 +2329,7 @@ function StarHero({
         {phrase}
       </p>
       <p
-        className="inv-hero-in font-cormorant mt-2 text-[10px] tracking-[0.5em]"
+        className="inv-hero-in font-cormorant mt-2 text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
         style={{ color: t.sub }}
       >
         {kicker}
@@ -2324,7 +2353,7 @@ function StarHero({
       </h1>
       {sub && (
         <p
-          className="inv-hero-in-delay mt-1.5 text-[14px]"
+          className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
           {sub}
@@ -2408,13 +2437,13 @@ function DolGardenLayout({
           </span>
         </div>
         <p
-          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           FIRST BIRTHDAY
         </p>
         <p
-          className="inv-hero-in mt-3 text-[15px] tracking-[0.1em]"
+          className="inv-hero-in mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.1em]"
           style={{ color: t.sub }}
         >
           작은 새싹이 자라 첫 봄을 맞았어요
@@ -2445,7 +2474,7 @@ function DolGardenLayout({
           />
         </div>
         <h1
-          className="inv-hero-in-delay mt-6 text-[1.7rem] tracking-wide"
+          className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-wide"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
@@ -2455,7 +2484,7 @@ function DolGardenLayout({
           aria-hidden
         >
           <span className="h-px w-8" style={{ background: t.line }} />
-          <span className="text-[10px]" style={{ color: t.accent }}>
+          <span className="text-[calc(10px*var(--inv-fs))]" style={{ color: t.accent }}>
             ❧
           </span>
           <span className="h-px w-8" style={{ background: t.line }} />
@@ -2508,7 +2537,7 @@ function DolCrayonLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in mt-4 text-[15px] font-bold tracking-[0.1em]"
+          className="inv-hero-in mt-4 text-[calc(15px*var(--inv-fs))] font-bold tracking-[0.1em]"
           style={{ color: t.accent }}
         >
           우리 아기 첫 생일이에요!
@@ -2537,7 +2566,7 @@ function DolCrayonLayout({
           />
         </div>
         <h1
-          className="inv-hero-in-delay mt-7 text-[1.9rem] font-extrabold tracking-tight"
+          className="inv-hero-in-delay mt-7 text-[calc(1.9rem*var(--inv-fs))] font-extrabold tracking-tight"
           style={{ color: t.ink }}
         >
           {data.groomName}
@@ -2621,19 +2650,19 @@ function SeniorInkLayout({
         </div>
         <div className="text-center">
           <p
-            className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+            className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
             style={{ color: t.sub }}
           >
             INVITATION
           </p>
           <h1
-            className="inv-hero-in mt-4 text-[1.5rem] tracking-[0.3em]"
+            className="inv-hero-in mt-4 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.3em]"
             style={{ fontFamily: t.headingFont, color: t.ink }}
           >
             {labels.seniorLabel}을 맞아
           </h1>
           <p
-            className="inv-hero-in mt-2 text-[15px] tracking-[0.15em]"
+            className="inv-hero-in mt-2 text-[calc(15px*var(--inv-fs))] tracking-[0.15em]"
             style={{ color: t.sub }}
           >
             귀한 자리에 모십니다
@@ -2661,7 +2690,7 @@ function SeniorInkLayout({
             aria-hidden
           />
           <p
-            className="inv-hero-in-delay mt-5 text-[1.5rem] tracking-[0.25em]"
+            className="inv-hero-in-delay mt-5 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.25em]"
             style={{ fontFamily: t.headingFont, color: t.ink }}
           >
             {data.groomName}
@@ -2717,13 +2746,13 @@ function SeniorWarmLayout({
         }}
       >
         <p
-          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           FAMILY ALBUM
         </p>
         <h1
-          className="inv-hero-in mt-3.5 text-[1.5rem] tracking-[0.15em]"
+          className="inv-hero-in mt-3.5 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.15em]"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {labels.seniorLabel} 잔치에 초대합니다
@@ -2748,14 +2777,14 @@ function SeniorWarmLayout({
           {corner({ left: 4, bottom: 4 }, 270)}
           {/* 손글씨 캡션 */}
           <p
-            className="mt-3 text-[15px]"
+            className="mt-3 text-[calc(15px*var(--inv-fs))]"
             style={{ fontFamily: "var(--font-brush)", color: t.sub }}
           >
             우리 가족의 가장 빛나는 날
           </p>
         </div>
         <p
-          className="inv-hero-in-delay mt-7 text-[1.5rem] tracking-[0.15em]"
+          className="inv-hero-in-delay mt-7 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.15em]"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
@@ -2844,7 +2873,7 @@ function BdayCakeLayout({
           <span className="inv-bob">🎂</span>
         </p>
         <p
-          className="inv-hero-in mt-3.5 font-cormorant text-[11px] tracking-[0.5em]"
+          className="inv-hero-in mt-3.5 font-cormorant text-[calc(11px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           HAPPY BIRTHDAY
@@ -2862,13 +2891,13 @@ function BdayCakeLayout({
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
         <h1
-          className="inv-hero-in-delay mt-6 text-[1.8rem] tracking-wide"
+          className="inv-hero-in-delay mt-6 text-[calc(1.8rem*var(--inv-fs))] tracking-wide"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
         </h1>
         <p
-          className="inv-hero-in-delay mt-1.5 text-[14px]"
+          className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
         >
           생일을 함께 해주세요.
@@ -2932,13 +2961,13 @@ function BdayBloomLayout({
           ))}
         </div>
         <p
-          className="inv-hero-in font-cormorant text-[10px] tracking-[0.5em]"
+          className="inv-hero-in font-cormorant text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
           style={{ color: t.accent }}
         >
           HAPPY BIRTHDAY
         </p>
         <p
-          className="inv-hero-in mt-3 text-[26px]"
+          className="inv-hero-in mt-3 text-[calc(26px*var(--inv-fs))]"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
           꽃처럼 환한 하루
@@ -2961,7 +2990,7 @@ function BdayBloomLayout({
           </div>
         </div>
         <h1
-          className="inv-hero-in-delay mt-6 text-[1.7rem] tracking-[0.1em]"
+          className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
           style={{ fontFamily: t.headingFont, color: t.ink }}
         >
           {data.groomName}
@@ -2971,7 +3000,7 @@ function BdayBloomLayout({
           aria-hidden
         >
           <span className="h-px w-8" style={{ background: t.line }} />
-          <span className="text-[10px]" style={{ color: t.accent }}>
+          <span className="text-[calc(10px*var(--inv-fs))]" style={{ color: t.accent }}>
             ✿
           </span>
           <span className="h-px w-8" style={{ background: t.line }} />
@@ -3033,7 +3062,7 @@ function Footer({
       }
     >
       <p
-        className="font-cormorant mb-6 flex items-center justify-center gap-3 text-[10px] tracking-[0.5em]"
+        className="font-cormorant mb-6 flex items-center justify-center gap-3 text-[calc(10px*var(--inv-fs))] tracking-[0.5em]"
         style={{ color: subColor }}
       >
         <span className="inline-block h-px w-8" style={{ background: lineColor }} />
@@ -3043,7 +3072,7 @@ function Footer({
       {message ? (
         // 사용자가 직접 쓴 맺음말
         <p
-          className="inv-fade whitespace-pre-line text-[17px] leading-9"
+          className="inv-fade whitespace-pre-line text-[calc(17px*var(--inv-fs))] leading-9"
           style={{ fontFamily: t.headingFont, color: mainColor }}
         >
           {message}
@@ -3079,7 +3108,7 @@ function Footer({
       )}
       <a
         href="/"
-        className="mt-9 inline-block text-[10px] tracking-wider transition"
+        className="mt-9 inline-block text-[calc(10px*var(--inv-fs))] tracking-wider transition"
         style={{ color: subColor }}
       >
         별빛 초대장 ✦ 별마마파파
@@ -3157,7 +3186,12 @@ export default function InvitationView({
   return (
     <div
       className="mx-auto min-h-full w-full max-w-md"
-      style={{ background: t.pageBg, color: t.ink, fontFamily: t.bodyFont }}
+      style={{
+        background: t.pageBg,
+        color: t.ink,
+        fontFamily: t.bodyFont,
+        ...fontScaleVars(data.fontScale),
+      }}
     >
       {(() => {
         const Layout = LAYOUTS[template] ?? ClassicLayout;
