@@ -600,8 +600,8 @@ function Label({
 }
 
 function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
-  if (variant === "modern")
-    return <div className="mx-8 h-px" style={{ background: t.line }} />;
+  // 모던은 섹션 제목 옆 라인만으로 구분 — 구간 사이 가로선은 두지 않는다
+  if (variant === "modern") return null;
   // 미니멀 헤어라인 — 작은 마름모 하나로 절제
   return (
     <div className="flex items-center justify-center gap-2.5 py-1" aria-hidden>
@@ -1340,7 +1340,7 @@ function CinemaLayout({
         )}
       </div>
       <p
-        className="pt-10 text-center font-cormorant text-[calc(19px*var(--inv-fs))] tracking-[0.3em]"
+        className="pt-10 text-center font-cormorant text-[calc(15px*var(--inv-fs))] tracking-[0.3em]"
         style={{ color: t.accent }}
       >
         <LetterReveal text="OUR MOMENT, FOREVER" />
