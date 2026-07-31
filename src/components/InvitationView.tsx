@@ -10,6 +10,7 @@ import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
 import Countdown from "./Countdown";
 import MapSection from "./MapSection";
+import ScrollReveal from "./ScrollReveal";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -3245,6 +3246,9 @@ export default function InvitationView({
         ...fontScaleVars(data.fontScale),
       }}
     >
+      {/* 사파리 등에서 스크롤에 맞춰 섹션이 나타나게 (크롬은 CSS 가 처리) */}
+      <ScrollReveal />
+
       {(() => {
         const Layout = LAYOUTS[template] ?? ClassicLayout;
         return <Layout data={data} t={t} preview={preview} />;

@@ -427,7 +427,7 @@ export default function EditorClient({
           </p>
         </div>
 
-        <Group title="템플릿" step={1}>
+        <Group title="메인" step={1}>
           <div className="grid grid-cols-2 gap-3">
             {catTemplates.map((t) => {
               const selected = template === t.id;

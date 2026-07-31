@@ -86,10 +86,24 @@ body {
   animation-timeline: view();
   animation-range: entry 0% entry 45%;
 }
-/* view() 미지원 브라우저: 로드 시 1회 재생 */
+/* view() 미지원 브라우저(사파리·파이어폭스): 로드 시 1회 재생.
+   ScrollReveal 이 붙으면 아래 규칙이 이어받아 스크롤에 맞춰 나타난다. */
 @supports not (animation-timeline: view()) {
   .inv-fade {
     animation: inv-fade-up 0.8s ease-out both;
+  }
+  /* 스크립트가 살아 있을 때만 적용 — 안 되면 위 규칙대로 그냥 보인다 */
+  .inv-reveal-on .inv-fade {
+    animation: none;
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.8s ease-out,
+      transform 0.8s ease-out;
+  }
+  .inv-reveal-on .inv-fade.inv-in {
+    opacity: 1;
+    transform: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
