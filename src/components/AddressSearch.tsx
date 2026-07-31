@@ -9,30 +9,37 @@ interface PostcodeResult {
   userSelectedType: "R" | "J"; // 사용자가 고른 주소 종류
 }
 
+type PostcodeCtor = new (options: {
+  oncomplete: (data: PostcodeResult) => void;
+  onresize?: (size: { height: number }) => void;
+  width?: string;
+  height?: string;
+}) => { embed: (el: HTMLElement) => void };
+
 declare global {
   interface Window {
-    daum?: {
-      Postcode: new (options: {
-        oncomplete: (data: PostcodeResult) => void;
-        onresize?: (size: { height: number }) => void;
-        width?: string;
-        height?: string;
-      }) => { embed: (el: HTMLElement) => void };
-    };
+    // 공유용 SDK 의 window.Kakao(대문자)와는 다른 전역이다
+    kakao?: { Postcode?: PostcodeCtor };
+    daum?: { Postcode?: PostcodeCtor };
   }
 }
 
 /**
  * 우편번호 서비스 스크립트 (별도 키 없음).
- * 안내 문서에 실린 주소를 먼저 쓰고, 막히면 예전부터 쓰이던 주소를 시도한다.
+ * 서비스가 카카오 CDN 으로 옮겨져서 그 주소를 먼저 쓰고,
+ * 막히면 예전 daum.net 주소를 차례로 시도한다.
  */
 const SDK_URLS = [
-  "https://t1.daum.net/postcode/api/mapsapi/bundle/daum.postcode.v2.js",
+  "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
   "https://t1.daum.net/postcode/api/mapsapi/postcode.v2.js",
   "https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js",
 ];
 
-const ready = () => Boolean(window.daum?.Postcode);
+// 스크립트 판에 따라 kakao 아래에 붙기도, daum 아래에 붙기도 한다 — 둘 다 본다
+const getPostcode = (): PostcodeCtor | undefined =>
+  window.kakao?.Postcode ?? window.daum?.Postcode;
+
+const ready = () => Boolean(getPostcode());
 
 function injectScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -124,9 +131,10 @@ export default function AddressSearch({
 
   // 시트가 열린 뒤 컨테이너가 생기면 그때 끼워 넣는다
   useEffect(() => {
-    if (!open || !boxRef.current || !window.daum) return;
+    const Postcode = getPostcode();
+    if (!open || !boxRef.current || !Postcode) return;
     boxRef.current.innerHTML = "";
-    new window.daum.Postcode({
+    new Postcode({
       oncomplete: (data) => {
         // 사용자가 고른 종류(도로명/지번)를 그대로 따른다
         const addr =
