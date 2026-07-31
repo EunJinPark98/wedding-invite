@@ -24,11 +24,11 @@ declare global {
 
 /**
  * 우편번호 서비스 스크립트 (별도 키 없음).
- * 같은 서비스를 여러 주소로 받을 수 있어, 막히거나 실패하면 다음 것을 시도한다.
+ * 안내 문서에 실린 주소를 먼저 쓰고, 막히면 예전부터 쓰이던 주소를 시도한다.
  */
 const SDK_URLS = [
+  "https://t1.daum.net/postcode/api/mapsapi/bundle/daum.postcode.v2.js",
   "https://t1.daum.net/postcode/api/mapsapi/postcode.v2.js",
-  "https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js",
   "https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js",
 ];
 
@@ -40,7 +40,8 @@ function injectScript(src: string): Promise<void> {
     script.src = src;
     script.async = true;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error(`load failed: ${src}`));
+    // 주소가 없거나(404) 네트워크·차단으로 못 받은 경우 — 브라우저는 이유를 알려주지 않는다
+    script.onerror = () => reject(new Error("내려받기 실패"));
     document.head.appendChild(script);
   });
 }
@@ -64,16 +65,21 @@ function loadSdk(): Promise<void> {
   if (ready()) return Promise.resolve();
   if (!sdkPromise) {
     sdkPromise = (async () => {
+      // 어디서 왜 막혔는지 남겨 둔다 — 실패 안내에 그대로 보여 준다
+      const tried: string[] = [];
       for (const url of SDK_URLS) {
+        const host = new URL(url).host;
         try {
           await injectScript(url);
         } catch {
+          tried.push(`${host}: 내려받기 실패`);
           continue; // 이 주소는 막혔거나 없음 → 다음 주소로
         }
         if (await waitForReady(3000)) return;
+        tried.push(`${host}: 받았지만 실행 안 됨`);
       }
       sdkPromise = null; // 다음에 다시 시도할 수 있게
-      throw new Error("Postcode SDK unavailable");
+      throw new Error(tried.join(" / "));
     })();
   }
   return sdkPromise;
@@ -93,17 +99,24 @@ export default function AddressSearch({
 }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(false);
+  const [reason, setReason] = useState<string | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
 
   async function handleOpen() {
-    setError(false);
+    setReason(null);
     setBusy(true);
     try {
       await loadSdk();
       setOpen(true);
-    } catch {
-      setError(true);
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : String(e);
+      // 인터넷 자체가 끊긴 경우는 서비스 탓이 아니니 따로 알려 준다
+      setReason(
+        typeof navigator !== "undefined" && !navigator.onLine
+          ? "인터넷 연결이 끊겨 있어요"
+          : detail
+      );
+      console.error("[AddressSearch] 우편번호 서비스 로드 실패 —", detail);
     } finally {
       setBusy(false);
     }
@@ -137,10 +150,14 @@ export default function AddressSearch({
         {busy ? "여는 중..." : "주소 검색"}
       </button>
 
-      {error && (
-        <p className="mt-1 w-full text-[11px] text-red-500">
-          주소 검색을 열지 못했어요. 잠시 후 다시 시도하거나 직접 입력해 주세요.
-        </p>
+      {reason && (
+        <div className="mt-1 w-full text-[11px] leading-relaxed">
+          <p className="text-red-500">
+            주소 검색을 열지 못했어요. 위 칸에 직접 입력해도 괜찮아요.
+          </p>
+          {/* 원인을 그대로 노출 — 광고 차단·사내망 차단인지 바로 알 수 있다 */}
+          <p className="mt-0.5 text-gray-400">사유 — {reason}</p>
+        </div>
       )}
 
       {open && (
