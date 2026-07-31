@@ -5,14 +5,13 @@ import { useEffect } from "react";
 /**
  * 스크롤로 내려갈 때 각 섹션 글씨가 떠오르게 한다.
  *
- * 원래는 CSS 만으로(`animation-timeline: view()`) 처리했는데, 이 기능은
- * 크롬 계열에서만 동작한다. 사파리·파이어폭스에서는 폴백이 걸려 스크롤과
- * 상관없이 화면을 열자마자 전부 재생돼 버려서, 정작 내려볼 때는 아무것도
- * 나타나지 않았다. 모바일 초대장은 아이폰으로 보는 경우가 많아 사실상
- * 대부분의 손님에게 연출이 없는 셈이었다.
+ * 원래는 CSS 만으로(`animation-timeline: view()`) 처리했는데, 이 속성은
+ * 브라우저마다 지원이 갈린다. 지원하지 않으면 폴백이 걸려 화면을 열자마자
+ * 전부 재생돼 정작 스크롤할 때는 아무것도 나타나지 않고, 지원하더라도
+ * 인앱 브라우저 등에서 기대대로 보이지 않는 경우가 있었다.
  *
- * 그래서 그 브라우저들에서만 이 컴포넌트가 대신 맡는다.
- * (CSS 규칙도 `@supports not` 안에 있어, 크롬에서는 기존 동작 그대로다.)
+ * 그래서 지원 여부를 따지지 않고 모든 브라우저에서 이쪽 한 가지 방식으로
+ * 통일한다. 스크립트가 없으면 CSS 폴백대로 그냥 보인다.
  */
 export default function ScrollReveal() {
   useEffect(() => {
@@ -20,13 +19,28 @@ export default function ScrollReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const root = document.documentElement;
+    const reveal = (el: Element) => el.classList.add("inv-in");
+
+    // 이미 보이고 있던 글씨를 숨겼다가 다시 띄우면 깜빡이므로, 첫 화면에
+    // 들어와 있는 것들은 숨기지 않고 그대로 둔다.
+    //
+    // 순서가 중요하다. getBoundingClientRect() 는 스타일 계산을 강제하므로,
+    // 반드시 inv-reveal-on 을 붙이기 "전에" 위치를 다 재둬야 한다. 순서가
+    // 뒤바뀌면 opacity:0 이 확정된 뒤 inv-in 이 붙어, 첫 화면 글씨가
+    // 사라졌다 나타나는 깜빡임이 생긴다.
+    const inFirstScreen = [
+      ...document.querySelectorAll<HTMLElement>(".inv-fade"),
+    ].filter((el) => el.getBoundingClientRect().top < window.innerHeight * 0.9);
+
+    // 아래 두 줄 사이에는 화면이 다시 그려지지 않는다
     root.classList.add("inv-reveal-on");
+    inFirstScreen.forEach(reveal);
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (!e.isIntersecting) continue;
-          e.target.classList.add("inv-in");
+          reveal(e.target);
           io.unobserve(e.target); // 한 번 나타나면 다시 숨기지 않는다
         }
       },
