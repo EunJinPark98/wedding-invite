@@ -26,13 +26,13 @@ declare global {
 
 /**
  * 우편번호 서비스 스크립트 (별도 키 없음).
- * 서비스가 카카오 CDN 으로 옮겨져서 그 주소를 먼저 쓰고,
- * 막히면 예전 daum.net 주소를 차례로 시도한다.
+ *
+ * 예전 t1.daum.net 주소는 이제 DNS 자체가 잡히지 않는다(ERR_NAME_NOT_RESOLVED).
+ * 서비스는 카카오 CDN 으로 옮겨졌고, 두 호스트가 같은 파일을 준다.
  */
 const SDK_URLS = [
   "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
-  "https://t1.daum.net/postcode/api/mapsapi/postcode.v2.js",
-  "https://spi.maps.daum.net/imap/map_js_init/postcode.v2.js",
+  "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
 ];
 
 // 스크립트 판에 따라 kakao 아래에 붙기도, daum 아래에 붙기도 한다 — 둘 다 본다
