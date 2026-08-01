@@ -654,6 +654,18 @@ function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
       >
         ● ● ●
       </span>
+      <span
+        className="inv-divider-star text-[11px] leading-none"
+        style={{ color: t.accent, opacity: 0.7 }}
+      >
+        ✦
+      </span>
+      <span
+        className="inv-divider-flower text-[13px] leading-none"
+        style={{ color: t.accent, opacity: 0.6 }}
+      >
+        ❀
+      </span>
       <span className="inv-divider-line h-px w-6" style={{ background: t.line }} />
     </div>
   );
@@ -3119,7 +3131,8 @@ function Footer({
       className="mt-8 px-8 pb-9 pt-10 text-center"
       style={
         isStar
-          ? { background: bg, borderTop: `1px solid ${t.accent}40` }
+          ? // 밤하늘 계열은 배경이 본문과 이어져 있어 가로선을 두면 오히려 떠 보인다
+            { background: bg }
           : isNeon
             ? { background: bg, borderTop: "1px solid rgba(255,95,162,0.25)" }
             : { background: bg }
