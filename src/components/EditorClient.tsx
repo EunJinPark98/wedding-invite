@@ -93,18 +93,21 @@ function ImageUpload({
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={value} alt="" className="h-full w-full object-cover" />
-        ) : busy ? (
-          <span className="flex flex-col items-center gap-1.5">
-            <Spinner />
-            <span className="text-xs">올리는 중...</span>
-          </span>
         ) : (
           <span>{label}</span>
+        )}
+        {/* 이미 올린 사진을 바꾸는 중에도 보이도록 위에 덮는다 */}
+        {busy && (
+          <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-white/70">
+            <Spinner />
+            <span className="text-xs text-gray-500">올리는 중...</span>
+          </span>
         )}
         <input
           type="file"
           accept="image/*"
-          className="absolute inset-0 cursor-pointer opacity-0"
+          disabled={busy}
+          className="absolute inset-0 cursor-pointer opacity-0 disabled:cursor-default"
           onChange={(e) => handleFile(e.target.files?.[0])}
         />
       </label>
