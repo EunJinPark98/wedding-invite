@@ -180,6 +180,81 @@ function BankPicker({
   );
 }
 
+/* ───────── 시간 선택 ───────── */
+// 저장은 지금까지와 같은 문자열 그대로 ("오후 1시", "오후 1시 30분")
+const MERIDIEMS = ["오전", "오후"];
+const HOURS = Array.from({ length: 12 }, (_, i) => i + 1);
+const MINUTES = [0, 10, 20, 30, 40, 50];
+
+function parseTime(v: string) {
+  const m = v.match(/(오전|오후)\s*(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?/);
+  if (!m) return { meridiem: "오후", hour: 1, minute: 0 };
+  return { meridiem: m[1], hour: Number(m[2]), minute: Number(m[3] ?? 0) };
+}
+
+const formatTime = (meridiem: string, hour: number, minute: number) =>
+  minute === 0 ? `${meridiem} ${hour}시` : `${meridiem} ${hour}시 ${minute}분`;
+
+function TimePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const cur = parseTime(value);
+  // 예전에 직접 적어 둔 값이 목록에 없을 수 있으니 그 분도 함께 보여 준다
+  const minutes = MINUTES.includes(cur.minute)
+    ? MINUTES
+    : [...MINUTES, cur.minute].sort((a, b) => a - b);
+
+  const cls = `${INPUT_CLASS} min-w-0`;
+  return (
+    <div>
+      <span className="mb-1.5 block text-xs font-medium text-gray-500">시간</span>
+      <div className="grid grid-cols-3 gap-2">
+        <select
+          value={cur.meridiem}
+          onChange={(e) => onChange(formatTime(e.target.value, cur.hour, cur.minute))}
+          className={cls}
+        >
+          {MERIDIEMS.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+        <select
+          value={cur.hour}
+          onChange={(e) =>
+            onChange(formatTime(cur.meridiem, Number(e.target.value), cur.minute))
+          }
+          className={cls}
+        >
+          {HOURS.map((h) => (
+            <option key={h} value={h}>
+              {h}시
+            </option>
+          ))}
+        </select>
+        <select
+          value={cur.minute}
+          onChange={(e) =>
+            onChange(formatTime(cur.meridiem, cur.hour, Number(e.target.value)))
+          }
+          className={cls}
+        >
+          {minutes.map((m) => (
+            <option key={m} value={m}>
+              {m}분
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── 작은 입력 컴포넌트 ───────── */
 function Field({
   label,
@@ -195,7 +270,9 @@ function Field({
   placeholder?: string;
 }) {
   return (
-    <label className="block">
+    // min-w-0 이 없으면 날짜 입력처럼 고유 폭이 큰 칸이 grid 칸을 밀어내
+    // 옆 칸과 겹친다 (grid 항목의 기본값이 min-width:auto 라서)
+    <label className="block min-w-0">
       <span className="mb-1.5 block text-xs font-medium text-gray-500">
         {label}
       </span>
@@ -900,20 +977,17 @@ export default function EditorClient({
         </Group>
 
         <Group title={labels.dateSectionTitle} step={4}>
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label={labels.dateFieldLabel}
-              type="date"
-              value={data.weddingDate}
-              onChange={(v) => set("weddingDate", v)}
-            />
-            <Field
-              label="시간"
-              value={data.weddingTime}
-              onChange={(v) => set("weddingTime", v)}
-              placeholder="오후 1시"
-            />
-          </div>
+          {/* 좁은 화면에서 날짜 칸이 눌리지 않도록 한 줄씩 둔다 */}
+          <Field
+            label={labels.dateFieldLabel}
+            type="date"
+            value={data.weddingDate}
+            onChange={(v) => set("weddingDate", v)}
+          />
+          <TimePicker
+            value={data.weddingTime}
+            onChange={(v) => set("weddingTime", v)}
+          />
           <Field
             label={labels.venueLabel}
             value={data.venueName}
