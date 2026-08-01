@@ -74,16 +74,20 @@ body {
 /* ── 섹션 사이 구분선 ──
    세 모양을 다 그려 두고 루트의 data-divider 값으로 하나만 남긴다.
    기본값(diamond)은 아래 규칙이 없을 때의 모습이다. */
-.inv-divider-dots {
+/* 기본(마름모)에서는 나머지 모양을 감춰 둔다 */
+.inv-divider-dots,
+.inv-divider-star,
+.inv-divider-flower {
   display: none;
 }
-[data-divider="line"] .inv-divider-diamond,
-[data-divider="line"] .inv-divider-dots {
+
+[data-divider="line"] .inv-divider-diamond {
   display: none;
 }
 [data-divider="line"] .inv-divider-line {
   width: 4.5rem;
 }
+
 [data-divider="dots"] .inv-divider-line,
 [data-divider="dots"] .inv-divider-diamond {
   display: none;
@@ -92,8 +96,34 @@ body {
   display: inline;
   letter-spacing: 0.4em;
 }
+
+[data-divider="star"] .inv-divider-diamond {
+  display: none;
+}
+[data-divider="star"] .inv-divider-star {
+  display: inline;
+}
+
+[data-divider="flower"] .inv-divider-line,
+[data-divider="flower"] .inv-divider-diamond {
+  display: none;
+}
+[data-divider="flower"] .inv-divider-flower {
+  display: inline;
+}
+
 [data-divider="none"] .inv-divider {
   display: none;
+}
+
+/* 선택 상자 — 기본 화살표를 지우고 오른쪽에서 조금 안쪽에 그린다 */
+.inv-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%239ca3af' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 0.7rem;
+  padding-right: 2rem;
 }
 
 @keyframes inv-fade-up {

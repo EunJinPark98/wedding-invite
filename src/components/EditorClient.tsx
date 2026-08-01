@@ -157,7 +157,7 @@ function BankPicker({
             onChange(v);
           }
         }}
-        className={INPUT_CLASS}
+        className={SELECT_CLASS}
       >
         <option value="" disabled>
           은행 선택
@@ -209,7 +209,7 @@ function TimePicker({
     ? MINUTES
     : [...MINUTES, cur.minute].sort((a, b) => a - b);
 
-  const cls = `${INPUT_CLASS} min-w-0`;
+  const cls = `${SELECT_CLASS} min-w-0`;
   return (
     <div>
       <span className="mb-1.5 block text-xs font-medium text-gray-500">시간</span>
@@ -251,6 +251,78 @@ function TimePicker({
             </option>
           ))}
         </select>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── 연락처 (칸 - 칸 - 칸) ───────── */
+// 저장은 지금까지와 같은 "010-0000-0000" 문자열이라 기존 초대장도 그대로 열린다
+function splitPhone(v: string): [string, string, string] {
+  const raw = (v ?? "").trim();
+  if (raw.includes("-")) {
+    const p = raw.split("-");
+    return [p[0] ?? "", p[1] ?? "", p[2] ?? ""].map((s) =>
+      s.replace(/\D/g, "")
+    ) as [string, string, string];
+  }
+  // 하이픈 없이 저장된 값도 자연스럽게 나눠 준다
+  const d = raw.replace(/\D/g, "");
+  if (d.length <= 3) return [d, "", ""];
+  if (d.length <= 7) return [d.slice(0, 3), d.slice(3), ""];
+  return [d.slice(0, 3), d.slice(3, d.length - 4), d.slice(-4)];
+}
+
+function joinPhone(parts: string[]) {
+  const t = [...parts];
+  while (t.length && t[t.length - 1] === "") t.pop(); // "010--" 같은 꼴 방지
+  return t.join("-");
+}
+
+function PhoneField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const parts = splitPhone(value);
+  const max = [3, 4, 4];
+  const boxes = useRef<(HTMLInputElement | null)[]>([]);
+
+  const setPart = (i: number, raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, max[i]);
+    const next = [...parts];
+    next[i] = digits;
+    onChange(joinPhone(next));
+    // 칸이 다 차면 다음 칸으로 옮겨 준다
+    if (digits.length === max[i] && i < 2) boxes.current[i + 1]?.focus();
+  };
+
+  return (
+    <div>
+      <span className="mb-1.5 block text-xs font-medium text-gray-500">
+        {label}
+      </span>
+      <div className="flex items-center gap-1.5">
+        {parts.map((p, i) => (
+          <div key={i} className="flex min-w-0 flex-1 items-center gap-1.5">
+            <input
+              ref={(el) => {
+                boxes.current[i] = el;
+              }}
+              value={p}
+              onChange={(e) => setPart(i, e.target.value)}
+              inputMode="numeric"
+              maxLength={max[i]}
+              placeholder={i === 0 ? "010" : "0000"}
+              className={`${INPUT_CLASS} min-w-0 px-2 text-center`}
+            />
+            {i < 2 && <span className="text-gray-300">-</span>}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -299,6 +371,9 @@ const fmtDate = (iso: string) => {
 // 공통 입력 스타일
 const INPUT_CLASS =
   "w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 text-sm text-gray-800 transition placeholder:text-gray-300 focus:border-gold-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-100";
+
+// 선택 상자 — 기본 화살표 대신 오른쪽에서 조금 안쪽에 직접 그린다 (globals.css)
+const SELECT_CLASS = `${INPUT_CLASS} inv-select`;
 
 function Group({
   title,
@@ -489,7 +564,8 @@ export default function EditorClient({
     const files = list ? [...list] : [];
     if (files.length === 0) return;
 
-    const room = MAX_GALLERY - data.gallery.length;
+    // 빈 슬롯은 자리를 차지하지 않는다 — 실제 담긴 사진만 센다
+    const room = MAX_GALLERY - data.gallery.filter(Boolean).length;
     if (room <= 0) {
       alert(`갤러리는 최대 ${MAX_GALLERY}장까지 담을 수 있어요.`);
       return;
@@ -505,7 +581,7 @@ export default function EditorClient({
       }
       setData((d) => ({
         ...d,
-        gallery: [...d.gallery, ...urls].slice(0, MAX_GALLERY),
+        gallery: [...d.gallery.filter(Boolean), ...urls].slice(0, MAX_GALLERY),
       }));
       if (files.length > picked.length) {
         alert(
@@ -947,20 +1023,19 @@ export default function EditorClient({
               </div>
             )}
           </div>
+          {/* 연락처는 칸이 세 개라 좁은 화면에서 나란히 두면 눌린다 */}
           {labels.showContact && (
-            <div className={labels.showPerson2 ? "grid grid-cols-2 gap-3" : ""}>
-              <Field
+            <div className="space-y-3.5">
+              <PhoneField
                 label={labels.contact1Label}
                 value={data.groomPhone}
                 onChange={(v) => set("groomPhone", v)}
-                placeholder="010-0000-0000"
               />
               {labels.showPerson2 && (
-                <Field
+                <PhoneField
                   label={labels.contact2Label}
                   value={data.bridePhone}
                   onChange={(v) => set("bridePhone", v)}
-                  placeholder="010-0000-0000"
                 />
               )}
             </div>
@@ -1109,23 +1184,27 @@ export default function EditorClient({
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               갤러리 사진{" "}
               <span className="text-gray-400">
-                ({data.gallery.length}/{MAX_GALLERY})
+                ({data.gallery.filter(Boolean).length}/{MAX_GALLERY})
               </span>
             </span>
             <div className="grid grid-cols-3 gap-2">
-              {data.gallery.map((g, i) => (
-                <ImageUpload
-                  key={i}
-                  value={g}
-                  onChange={(url) => {
-                    if (url) setGallery(i, url);
-                    else removeGallery(i);
-                  }}
-                  label="사진 추가"
-                  className="h-24"
-                />
-              ))}
-              {data.gallery.length < MAX_GALLERY && (
+              {/* 빈 슬롯은 두지 않는다. 예전에는 빈 슬롯이 한 장짜리 업로드라,
+                  여러 장 담기 타일보다 먼저 눈에 띄어 한 장씩만 올리게 됐다. */}
+              {data.gallery.map((g, i) =>
+                g ? (
+                  <ImageUpload
+                    key={i}
+                    value={g}
+                    onChange={(url) => {
+                      if (url) setGallery(i, url);
+                      else removeGallery(i);
+                    }}
+                    label="사진 추가"
+                    className="h-24"
+                  />
+                ) : null
+              )}
+              {data.gallery.filter(Boolean).length < MAX_GALLERY && (
                 // 폰 사진첩에서 여러 장을 한 번에 고를 수 있다
                 <label className="relative flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-300 transition hover:border-gold-300 hover:text-gold-400">
                   {bulk ? (
@@ -1135,7 +1214,7 @@ export default function EditorClient({
                   ) : (
                     <>
                       <span className="text-2xl leading-none">+</span>
-                      <span className="mt-1 text-[11px]">여러 장 선택</span>
+                      <span className="mt-1 text-[11px]">사진 추가</span>
                     </>
                   )}
                   {/* display:none 으로 숨기면 아이폰에서 사진첩이 열리지 않는다.
@@ -1178,7 +1257,7 @@ export default function EditorClient({
                       onChange={(e) =>
                         setAccount(i, { side: e.target.value as Account["side"] })
                       }
-                      className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-700"
+                      className="inv-select rounded-lg border border-gray-200 bg-white py-1.5 pl-2.5 text-sm text-gray-700"
                     >
                       <option value="신랑측">신랑측</option>
                       <option value="신부측">신부측</option>

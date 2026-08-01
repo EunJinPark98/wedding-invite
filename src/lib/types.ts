@@ -121,6 +121,8 @@ export const DIVIDERS = [
   { id: "diamond", label: "마름모", desc: "선 사이 작은 마름모" },
   { id: "line", label: "가는 선", desc: "가로선 하나로 담백하게" },
   { id: "dots", label: "점 세 개", desc: "점만 콕콕" },
+  { id: "star", label: "별", desc: "선 사이 작은 별" },
+  { id: "flower", label: "꽃", desc: "꽃 하나만" },
   { id: "none", label: "없음", desc: "구분선을 두지 않음" },
 ] as const;
 export type DividerStyle = (typeof DIVIDERS)[number]["id"];
