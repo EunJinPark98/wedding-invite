@@ -114,6 +114,18 @@ export const HERO_MOTIONS = [
 export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 
 /**
+ * 섹션 사이 구분선 디자인.
+ * 실제 모양은 CSS 가 초대장 루트의 data-divider 값을 보고 고른다.
+ */
+export const DIVIDERS = [
+  { id: "diamond", label: "마름모", desc: "선 사이 작은 마름모" },
+  { id: "line", label: "가는 선", desc: "가로선 하나로 담백하게" },
+  { id: "dots", label: "점 세 개", desc: "점만 콕콕" },
+  { id: "none", label: "없음", desc: "구분선을 두지 않음" },
+] as const;
+export type DividerStyle = (typeof DIVIDERS)[number]["id"];
+
+/**
  * 초대장 글꼴 크기 배율.
  * 사진·여백은 그대로 두고 글자 크기만 배율만큼 키우거나 줄인다.
  * (InvitationView 루트에서 --inv-fs 로 내려보내 하위 텍스트에 적용)
@@ -220,6 +232,8 @@ export interface InvitationData {
   mainPhotoUrl: string;
   // 대표 사진 모션 (HeroMotion id)
   heroMotion: string;
+  // 섹션 사이 구분선 디자인 (DividerStyle id)
+  dividerStyle: string;
   // 신랑/신부 개별 프로필 사진 (선택)
   groomPhotoUrl: string;
   bridePhotoUrl: string;
@@ -282,6 +296,9 @@ export const normalizeData = (
   heroMotion: HERO_MOTIONS.some((m) => m.id === d?.heroMotion)
     ? (d!.heroMotion as HeroMotion)
     : "zoomin",
+  dividerStyle: DIVIDERS.some((v) => v.id === d?.dividerStyle)
+    ? (d!.dividerStyle as DividerStyle)
+    : "diamond",
   groomPhotoUrl: d?.groomPhotoUrl ?? "",
   bridePhotoUrl: d?.bridePhotoUrl ?? "",
   gallery: Array.isArray(d?.gallery)
@@ -407,6 +424,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
     mainPhotoUrl: s.mainPhoto,
     heroMotion: "zoomin",
+    dividerStyle: "diamond",
     groomPhotoUrl: "",
     bridePhotoUrl: "",
     // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가

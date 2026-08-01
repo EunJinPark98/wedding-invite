@@ -15,6 +15,7 @@ import {
   normalizeData,
   BABY_GENDERS,
   CATEGORY_IDS,
+  DIVIDERS,
   DOL_KINDS,
   FONT_SCALES,
   HERO_MOTIONS,
@@ -649,6 +650,49 @@ export default function EditorClient({
                 </button>
               );
             })}
+          </div>
+          {/* 섹션 사이 구분선 — 모양을 미리 보여 주고 고르게 한다 */}
+          <div>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              구분선 디자인
+            </span>
+            <div className="grid grid-cols-2 gap-2">
+              {DIVIDERS.map((v) => {
+                const selected = data.dividerStyle === v.id;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => set("dividerStyle", v.id)}
+                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                      selected
+                        ? "border-gold-400 bg-gold-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="block text-sm font-medium text-gray-800">
+                      {v.label}
+                    </span>
+                    {/* 고르기 전에 모양을 알 수 있게 실제 모습을 작게 보여 준다 */}
+                    <span className="mt-1.5 flex h-3 items-center gap-1.5 text-gold-400">
+                      {v.id === "none" ? (
+                        <span className="text-[11px] text-gray-400">—</span>
+                      ) : v.id === "dots" ? (
+                        <span className="text-[8px] tracking-[0.4em]">●●●</span>
+                      ) : (
+                        <>
+                          <span className="h-px w-5 bg-gray-300" />
+                          {v.id === "diamond" && (
+                            <span className="h-[3px] w-[3px] rotate-45 bg-gold-400" />
+                          )}
+                          <span className="h-px w-5 bg-gray-300" />
+                        </>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div ref={photoSectionRef}>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
