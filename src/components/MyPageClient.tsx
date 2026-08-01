@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthStatus from "./AuthStatus";
@@ -51,6 +51,17 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+
+  // 종류당 1개 제한에 걸려 넘어온 경우 — 알림창으로 알려 준다.
+  // 개발 모드에서 효과가 두 번 실행돼도 한 번만 뜨도록 막는다.
+  const alerted = useRef(false);
+  useEffect(() => {
+    if (notice !== "limit" || alerted.current) return;
+    alerted.current = true;
+    alert(
+      `${limitLabel ? `${limitLabel}은` : "이 종류는"} 이미 만드셨어요.\n새로 만들려면 아래에서 기존 초대장을 삭제해 주세요.`
+    );
+  }, [notice, limitLabel]);
 
   async function handleDelete(slug: string) {
     setBusy(true);
@@ -120,13 +131,6 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
           </strong>{" "}
           삭제되면 추가로 만들 수 있습니다.
         </p>
-
-        {notice === "limit" && (
-          <div className="mt-5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
-            {limitLabel ? `${limitLabel}은 ` : "이 종류는 "}이미 만드셨어요. 새로
-            만들려면 아래에서 기존 초대장을 삭제해 주세요.
-          </div>
-        )}
 
         {/* 아직 만들지 않은 종류 바로 만들기 */}
         {available.length > 0 && (
