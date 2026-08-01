@@ -31,7 +31,8 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      images: inv.data.mainPhotoUrl ? [inv.data.mainPhotoUrl] : [],
+      // 대표 사진이 없으면 서비스 공유 카드로 대신한다 (빈 미리보기 방지)
+      images: [inv.data.mainPhotoUrl || "/og.png"],
     },
   };
 }
