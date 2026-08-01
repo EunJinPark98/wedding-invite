@@ -13,6 +13,11 @@ import { useEffect } from "react";
  * 그래서 지원 여부를 따지지 않고 모든 브라우저에서 이쪽 한 가지 방식으로
  * 통일한다. 스크립트가 없으면 CSS 폴백대로 그냥 보인다.
  */
+// 에디터에는 미리보기가 여러 개 떠 있어 이 컴포넌트도 여러 번 붙는다.
+// 하나가 사라질 때 공용 클래스를 지워 나머지 미리보기의 연출이 풀리지
+// 않도록, 마지막 하나가 사라질 때만 정리한다.
+let mounted = 0;
+
 export default function ScrollReveal() {
   useEffect(() => {
     // 모션을 줄이도록 설정한 기기에서는 연출을 걸지 않는다 — 글씨는 그대로 보인다
@@ -33,6 +38,7 @@ export default function ScrollReveal() {
     ].filter((el) => el.getBoundingClientRect().top < window.innerHeight * 0.9);
 
     // 아래 두 줄 사이에는 화면이 다시 그려지지 않는다
+    mounted += 1;
     root.classList.add("inv-reveal-on");
     inFirstScreen.forEach(reveal);
 
@@ -44,8 +50,11 @@ export default function ScrollReveal() {
           io.unobserve(e.target); // 한 번 나타나면 다시 숨기지 않는다
         }
       },
-      // 살짝 올라온 뒤에 시작해야 자연스럽다
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 }
+      // 아래쪽 여백(rootMargin)을 음수로 주면 안 된다. 화면 맨 아래 그만큼은
+      // 영원히 교차 판정이 안 나서, 푸터 맺음말처럼 페이지 끝에 붙은 글씨가
+      // 끝까지 내려도 계속 숨은 채로 남는다.
+      // 대신 요소가 어느 정도 들어왔을 때 시작하도록 threshold 로 조절한다.
+      { threshold: 0.15 }
     );
 
     const watch = () =>
@@ -62,7 +71,8 @@ export default function ScrollReveal() {
     return () => {
       mo.disconnect();
       io.disconnect();
-      root.classList.remove("inv-reveal-on");
+      mounted -= 1;
+      if (mounted === 0) root.classList.remove("inv-reveal-on");
     };
   }, []);
 

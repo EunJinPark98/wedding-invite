@@ -33,6 +33,17 @@ import {
 } from "@/lib/types";
 
 /* ───────── 이미지 업로드 ───────── */
+// 클라이언트에서 압축 → 서버 업로드 → 저장은 URL만
+async function uploadPhoto(file: File): Promise<string> {
+  const blob = await fileToCompressedBlob(file);
+  const form = new FormData();
+  form.append("file", blob, "photo.jpg");
+  const res = await fetch("/api/upload", { method: "POST", body: form });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || "업로드에 실패했습니다.");
+  return json.url as string;
+}
+
 function ImageUpload({
   value,
   onChange,
@@ -50,14 +61,7 @@ function ImageUpload({
     if (!file) return;
     setBusy(true);
     try {
-      // 클라이언트에서 압축 → 서버 업로드 → 저장은 URL만
-      const blob = await fileToCompressedBlob(file);
-      const form = new FormData();
-      form.append("file", blob, "photo.jpg");
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "업로드에 실패했습니다.");
-      onChange(json.url);
+      onChange(await uploadPhoto(file));
     } catch (e) {
       alert(
         e instanceof Error
@@ -95,6 +99,82 @@ function ImageUpload({
         >
           사진 삭제
         </button>
+      )}
+    </div>
+  );
+}
+
+/* ───────── 은행 선택 ───────── */
+// 많이 쓰는 은행만 추린 목록 — 여기 없으면 직접 입력으로 넣는다
+const BANKS = [
+  "국민은행",
+  "신한은행",
+  "우리은행",
+  "하나은행",
+  "농협은행",
+  "기업은행",
+  "카카오뱅크",
+  "토스뱅크",
+  "케이뱅크",
+  "새마을금고",
+  "우체국",
+  "신협",
+  "수협",
+  "SC제일은행",
+  "부산은행",
+  "대구은행",
+  "경남은행",
+  "광주은행",
+  "전북은행",
+  "제주은행",
+];
+const BANK_CUSTOM = "__custom__";
+
+function BankPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  // "직접 입력"을 고르면 아직 아무것도 안 적었어도 입력칸이 떠 있어야 한다
+  const [manual, setManual] = useState(false);
+  const known = BANKS.includes(value);
+  const showInput = manual || (!!value && !known);
+
+  return (
+    <div className="space-y-2">
+      <select
+        value={showInput ? BANK_CUSTOM : known ? value : ""}
+        onChange={(e) => {
+          const v = e.target.value;
+          if (v === BANK_CUSTOM) {
+            setManual(true);
+            onChange("");
+          } else {
+            setManual(false);
+            onChange(v);
+          }
+        }}
+        className={INPUT_CLASS}
+      >
+        <option value="" disabled>
+          은행 선택
+        </option>
+        {BANKS.map((b) => (
+          <option key={b} value={b}>
+            {b}
+          </option>
+        ))}
+        <option value={BANK_CUSTOM}>직접 입력</option>
+      </select>
+      {showInput && (
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="은행 이름을 입력해 주세요"
+          className={INPUT_CLASS}
+        />
       )}
     </div>
   );
@@ -240,6 +320,8 @@ export default function EditorClient({
   const [copied, setCopied] = useState(false);
   const [confirming, setConfirming] = useState(false); // 제작 전 확인 모달
   const [showPreview, setShowPreview] = useState(false); // 모바일 전체화면 미리보기
+  // 갤러리 여러 장 업로드 진행 상황 (null이면 진행 중 아님)
+  const [bulk, setBulk] = useState<{ done: number; total: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
   const photoSectionRef = useRef<HTMLDivElement>(null);
@@ -320,14 +402,48 @@ export default function EditorClient({
       ...d,
       gallery: d.gallery.map((g, idx) => (idx === i ? url : g)),
     }));
-  const addGallery = () =>
-    setData((d) =>
-      d.gallery.length >= MAX_GALLERY
-        ? d
-        : { ...d, gallery: [...d.gallery, ""] }
-    );
   const removeGallery = (i: number) =>
     setData((d) => ({ ...d, gallery: d.gallery.filter((_, idx) => idx !== i) }));
+
+  // 갤러리 여러 장 한 번에 담기 — 폰 사진첩에서 여러 장을 골라 올릴 수 있게.
+  // 한 장씩 순서대로 올려 진행 상황을 보여 준다.
+  async function addGalleryFiles(list: FileList | null) {
+    const files = list ? [...list] : [];
+    if (files.length === 0) return;
+
+    const room = MAX_GALLERY - data.gallery.length;
+    if (room <= 0) {
+      alert(`갤러리는 최대 ${MAX_GALLERY}장까지 담을 수 있어요.`);
+      return;
+    }
+    const picked = files.slice(0, room);
+
+    setBulk({ done: 0, total: picked.length });
+    try {
+      const urls: string[] = [];
+      for (const f of picked) {
+        urls.push(await uploadPhoto(f));
+        setBulk({ done: urls.length, total: picked.length });
+      }
+      setData((d) => ({
+        ...d,
+        gallery: [...d.gallery, ...urls].slice(0, MAX_GALLERY),
+      }));
+      if (files.length > picked.length) {
+        alert(
+          `갤러리는 최대 ${MAX_GALLERY}장이라 ${picked.length}장만 담았어요.`
+        );
+      }
+    } catch (e) {
+      alert(
+        e instanceof Error
+          ? e.message
+          : "이미지를 처리하지 못했습니다. 다른 파일을 시도해 주세요."
+      );
+    } finally {
+      setBulk(null);
+    }
+  }
 
   async function handleSubmit() {
     setSubmitting(true);
@@ -892,19 +1008,37 @@ export default function EditorClient({
                 />
               ))}
               {data.gallery.length < MAX_GALLERY && (
-                <button
-                  type="button"
-                  onClick={addGallery}
-                  className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-2xl text-gray-300 transition hover:border-gold-300 hover:text-gold-400"
-                >
-                  +
-                </button>
+                // 폰 사진첩에서 여러 장을 한 번에 고를 수 있다
+                <label className="flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-300 transition hover:border-gold-300 hover:text-gold-400">
+                  {bulk ? (
+                    <span className="text-xs font-medium text-gold-400">
+                      {bulk.done}/{bulk.total}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-2xl leading-none">+</span>
+                      <span className="mt-1 text-[10px]">여러 장 선택</span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={!!bulk}
+                    className="hidden"
+                    onChange={(e) => {
+                      addGalleryFiles(e.target.files);
+                      e.target.value = ""; // 같은 사진을 다시 골라도 반응하도록
+                    }}
+                  />
+                </label>
               )}
             </div>
           </div>
           <p className="text-xs text-gray-400">
-            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요. 업로드한 사진은
-            자동으로 압축되어 저장됩니다.
+            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요. 사진첩에서 여러
+            장을 한 번에 고를 수 있고, 업로드한 사진은 자동으로 압축되어
+            저장됩니다.
           </p>
         </Group>
 
@@ -937,20 +1071,16 @@ export default function EditorClient({
                     삭제
                   </button>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <input
-                    value={a.bank}
-                    onChange={(e) => setAccount(i, { bank: e.target.value })}
-                    placeholder="은행"
-                    className={INPUT_CLASS}
-                  />
-                  <input
-                    value={a.number}
-                    onChange={(e) => setAccount(i, { number: e.target.value })}
-                    placeholder="계좌번호"
-                    className={`${INPUT_CLASS} col-span-2`}
-                  />
-                </div>
+                <BankPicker
+                  value={a.bank}
+                  onChange={(bank) => setAccount(i, { bank })}
+                />
+                <input
+                  value={a.number}
+                  onChange={(e) => setAccount(i, { number: e.target.value })}
+                  placeholder="계좌번호"
+                  className={INPUT_CLASS}
+                />
                 <input
                   value={a.name}
                   onChange={(e) => setAccount(i, { name: e.target.value })}
@@ -1003,7 +1133,7 @@ export default function EditorClient({
       {/* 미리보기 — 모바일(우상단 미니, 탭하면 확대) */}
       <div
         className="fixed right-3 top-16 z-40 overflow-hidden rounded-xl border-2 border-gray-800 bg-white shadow-lg md:hidden"
-        style={{ width: 104, height: 150 }}
+        style={{ width: 126, height: 182 }}
       >
         {/* 축소된 실시간 미리보기 (클릭은 위 오버레이가 처리) */}
         <div
@@ -1011,7 +1141,7 @@ export default function EditorClient({
           style={{
             width: 390,
             transformOrigin: "top left",
-            transform: `scale(${104 / 390})`,
+            transform: `scale(${126 / 390})`,
           }}
         >
           <InvitationView template={template} data={data} preview />
@@ -1020,7 +1150,7 @@ export default function EditorClient({
           type="button"
           onClick={() => setShowPreview(true)}
           aria-label="미리보기 크게 보기"
-          className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 via-transparent to-transparent pb-1 text-[11px] font-medium text-white"
+          className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/55 via-transparent to-transparent pb-1.5 text-xs font-medium text-white"
         >
           🔍 미리보기
         </button>
