@@ -71,6 +71,31 @@ body {
 /* ───────── 청첩장 연출 ───────── */
 
 /* 섹션 등장 애니메이션 (스크롤 진입 시 부드럽게) */
+/* ── 섹션 사이 구분선 ──
+   세 모양을 다 그려 두고 루트의 data-divider 값으로 하나만 남긴다.
+   기본값(diamond)은 아래 규칙이 없을 때의 모습이다. */
+.inv-divider-dots {
+  display: none;
+}
+[data-divider="line"] .inv-divider-diamond,
+[data-divider="line"] .inv-divider-dots {
+  display: none;
+}
+[data-divider="line"] .inv-divider-line {
+  width: 4.5rem;
+}
+[data-divider="dots"] .inv-divider-line,
+[data-divider="dots"] .inv-divider-diamond {
+  display: none;
+}
+[data-divider="dots"] .inv-divider-dots {
+  display: inline;
+  letter-spacing: 0.4em;
+}
+[data-divider="none"] .inv-divider {
+  display: none;
+}
+
 @keyframes inv-fade-up {
   from {
     opacity: 0;

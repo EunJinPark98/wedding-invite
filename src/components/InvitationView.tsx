@@ -635,15 +635,26 @@ function Label({
 function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
   // 모던은 섹션 제목 옆 라인만으로 구분 — 구간 사이 가로선은 두지 않는다
   if (variant === "modern") return null;
-  // 미니멀 헤어라인 — 작은 마름모 하나로 절제
+  // 세 가지 모양을 모두 그려 두고, 초대장 루트의 data-divider 값에 따라
+  // CSS 가 한 가지만 보이게 한다. 구분선은 35곳에서 쓰여 값을 일일이
+  // 넘기는 대신 이 방식을 택했다.
   return (
-    <div className="flex items-center justify-center gap-2.5 py-1" aria-hidden>
-      <span className="h-px w-6" style={{ background: t.line }} />
+    <div
+      className="inv-divider flex items-center justify-center gap-2.5 py-1"
+      aria-hidden
+    >
+      <span className="inv-divider-line h-px w-6" style={{ background: t.line }} />
       <span
-        className="inline-block h-[3px] w-[3px] rotate-45"
+        className="inv-divider-diamond inline-block h-[3px] w-[3px] rotate-45"
         style={{ background: t.accent, opacity: 0.55 }}
       />
-      <span className="h-px w-6" style={{ background: t.line }} />
+      <span
+        className="inv-divider-dots text-[10px] leading-none"
+        style={{ color: t.accent, opacity: 0.55 }}
+      >
+        ● ● ●
+      </span>
+      <span className="inv-divider-line h-px w-6" style={{ background: t.line }} />
     </div>
   );
 }
@@ -3242,6 +3253,8 @@ export default function InvitationView({
       // 동작하지 않는다(요소가 화면과 교차하지 않아 계속 숨은 채로 남는다).
       // 미리보기에서는 연출을 끄고 입력한 내용을 항상 그대로 보여 준다.
       className={`mx-auto min-h-full w-full max-w-md${preview ? " inv-static" : ""}`}
+      // 구분선 모양은 CSS 가 이 값을 보고 고른다
+      data-divider={data.dividerStyle}
       style={{
         background: t.pageBg,
         color: t.ink,
