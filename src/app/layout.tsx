@@ -81,6 +81,11 @@ const cormorant = Cormorant_Garamond({
 const DESCRIPTION =
   "별처럼 빛나는 순간, 마음을 담은 초대장으로. 결혼 청첩장부터 백일·돌잔치·칠순·팔순·생일 초대장까지, 템플릿을 고르고 내용을 입력해 나만의 모바일 초대장을 만들고 링크로 공유하세요. 결혼·육아·가족을 위한 웹서비스, 별마마파파.";
 
+// 공유 카드(카톡·문자 미리보기)에 뜨는 제목과 설명 — 검색용 문구와 따로 둔다
+const SHARE_TITLE = "별빛 초대장 - 나만의 초대장 만들기";
+const SHARE_DESCRIPTION =
+  "결혼식·백일·돌잔치·칠순·팔순·생일 초대장을 직접 만드는 무료 서비스";
+
 /**
  * 공유 카드(카톡·문자 미리보기)를 만들 때 쓰는 기준 주소.
  * 이미지 경로를 절대 주소로 바꾸는 데 필요하다 — 없으면 미리보기에 그림이 안 뜬다.
@@ -104,8 +109,8 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     siteName: "별빛 초대장",
     url: "/",
-    title: "별빛 초대장 — 마음을 담은 모바일 초대장 만들기",
-    description: DESCRIPTION,
+    title: SHARE_TITLE,
+    description: SHARE_DESCRIPTION,
     images: [
       {
         url: "/og.png",
@@ -117,8 +122,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "별빛 초대장 — 마음을 담은 모바일 초대장 만들기",
-    description: DESCRIPTION,
+    title: SHARE_TITLE,
+    description: SHARE_DESCRIPTION,
     images: ["/og.png"],
   },
 };
