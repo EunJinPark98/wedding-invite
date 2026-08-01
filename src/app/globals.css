@@ -76,7 +76,6 @@ body {
    기본값(diamond)은 아래 규칙이 없을 때의 모습이다. */
 /* 기본(마름모)에서는 나머지 모양을 감춰 둔다 */
 .inv-divider-dots,
-.inv-divider-star,
 .inv-divider-flower {
   display: none;
 }
@@ -98,13 +97,6 @@ body {
   display: inline;
   font-size: 6px;
   letter-spacing: 0.45em;
-}
-
-[data-divider="star"] .inv-divider-diamond {
-  display: none;
-}
-[data-divider="star"] .inv-divider-star {
-  display: inline;
 }
 
 [data-divider="flower"] .inv-divider-line,

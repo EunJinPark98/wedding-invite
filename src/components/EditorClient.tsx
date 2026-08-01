@@ -748,7 +748,8 @@ export default function EditorClient({
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               구분선 디자인
             </span>
-            <div className="grid grid-cols-2 gap-2">
+            {/* 자리를 적게 차지하도록 한 줄에 모두 둔다 */}
+            <div className="grid grid-cols-5 gap-1.5">
               {DIVIDERS.map((v) => {
                 const selected = data.dividerStyle === v.id;
                 return (
@@ -756,37 +757,30 @@ export default function EditorClient({
                     key={v.id}
                     type="button"
                     onClick={() => set("dividerStyle", v.id)}
-                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                    className={`min-w-0 rounded-lg border-2 px-1 py-2 text-center transition ${
                       selected
                         ? "border-gold-400 bg-gold-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
-                    <span className="block text-sm font-medium text-gray-800">
+                    <span className="block whitespace-nowrap text-[11px] font-medium text-gray-800">
                       {v.label}
                     </span>
                     {/* 고르기 전에 모양을 알 수 있게 실제 모습을 작게 보여 준다.
                         종류마다 실제 초대장과 같은 모습이어야 한다. */}
-                    <span className="mt-1.5 flex h-3 items-center justify-center gap-1.5 text-gold-400">
+                    <span className="mt-1 flex h-3 items-center justify-center gap-1 text-gold-400">
                       {v.id === "diamond" && (
                         <>
-                          <span className="h-px w-5 bg-gray-300" />
-                          <span className="h-[3px] w-[3px] rotate-45 bg-gold-400" />
-                          <span className="h-px w-5 bg-gray-300" />
+                          <span className="h-px w-2.5 bg-gray-300" />
+                          <span className="h-[3px] w-[3px] shrink-0 rotate-45 bg-gold-400" />
+                          <span className="h-px w-2.5 bg-gray-300" />
                         </>
                       )}
                       {v.id === "line" && (
                         <span className="h-px w-full bg-gray-300" />
                       )}
                       {v.id === "dots" && (
-                        <span className="text-[5px] tracking-[0.45em]">●●●</span>
-                      )}
-                      {v.id === "star" && (
-                        <>
-                          <span className="h-px w-5 bg-gray-300" />
-                          <span className="text-[10px] leading-none">★</span>
-                          <span className="h-px w-5 bg-gray-300" />
-                        </>
+                        <span className="text-[5px] tracking-[0.4em]">●●●</span>
                       )}
                       {v.id === "flower" && (
                         <span className="text-[12px] leading-none">❀</span>
