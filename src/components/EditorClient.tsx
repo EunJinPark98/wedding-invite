@@ -1009,7 +1009,7 @@ export default function EditorClient({
               ))}
               {data.gallery.length < MAX_GALLERY && (
                 // 폰 사진첩에서 여러 장을 한 번에 고를 수 있다
-                <label className="flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-300 transition hover:border-gold-300 hover:text-gold-400">
+                <label className="relative flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-300 transition hover:border-gold-300 hover:text-gold-400">
                   {bulk ? (
                     <span className="text-xs font-medium text-gold-400">
                       {bulk.done}/{bulk.total}
@@ -1017,15 +1017,17 @@ export default function EditorClient({
                   ) : (
                     <>
                       <span className="text-2xl leading-none">+</span>
-                      <span className="mt-1 text-[10px]">여러 장 선택</span>
+                      <span className="mt-1 text-[11px]">여러 장 선택</span>
                     </>
                   )}
+                  {/* display:none 으로 숨기면 아이폰에서 사진첩이 열리지 않는다.
+                      위 ImageUpload 와 같이 투명하게 덮어 두는 방식을 쓴다. */}
                   <input
                     type="file"
                     accept="image/*"
                     multiple
                     disabled={!!bulk}
-                    className="hidden"
+                    className="absolute inset-0 cursor-pointer opacity-0"
                     onChange={(e) => {
                       addGalleryFiles(e.target.files);
                       e.target.value = ""; // 같은 사진을 다시 골라도 반응하도록
