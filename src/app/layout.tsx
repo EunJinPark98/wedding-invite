@@ -113,10 +113,10 @@ export const metadata: Metadata = {
     description: SHARE_DESCRIPTION,
     images: [
       {
-        url: "/og.png",
+        url: "/og-v2.png",
         width: 1200,
         height: 630,
-        alt: "별빛 초대장 — 결혼 · 백일 · 돌잔치 · 칠순 · 생일 모바일 초대장",
+        alt: "별빛 초대장 — 결혼 · 백일 · 돌잔치 · 칠순 · 팔순 · 생일 모바일 초대장",
       },
     ],
   },
@@ -124,7 +124,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SHARE_TITLE,
     description: SHARE_DESCRIPTION,
-    images: ["/og.png"],
+    images: ["/og-v2.png"],
   },
 };
 
