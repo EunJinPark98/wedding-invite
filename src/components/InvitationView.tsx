@@ -654,11 +654,12 @@ function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
       >
         ● ● ●
       </span>
+      {/* ✦ 는 마름모처럼 보여 별 모양(★)으로 쓴다 */}
       <span
         className="inv-divider-star text-[11px] leading-none"
         style={{ color: t.accent, opacity: 0.7 }}
       >
-        ✦
+        ★
       </span>
       <span
         className="inv-divider-flower text-[13px] leading-none"

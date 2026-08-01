@@ -81,11 +81,13 @@ body {
   display: none;
 }
 
-[data-divider="line"] .inv-divider-diamond {
+/* 가는 선 — 선이 둘로 끊겨 보이지 않도록 뒤쪽 선을 지우고 앞쪽을 길게 */
+[data-divider="line"] .inv-divider-diamond,
+[data-divider="line"] .inv-divider-line:last-child {
   display: none;
 }
-[data-divider="line"] .inv-divider-line {
-  width: 4.5rem;
+[data-divider="line"] .inv-divider-line:first-child {
+  width: 9rem;
 }
 
 [data-divider="dots"] .inv-divider-line,
@@ -94,7 +96,8 @@ body {
 }
 [data-divider="dots"] .inv-divider-dots {
   display: inline;
-  letter-spacing: 0.4em;
+  font-size: 6px;
+  letter-spacing: 0.45em;
 }
 
 [data-divider="star"] .inv-divider-diamond {

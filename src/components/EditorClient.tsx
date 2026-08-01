@@ -34,6 +34,17 @@ import {
 } from "@/lib/types";
 
 /* ───────── 이미지 업로드 ───────── */
+// 사진이 올라가는 동안 도는 표시 (업로드가 길어질 때 멈춘 것처럼 보이지 않게)
+function Spinner({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <span
+      role="status"
+      aria-label="사진 올리는 중"
+      className={`${className} animate-spin rounded-full border-2 border-gold-100 border-t-gold-400`}
+    />
+  );
+}
+
 // 클라이언트에서 압축 → 서버 업로드 → 저장은 URL만
 async function uploadPhoto(file: File): Promise<string> {
   const blob = await fileToCompressedBlob(file);
@@ -82,8 +93,13 @@ function ImageUpload({
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={value} alt="" className="h-full w-full object-cover" />
+        ) : busy ? (
+          <span className="flex flex-col items-center gap-1.5">
+            <Spinner />
+            <span className="text-xs">올리는 중...</span>
+          </span>
         ) : (
-          <span>{busy ? "처리 중..." : label}</span>
+          <span>{label}</span>
         )}
         <input
           type="file"
@@ -749,21 +765,33 @@ export default function EditorClient({
                     <span className="block text-sm font-medium text-gray-800">
                       {v.label}
                     </span>
-                    {/* 고르기 전에 모양을 알 수 있게 실제 모습을 작게 보여 준다 */}
-                    <span className="mt-1.5 flex h-3 items-center gap-1.5 text-gold-400">
-                      {v.id === "none" ? (
-                        <span className="text-[11px] text-gray-400">—</span>
-                      ) : v.id === "dots" ? (
-                        <span className="text-[8px] tracking-[0.4em]">●●●</span>
-                      ) : (
+                    {/* 고르기 전에 모양을 알 수 있게 실제 모습을 작게 보여 준다.
+                        종류마다 실제 초대장과 같은 모습이어야 한다. */}
+                    <span className="mt-1.5 flex h-3 items-center justify-center gap-1.5 text-gold-400">
+                      {v.id === "diamond" && (
                         <>
                           <span className="h-px w-5 bg-gray-300" />
-                          {v.id === "diamond" && (
-                            <span className="h-[3px] w-[3px] rotate-45 bg-gold-400" />
-                          )}
+                          <span className="h-[3px] w-[3px] rotate-45 bg-gold-400" />
                           <span className="h-px w-5 bg-gray-300" />
                         </>
                       )}
+                      {v.id === "line" && (
+                        <span className="h-px w-full bg-gray-300" />
+                      )}
+                      {v.id === "dots" && (
+                        <span className="text-[5px] tracking-[0.45em]">●●●</span>
+                      )}
+                      {v.id === "star" && (
+                        <>
+                          <span className="h-px w-5 bg-gray-300" />
+                          <span className="text-[10px] leading-none">★</span>
+                          <span className="h-px w-5 bg-gray-300" />
+                        </>
+                      )}
+                      {v.id === "flower" && (
+                        <span className="text-[12px] leading-none">❀</span>
+                      )}
+                      {/* "없음"은 예시도 두지 않는다 */}
                     </span>
                   </button>
                 );
@@ -1208,9 +1236,13 @@ export default function EditorClient({
                 // 폰 사진첩에서 여러 장을 한 번에 고를 수 있다
                 <label className="relative flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-300 transition hover:border-gold-300 hover:text-gold-400">
                   {bulk ? (
-                    <span className="text-xs font-medium text-gold-400">
-                      {bulk.done}/{bulk.total}
-                    </span>
+                    // 사진이 다 올라갈 때까지 돌아가는 표시
+                    <>
+                      <Spinner />
+                      <span className="mt-1 text-[11px] font-medium text-gold-400">
+                        {bulk.done}/{bulk.total}
+                      </span>
+                    </>
                   ) : (
                     <>
                       <span className="text-2xl leading-none">+</span>
