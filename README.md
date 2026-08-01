@@ -12,7 +12,7 @@
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-바로가기-ff5b85?style=for-the-badge)](https://starinvite.vercel.app)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-바로가기-ff5b85?style=for-the-badge)](https://starinvite-byeolmamapapa.vercel.app)
 
 <br/>
 
@@ -128,7 +128,7 @@
 <img src="docs/img/landing-full.png" alt="초대장 메이커 전체 화면" width="380"/>
 </div>
 
-> 🌐 **직접 만들어 보기 →** [starinvite.vercel.app](https://starinvite.vercel.app)
+> 🌐 **직접 만들어 보기 →** [starinvite-byeolmamapapa.vercel.app](https://starinvite-byeolmamapapa.vercel.app)
 
 <br/>
 
