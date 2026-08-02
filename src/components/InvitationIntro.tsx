@@ -46,6 +46,28 @@ const PETALS = [
   { left: "93%", size: 10, dur: 3.3, delay: 0.55, sway: -18, tilt: -22 },
 ];
 
+// 풍선 — 아래에서 두둥실 떠오른다 (돌잔치)
+const BALLOONS = [
+  { left: "10%", size: 34, dur: 2.6, delay: 0, sway: 18, color: "#ff9aa2" },
+  { left: "24%", size: 26, dur: 3.0, delay: 0.3, sway: -14, color: "#ffd166" },
+  { left: "40%", size: 40, dur: 2.4, delay: 0.1, sway: 22, color: "#a0d8ef" },
+  { left: "56%", size: 28, dur: 2.9, delay: 0.45, sway: -18, color: "#c3b1e1" },
+  { left: "72%", size: 36, dur: 2.5, delay: 0.2, sway: 16, color: "#ffb3c6" },
+  { left: "88%", size: 24, dur: 3.1, delay: 0.55, sway: -20, color: "#b5e5a4" },
+];
+
+// 컨페티 — 위에서 쏟아진다 (생일)
+const CONFETTI = [
+  { left: "6%", dur: 2.3, delay: 0, tilt: 24, color: "#f26d5f" },
+  { left: "18%", dur: 2.8, delay: 0.25, tilt: -18, color: "#ffd166" },
+  { left: "30%", dur: 2.5, delay: 0.1, tilt: 32, color: "#5fb7c9" },
+  { left: "42%", dur: 3.0, delay: 0.4, tilt: -26, color: "#9b8cf2" },
+  { left: "54%", dur: 2.4, delay: 0.05, tilt: 20, color: "#f2a3c0" },
+  { left: "66%", dur: 2.9, delay: 0.3, tilt: -30, color: "#ffd166" },
+  { left: "78%", dur: 2.6, delay: 0.15, tilt: 28, color: "#f26d5f" },
+  { left: "90%", dur: 3.1, delay: 0.5, tilt: -22, color: "#5fb7c9" },
+];
+
 /**
  * 한 글자씩 써지듯 나타나는 문구.
  *
@@ -130,8 +152,10 @@ export default function InvitationIntro({
   // 어느 것도 자간을 건드리지 않는다. 자간이 변하면 글자 폭이 달라져
   // 재생 도중에 줄바꿈이 다시 계산되고, 두 줄이던 문구가 한 줄로 튄다.
   const phraseClass =
-    style === "blur"
-      ? "inv-intro-blur"
+    style === "ink"
+      ? "inv-intro-ink"
+      : style === "blur"
+        ? "inv-intro-blur"
       : style === "line"
         ? "inv-intro-wipe"
         : style === "petal"
@@ -169,6 +193,48 @@ export default function InvitationIntro({
                     animationDelay: `${p.delay}s`,
                     "--petal-sway": `${p.sway}px`,
                     "--petal-tilt": `${p.tilt}deg`,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
+        )}
+
+        {style === "balloon" && (
+          <div className="pointer-events-none absolute inset-0">
+            {BALLOONS.map((b, i) => (
+              <span
+                key={i}
+                className="inv-intro-balloon"
+                style={
+                  {
+                    left: b.left,
+                    width: b.size,
+                    height: b.size * 1.22,
+                    background: b.color,
+                    animationDuration: `${b.dur}s`,
+                    animationDelay: `${b.delay}s`,
+                    "--sway": `${b.sway}px`,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
+        )}
+
+        {style === "confetti" && (
+          <div className="pointer-events-none absolute inset-0">
+            {CONFETTI.map((c, i) => (
+              <span
+                key={i}
+                className="inv-intro-confetti"
+                style={
+                  {
+                    left: c.left,
+                    background: c.color,
+                    animationDuration: `${c.dur}s`,
+                    animationDelay: `${c.delay}s`,
+                    "--tilt": `${c.tilt}deg`,
                   } as React.CSSProperties
                 }
               />

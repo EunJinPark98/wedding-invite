@@ -409,6 +409,103 @@ body {
   animation-iteration-count: infinite;
 }
 
+/* 풍선 — 아래에서 두둥실 떠오른다 (돌잔치 인트로) */
+@keyframes inv-intro-balloon {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 30vh, 0);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate3d(var(--sway), -18vh, 0);
+  }
+  90% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -60vh, 0);
+  }
+}
+.inv-intro-balloon {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50% 50% 48% 48%;
+  opacity: 0;
+  animation-name: inv-intro-balloon;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+/* 풍선 끈 */
+.inv-intro-balloon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 18px;
+  background: currentColor;
+  opacity: 0.35;
+  transform: translateX(-50%);
+}
+
+/* 컨페티 — 위에서 쏟아진다 (생일 인트로) */
+@keyframes inv-intro-confetti {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -16vh, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 92vh, 0) rotate(calc(var(--tilt) * 12));
+  }
+}
+.inv-intro-confetti {
+  position: absolute;
+  top: 0;
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  opacity: 0;
+  animation-name: inv-intro-confetti;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+/* 먹번짐 — 스미듯 천천히 또렷해진다 (칠순 인트로) */
+@keyframes inv-intro-ink {
+  0% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+.inv-intro-ink {
+  animation: inv-intro-ink 1.8s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-intro-balloon,
+  .inv-intro-confetti,
+  .inv-intro-ink {
+    animation: none;
+  }
+}
+
+
 /* 라인 리빌 — 가는 선이 좌우로 그어지고, 그 사이로 문구가 닦이듯 드러난다 */
 @keyframes inv-intro-line {
   from {
