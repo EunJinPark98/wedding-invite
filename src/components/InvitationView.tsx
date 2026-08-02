@@ -1869,7 +1869,7 @@ function SeniorGoldLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mb-3 mt-3 text-sm tracking-[0.25em]"
+            className="inv-hero-in-delay mb-3 mt-3 text-sm tracking-[0.1em] whitespace-nowrap"
             style={{ color: `${gold}bb` }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
@@ -1976,7 +1976,7 @@ function SeniorBloomLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 text-sm tracking-[0.22em]"
+            className="inv-hero-in-delay mt-2.5 text-sm tracking-[0.1em] whitespace-nowrap"
             style={{ color: t.sub }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
@@ -2073,7 +2073,7 @@ function SeniorPineLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-sm tracking-[0.25em]"
+            className="inv-hero-in-delay mt-3 text-sm tracking-[0.1em] whitespace-nowrap"
             style={{ color: "#9db4a6" }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
@@ -2785,7 +2785,7 @@ function SeniorInkLayout({
           </p>
           {p && (
             <p
-              className="inv-hero-in-delay mt-3 text-sm tracking-[0.2em]"
+              className="inv-hero-in-delay mt-3 text-sm tracking-[0.1em] whitespace-nowrap"
               style={{ color: t.sub }}
             >
               {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
@@ -2880,7 +2880,7 @@ function SeniorWarmLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.16em] whitespace-nowrap"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
