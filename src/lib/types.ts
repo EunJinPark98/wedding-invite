@@ -364,10 +364,11 @@ const CATEGORY_SAMPLE: Record<
   wedding: {
     groomName: "김신랑",
     brideName: "박신부",
-    groomFather: "김아버지",
-    groomMother: "박어머니",
-    brideFather: "박아버지",
-    brideMother: "엄어머니",
+    // 혼주 예시는 신랑 성(김)·신부 성(박)에 맞춰 아빠/엄마로 통일
+    groomFather: "김아빠",
+    groomMother: "김엄마",
+    brideFather: "박아빠",
+    brideMother: "박엄마",
     greetingTitle: "소중한 분들을 초대합니다",
     greetingMessage:
       "서로 다른 길을 걸어온 저희 두 사람이\n이제 같은 곳을 바라보며\n한 길을 걷고자 합니다.\n오셔서 축복해 주시면 감사하겠습니다.",
