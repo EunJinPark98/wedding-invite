@@ -399,7 +399,8 @@ function Group({
   step,
   children,
 }: {
-  title: string;
+  // "(선택)" 처럼 스타일이 다른 조각을 붙일 수 있게 문자열이 아닌 노드로 받는다
+  title: React.ReactNode;
   step?: number;
   children: React.ReactNode;
 }) {
@@ -1218,7 +1219,15 @@ export default function EditorClient({
           </label>
         </Group>
 
-        <Group title="갤러리" step={6}>
+        <Group
+          title={
+            <>
+              갤러리{" "}
+              <span className="font-normal text-gray-400">(선택)</span>
+            </>
+          }
+          step={6}
+        >
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               갤러리 사진{" "}
