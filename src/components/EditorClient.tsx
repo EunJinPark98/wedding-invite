@@ -777,6 +777,56 @@ export default function EditorClient({
               );
             })}
           </div>
+          {/* 인트로 — 청첩장을 열자마자 잠깐 지나가는 첫 화면.
+              템플릿과 함께 첫인상을 정하는 항목이라 바로 아래에 둔다. */}
+          {data.category === "wedding" && (
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                인트로
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {INTROS.map((v) => {
+                  const selected = data.intro === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => set("intro", v.id)}
+                      aria-pressed={selected}
+                      className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                        selected
+                          ? "border-gold-400 bg-gold-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <span className="block text-sm font-medium text-gray-800">
+                        {v.label}
+                      </span>
+                      <span className="mt-0.5 block text-[11px] text-gray-400">
+                        {v.desc}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* 문구는 인트로를 켰을 때만 — 안 쓰는 사람에게는 빈 칸이 짐이 된다 */}
+              {data.intro !== "none" && (
+                <div className="mt-3">
+                  <TextareaField
+                    label="인트로 문구"
+                    value={data.introText}
+                    onChange={(v) => set("introText", v)}
+                    placeholder="We are getting married!"
+                  />
+                  <p className="mt-1.5 text-[11px] text-gray-400">
+                    이 문구가 고른 연출로 움직여요. 비우면 두 분 이름이 대신
+                    들어가고, 줄바꿈도 그대로 나와요. 하객이 화면을 누르면
+                    건너뛸 수 있어요.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
           {/* 섹션 사이 구분선 — 모양을 미리 보여 주고 고르게 한다 */}
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
@@ -885,43 +935,6 @@ export default function EditorClient({
               })}
             </div>
           </div>
-          {/* 인트로 — 청첩장을 열자마자 잠깐 지나가는 첫 화면 */}
-          {data.category === "wedding" && (
-            <div>
-              <span className="mb-1.5 block text-xs font-medium text-gray-500">
-                인트로
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {INTROS.map((v) => {
-                  const selected = data.intro === v.id;
-                  return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      onClick={() => set("intro", v.id)}
-                      aria-pressed={selected}
-                      className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
-                        selected
-                          ? "border-gold-400 bg-gold-50"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      <span className="block text-sm font-medium text-gray-800">
-                        {v.label}
-                      </span>
-                      <span className="mt-0.5 block text-[11px] text-gray-400">
-                        {v.desc}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-1.5 text-[11px] text-gray-400">
-                고르면 미리보기에서 바로 다시 재생돼요. 하객이 화면을 누르면
-                건너뛸 수 있어요.
-              </p>
-            </div>
-          )}
         </Group>
 
         <Group title="글꼴" step={2}>

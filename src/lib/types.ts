@@ -120,10 +120,10 @@ export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
  */
 export const INTROS = [
   { id: "none", label: "사용 안 함", desc: "인트로 없이 바로 열림" },
-  { id: "fade", label: "심플 페이드", desc: "이름과 날짜가 은은하게" },
-  { id: "curtain", label: "커튼 열림", desc: "양옆으로 갈라지며" },
-  { id: "photo", label: "사진 인트로", desc: "대표 사진 위에 이름이" },
-  { id: "envelope", label: "봉투 열기", desc: "봉투가 열리고 카드가" },
+  { id: "blur", label: "글씨 번짐", desc: "문구가 번지듯 또렷해져요" },
+  { id: "line", label: "라인 리빌", desc: "선을 따라 문구가 드러나요" },
+  { id: "photo", label: "사진 페이드", desc: "사진이 밝아지며 문구가" },
+  { id: "star", label: "별빛", desc: "반짝임 속에 문구가 떠올라요" },
 ] as const;
 export type IntroStyle = (typeof INTROS)[number]["id"];
 export const isIntroStyle = (v: unknown): v is IntroStyle =>
@@ -244,6 +244,8 @@ export interface InvitationData {
   directionsParking: string;
   // 인트로(오프닝) 연출 (IntroStyle, "none"=사용 안 함 · 결혼 청첩장 전용)
   intro: string;
+  // 인트로에 크게 뜨며 애니메이션되는 문구. 비우면 두 사람 이름이 대신 들어간다.
+  introText: string;
   // 인사말
   greetingTitle: string;
   greetingMessage: string;
@@ -315,6 +317,7 @@ export const normalizeData = (
   directionsParking: d?.directionsParking ?? "",
   // 목록에 없는 값(과거 데이터·조작된 입력)은 인트로 없음으로 되돌린다
   intro: isIntroStyle(d?.intro) ? d!.intro! : "none",
+  introText: d?.introText ?? "",
   greetingTitle: d?.greetingTitle ?? "",
   greetingMessage: d?.greetingMessage ?? "",
   fontHeading: d?.fontHeading ?? "default",
@@ -446,11 +449,13 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     venueName: s.venueName,
     venueHall: s.venueHall,
     venueAddress: s.venueAddress,
-    // 오시는 길·인트로는 직접 채우는 항목이라 비워 둔다 (안 쓰면 그대로 안 나옴)
+    // 오시는 길은 직접 채우는 항목이라 비워 둔다 (안 쓰면 그대로 안 나옴)
     directionsSubway: "",
     directionsBus: "",
     directionsParking: "",
+    // 인트로는 기본으로 쓰지 않되, 켜면 바로 보이도록 예시 문구는 채워 둔다
     intro: "none",
+    introText: category === "wedding" ? "We are getting married!" : "",
     greetingTitle: s.greetingTitle,
     greetingMessage: s.greetingMessage,
     fontHeading: "default",

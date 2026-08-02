@@ -235,88 +235,68 @@ body {
   animation: inv-intro-rise 1.2s ease-out 0.45s both;
 }
 
-/* 커튼 — 이름을 보여준 뒤 양옆으로 갈라진다 */
-@keyframes inv-intro-curtain-l {
-  0%,
-  50% {
-    transform: none;
-  }
-  100% {
-    transform: translateX(-101%);
-  }
-}
-@keyframes inv-intro-curtain-r {
-  0%,
-  50% {
-    transform: none;
-  }
-  100% {
-    transform: translateX(101%);
-  }
-}
-.inv-intro-curtain-l {
-  animation: inv-intro-curtain-l 2.6s cubic-bezier(0.7, 0, 0.25, 1) both;
-}
-.inv-intro-curtain-r {
-  animation: inv-intro-curtain-r 2.6s cubic-bezier(0.7, 0, 0.25, 1) both;
-}
-
-/* 사진 — 천천히 확대되며 물러난다 */
-@keyframes inv-intro-zoom {
+/* 글씨 번짐 — 번진 글씨가 자간을 좁히며 또렷해진다 */
+@keyframes inv-intro-blur {
   from {
-    transform: scale(1.18);
+    opacity: 0;
+    filter: blur(14px);
+    letter-spacing: 0.5em;
   }
   to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+.inv-intro-blur {
+  animation: inv-intro-blur 1.8s ease-out both;
+}
+
+/* 라인 리빌 — 가는 선이 좌우로 그어지고, 그 사이로 문구가 닦이듯 드러난다 */
+@keyframes inv-intro-line {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 8.5rem;
+    opacity: 1;
+  }
+}
+@keyframes inv-intro-wipe {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+.inv-intro-line {
+  animation: inv-intro-line 0.9s ease-out both;
+}
+.inv-intro-wipe {
+  animation: inv-intro-wipe 1.6s cubic-bezier(0.6, 0, 0.2, 1) 0.35s both;
+}
+
+/* 사진 페이드 — 어둠 속에서 사진이 천천히 밝아진다 */
+@keyframes inv-intro-photo {
+  from {
+    opacity: 0.15;
+    filter: brightness(0.35);
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(0.62);
     transform: scale(1);
   }
 }
-.inv-intro-zoom {
-  animation: inv-intro-zoom 3.2s ease-out both;
-}
-
-/* 봉투 — 덮개가 젖혀지고 안의 카드가 떠오른다 */
-@keyframes inv-intro-flap {
-  0%,
-  18% {
-    transform: rotateX(0deg);
-  }
-  62%,
-  100% {
-    transform: rotateX(-172deg);
-  }
-}
-@keyframes inv-intro-letter {
-  0%,
-  40% {
-    transform: translateY(26px);
-    opacity: 0;
-  }
-  75%,
-  100% {
-    transform: translateY(-30px);
-    opacity: 1;
-  }
-}
-@keyframes inv-intro-envelope-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.inv-intro-flap {
-  transform-origin: top center;
-  transform-style: preserve-3d;
-  animation: inv-intro-flap 2.4s ease-in-out both;
-}
-.inv-intro-letter {
-  animation: inv-intro-letter 2.4s ease-out both;
-}
-.inv-intro-card {
-  animation: inv-intro-envelope-in 0.9s ease-out both;
+.inv-intro-photo {
+  animation: inv-intro-photo 2.6s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -324,12 +304,10 @@ body {
   .inv-intro,
   .inv-intro-rise,
   .inv-intro-rise-2,
-  .inv-intro-curtain-l,
-  .inv-intro-curtain-r,
-  .inv-intro-zoom,
-  .inv-intro-flap,
-  .inv-intro-letter,
-  .inv-intro-card {
+  .inv-intro-blur,
+  .inv-intro-line,
+  .inv-intro-wipe,
+  .inv-intro-photo {
     animation: none;
   }
 }
