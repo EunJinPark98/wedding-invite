@@ -32,17 +32,57 @@ const SPARKS = [
   { left: "56%", top: "88%", size: 3, delay: 1.7 },
 ];
 
-// 꽃잎 흩날림 — 자리·속도·기울기를 고정해 매번 같은 그림이 나오게 한다
+// 꽃잎 흩날림 — 자리·속도·기울기를 고정해 매번 같은 그림이 나오게 한다.
+// 인트로가 3초도 채 되지 않으니 늦게 시작하는 꽃잎은 보이지도 않는다.
+// 그래서 대기 시간은 짧게, 떨어지는 속도는 빠르게 잡는다.
 const PETALS = [
-  { left: "8%", size: 13, dur: 4.2, delay: 0, sway: 26, tilt: -18 },
-  { left: "21%", size: 9, dur: 5.1, delay: 0.9, sway: -20, tilt: 24 },
-  { left: "34%", size: 15, dur: 4.6, delay: 0.35, sway: 30, tilt: 12 },
-  { left: "47%", size: 10, dur: 5.6, delay: 1.5, sway: -26, tilt: -30 },
-  { left: "59%", size: 14, dur: 4.4, delay: 0.15, sway: 22, tilt: 20 },
-  { left: "71%", size: 9, dur: 5.3, delay: 1.1, sway: -30, tilt: -14 },
-  { left: "84%", size: 12, dur: 4.8, delay: 0.6, sway: 24, tilt: 28 },
-  { left: "93%", size: 10, dur: 5.8, delay: 1.8, sway: -18, tilt: -22 },
+  { left: "8%", size: 13, dur: 2.4, delay: 0, sway: 26, tilt: -18 },
+  { left: "21%", size: 9, dur: 3.0, delay: 0.25, sway: -20, tilt: 24 },
+  { left: "34%", size: 15, dur: 2.6, delay: 0.1, sway: 30, tilt: 12 },
+  { left: "47%", size: 10, dur: 3.2, delay: 0.45, sway: -26, tilt: -30 },
+  { left: "59%", size: 14, dur: 2.5, delay: 0.05, sway: 22, tilt: 20 },
+  { left: "71%", size: 9, dur: 3.1, delay: 0.35, sway: -30, tilt: -14 },
+  { left: "84%", size: 12, dur: 2.8, delay: 0.15, sway: 24, tilt: 28 },
+  { left: "93%", size: 10, dur: 3.3, delay: 0.55, sway: -18, tilt: -22 },
 ];
+
+/**
+ * 한 글자씩 써지듯 나타나는 문구.
+ *
+ * 글자마다 span 을 만들어 시작 시각만 조금씩 늦춘다. 단어는 통째로 감싸
+ * 줄바꿈이 단어 중간에서 일어나지 않게 하고, 문구가 길어도 인트로가 끝나기
+ * 전에 다 써지도록 글자 간격을 줄인다.
+ */
+function WrittenPhrase({ text }: { text: string }) {
+  const total = [...text.replace(/\s/g, "")].length || 1;
+  const step = Math.min(0.06, 1.25 / total);
+  let n = 0;
+
+  return (
+    <>
+      {text.split("\n").map((line, li) => (
+        <span key={li} className="block">
+          {line.split(" ").map((word, wi, words) => (
+            <span key={wi}>
+              <span className="inline-block whitespace-nowrap">
+                {[...word].map((ch, ci) => (
+                  <span
+                    key={ci}
+                    className="inv-intro-letter"
+                    style={{ animationDelay: `${(n++ * step).toFixed(3)}s` }}
+                  >
+                    {ch}
+                  </span>
+                ))}
+              </span>
+              {wi < words.length - 1 && " "}
+            </span>
+          ))}
+        </span>
+      ))}
+    </>
+  );
+}
 
 const dateText = (weddingDate: string) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(weddingDate.trim());
@@ -95,7 +135,7 @@ export default function InvitationIntro({
       : style === "line"
         ? "inv-intro-wipe"
         : style === "petal"
-          ? "inv-intro-sway"
+          ? "" // 글자마다 따로 나타나므로 문단에는 연출을 걸지 않는다
           : "inv-intro-phrase-in";
 
   return (
@@ -170,7 +210,7 @@ export default function InvitationIntro({
             className={`${phraseClass} inv-intro-phrase whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
             style={{ color: inkColor }}
           >
-            {phrase}
+            {style === "petal" ? <WrittenPhrase text={phrase} /> : phrase}
           </p>
 
           {sub && (

@@ -322,6 +322,24 @@ body {
   animation: inv-intro-phrase-in 1.3s ease-out both;
 }
 
+/* 한 글자씩 써지듯 — 글자마다 시작 시각만 다르다 */
+@keyframes inv-intro-letter {
+  from {
+    opacity: 0;
+    transform: translateY(0.18em);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.inv-intro-letter {
+  display: inline-block;
+  animation: inv-intro-letter 0.5s ease-out both;
+}
+
 /* 꽃잎 — 문구가 바람에 실린 듯 살짝 흔들리며 떠오른다 */
 @keyframes inv-intro-sway {
   0% {
@@ -427,6 +445,7 @@ body {
   .inv-intro-rise,
   .inv-intro-rise-2,
   .inv-intro-blur,
+  .inv-intro-letter,
   .inv-intro-phrase-in,
   .inv-intro-sway,
   .inv-intro-petal,
