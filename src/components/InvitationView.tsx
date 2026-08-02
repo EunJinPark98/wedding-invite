@@ -16,6 +16,7 @@ import AccountList from "./AccountList";
 import Countdown from "./Countdown";
 import MapSection from "./MapSection";
 import ScrollReveal from "./ScrollReveal";
+import InvitationIntro from "./InvitationIntro";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -476,7 +477,13 @@ function LocationInner({
         {data.venueAddress}
       </p>
       {/* 실제 지도 + 네이버 길찾기 + 주소 복사 */}
-      <MapSection address={data.venueAddress} t={t} />
+      <MapSection
+        address={data.venueAddress}
+        t={t}
+        subway={data.directionsSubway}
+        bus={data.directionsBus}
+        parking={data.directionsParking}
+      />
     </div>
   );
 }
@@ -932,7 +939,14 @@ function ModernLayout({
             {data.venueAddress}
           </p>
           {/* 실제 지도 + 네이버 길찾기 + 주소 복사 */}
-          <MapSection address={data.venueAddress} t={t} square />
+          <MapSection
+            address={data.venueAddress}
+            t={t}
+            square
+            subway={data.directionsSubway}
+            bus={data.directionsBus}
+            parking={data.directionsParking}
+          />
         </div>
       </Sec>
       {showGallery(data, preview) && (
@@ -3271,10 +3285,13 @@ export default function InvitationView({
     bodyFont: bodyFam || base.bodyFont,
   };
   const fp = dateParts(data.weddingDate);
+  // 인트로는 결혼 청첩장에만 둔다 (다른 종류에 값이 남아 있어도 무시)
+  const intro = data.category === "wedding" ? data.intro : "none";
 
   return (
     <div
-      className="mx-auto min-h-full w-full max-w-md"
+      // relative: 인트로 덮개(absolute)가 이 초대장 안에만 씌워지도록
+      className="relative mx-auto min-h-full w-full max-w-md"
       // 구분선 모양은 CSS 가 이 값을 보고 고른다
       data-divider={data.dividerStyle}
       style={{
@@ -3286,6 +3303,11 @@ export default function InvitationView({
     >
       {/* 스크롤에 맞춰 섹션이 나타나게 — 에디터 미리보기도 실제와 똑같이 */}
       <ScrollReveal />
+
+      {/* 인트로 — 고른 연출이 바뀌면 key 가 바뀌어 미리보기에서 다시 재생된다 */}
+      {intro !== "none" && (
+        <InvitationIntro key={intro} data={data} t={t} style={intro} />
+      )}
 
       {(() => {
         const Layout = LAYOUTS[template] ?? ClassicLayout;
