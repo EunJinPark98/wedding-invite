@@ -524,15 +524,20 @@ function usePreviewSync(
     let raf = 0;
     const sync = () => {
       raf = 0;
-      // 화면 위쪽 선을 지난 마지막 단계를 "지금 보고 있는 곳"으로 본다.
-      // 선을 너무 아래에 두면 아직 날짜를 채우는 중인데 바로 아래 장소 칸이
-      // 먼저 선을 넘어서, 미리보기가 성급하게 지도로 넘어가 버린다.
-      const line = window.innerHeight * 0.2;
+      // 어떤 선을 넘어선 마지막 단계를 "지금 보고 있는 곳"으로 본다.
+      //
+      // 단계(Group)는 화면 중간쯤 올라오면 곧바로 바꾼다 — 한참 스크롤한
+      // 뒤에야 미리보기가 따라오면 굼떠 보인다.
+      // 단계 안에 든 작은 묶음(예: 일시·장소 단계 안의 장소 칸)은 더
+      // 위쪽까지 올라와야 인정한다. 같은 선을 쓰면 아직 날짜를 채우는
+      // 중인데 바로 아래 장소 칸이 먼저 선을 넘어 지도로 넘어가 버린다.
+      const h = window.innerHeight;
       let active = "";
       document
         .querySelectorAll<HTMLElement>("[data-form-section]")
         .forEach((g) => {
-          if (g.getBoundingClientRect().top <= line) {
+          const nested = !!g.parentElement?.closest("[data-form-section]");
+          if (g.getBoundingClientRect().top <= h * (nested ? 0.2 : 0.45)) {
             active = g.dataset.formSection ?? "";
           }
         });
