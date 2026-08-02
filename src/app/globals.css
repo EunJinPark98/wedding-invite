@@ -199,6 +199,53 @@ body {
   }
 }
 
+/* ════════ 푸터 맺음말 — 왼쪽에서 오른쪽으로 써 내려가듯 ════════ */
+/* 자르는 건 반드시 안쪽 span(.inv-write) 이어야 한다. 바깥 p 를 clip-path 로
+   자르면 IntersectionObserver 가 "화면에 없다"고 보고 영영 나타나지 않는다. */
+@keyframes inv-write {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* 스크립트가 없을 때(폴백)는 로드 시 한 번 재생 */
+.inv-write {
+  display: inline-block;
+  animation: inv-write 1.5s cubic-bezier(0.55, 0, 0.25, 1) both;
+}
+.inv-write-late {
+  animation-delay: 0.45s;
+}
+
+/* ScrollReveal 이 붙으면 화면에 들어온 순간부터 써진다.
+   글씨는 떠오르지 않고 '써지는' 것만 보이게 한다 —
+   (.inv-fade 규칙과 특이도가 같으므로 반드시 그 뒤에 와야 한다) */
+.inv-reveal-on .inv-writing {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.inv-reveal-on .inv-write {
+  animation: none;
+  clip-path: inset(0 100% 0 0);
+}
+.inv-reveal-on .inv-in .inv-write {
+  animation: inv-write 1.5s cubic-bezier(0.55, 0, 0.25, 1) both;
+}
+.inv-reveal-on .inv-in .inv-write-late {
+  animation-delay: 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-write,
+  .inv-reveal-on .inv-write {
+    animation: none;
+    clip-path: none;
+  }
+}
+
 /* ════════ 인트로(오프닝) 연출 ════════ */
 /* 인트로 문구 — 크게 띄우는 한 줄이라 흘려 쓴 굵은 글씨로 고정한다.
    영문은 Dancing Script, 한글은 그 서체에 글리프가 없어 붓글씨로 넘어간다.

@@ -3232,36 +3232,40 @@ function Footer({
       {message ? (
         // 사용자가 직접 쓴 맺음말
         <p
-          className="inv-fade whitespace-pre-line text-[calc(17px*var(--inv-fs))] leading-9"
+          className="inv-fade inv-writing whitespace-pre-line text-[calc(17px*var(--inv-fs))] leading-9"
           style={{ fontFamily: t.headingFont, color: mainColor }}
         >
-          {message}
+          <span className="inv-write">{message}</span>
         </p>
       ) : (
         <>
           <p
-            className="text-xl tracking-wide"
+            className="inv-fade inv-writing text-xl tracking-wide"
             style={{ fontFamily: t.headingFont, color: mainColor }}
           >
-            {labelsOf(data).showPerson2 ? (
-              <>
-                {data.groomName}
-                <span className="mx-2 text-[0.8em]" style={{ color: subColor }}>
-                  ♡
-                </span>
-                {data.brideName}
-              </>
-            ) : (
-              data.groomName
-            )}
+            <span className="inv-write">
+              {labelsOf(data).showPerson2 ? (
+                <>
+                  {data.groomName}
+                  <span className="mx-2 text-[0.8em]" style={{ color: subColor }}>
+                    ♡
+                  </span>
+                  {data.brideName}
+                </>
+              ) : (
+                data.groomName
+              )}
+            </span>
           </p>
           {fp && (
             <p
-              className="mt-2.5 font-cormorant text-sm tracking-[0.3em]"
+              className="inv-fade inv-writing mt-2.5 font-cormorant text-sm tracking-[0.3em]"
               style={{ color: subColor }}
             >
-              {fp.year}. {String(fp.month).padStart(2, "0")}.{" "}
-              {String(fp.day).padStart(2, "0")}
+              <span className="inv-write inv-write-late">
+                {fp.year}. {String(fp.month).padStart(2, "0")}.{" "}
+                {String(fp.day).padStart(2, "0")}
+              </span>
             </p>
           )}
         </>
