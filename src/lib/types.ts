@@ -162,7 +162,7 @@ export const introPlaceholder = (category: Category) =>
     : category === "senior"
       ? "귀한 걸음으로 빛내 주세요"
       : category === "birthday"
-        ? "오늘은 내 생일!"
+        ? "생일파티에 초대합니다!"
         : "We are getting married!";
 
 /**
