@@ -66,6 +66,10 @@ body {
 /* 영문 장식 서체 유틸 */
 .font-cormorant {
   font-family: var(--font-cormorant), serif;
+  /* Cormorant 는 옛날식 숫자가 기본이라 3·4·5·7·9 가 baseline 아래로 내려간다.
+     날짜·시간이 들쭉날쭉해 보여 높이가 고른 라이닝 숫자로 맞춘다. */
+  font-variant-numeric: lining-nums;
+  font-feature-settings: "lnum" 1;
 }
 
 /* ───────── 청첩장 연출 ───────── */

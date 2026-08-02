@@ -437,7 +437,8 @@ function Group({
   previewSection,
   children,
 }: {
-  title: string;
+  // "(선택)" 처럼 스타일이 다른 조각을 붙일 수 있게 문자열이 아닌 노드로 받는다
+  title: React.ReactNode;
   step?: number;
   // 이 칸을 채우고 있을 때 미리보기가 보여 줄 초대장 섹션
   // (InvitationView 의 data-inv-section 과 같은 값, "top"이면 맨 위)
@@ -937,6 +938,30 @@ export default function EditorClient({
               )}
             </div>
           )}
+          {/* 생일은 상단 사진 위에 이름 대신 직접 쓴 문구를 올린다 */}
+          {category === "birthday" && (
+            <div>
+              <Field
+                label="메인 타이틀"
+                value={data.heroTitle}
+                onChange={(v) => set("heroTitle", v)}
+                placeholder="예) 은진이의 서른 번째 생일"
+              />
+              <p className="mt-1 text-[11px] text-gray-400">
+                상단 사진 위에 크게 보여요. 비워두면 아무것도 표시되지 않아요.
+              </p>
+              <div className="mt-3">
+                <span className="mb-2 block text-xs font-medium text-gray-500">
+                  메인 타이틀 글꼴
+                </span>
+                <FontPicker
+                  value={data.titleFont}
+                  onChange={(id) => set("titleFont", id)}
+                  options={TITLE_FONTS}
+                />
+              </div>
+            </div>
+          )}
           {/* 섹션 사이 구분선 — 모양을 미리 보여 주고 고르게 한다 */}
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
@@ -1185,22 +1210,6 @@ export default function EditorClient({
               />
             )}
           </div>
-          {/* 맨 위에 크게 들어가는 이름이라, 적는 칸 바로 아래에서 글꼴을 고른다 */}
-          {category === "birthday" && (
-            <div>
-              <span className="mb-2 block text-xs font-medium text-gray-500">
-                메인 타이틀 글꼴
-              </span>
-              <FontPicker
-                value={data.titleFont}
-                onChange={(id) => set("titleFont", id)}
-                options={TITLE_FONTS}
-              />
-              <p className="mt-1.5 text-[11px] text-gray-400">
-                맨 위에 크게 들어가는 이름에만 적용돼요.
-              </p>
-            </div>
-          )}
           {/* 아기 성별 — 초대장에서 이름 옆에 함께 표시 */}
           {category === "doljanchi" && (
             <div>
@@ -1432,7 +1441,15 @@ export default function EditorClient({
           </label>
         </Group>
 
-        <Group title="갤러리" step={6} previewSection="gallery">
+        <Group
+          title={
+            <>
+              갤러리<span className="font-normal text-gray-400">(선택)</span>
+            </>
+          }
+          step={6}
+          previewSection="gallery"
+        >
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               갤러리 사진{" "}
@@ -1492,9 +1509,7 @@ export default function EditorClient({
             </div>
           </div>
           <p className="text-xs text-gray-400">
-            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요. 사진첩에서 여러
-            장을 한 번에 고를 수 있고, 업로드한 사진은 자동으로 압축되어
-            저장됩니다.
+            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요.
           </p>
         </Group>
 

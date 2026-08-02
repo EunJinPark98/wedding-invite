@@ -205,6 +205,21 @@ function GreetingInner({
 }
 
 // 예식일까지 남은 일수 (지났으면 null)
+/**
+ * 날짜를 숫자·영문 서체로 쓰는 히어로에서는 시간도 숫자로 맞춘다 ("오후 1시" → "13:00").
+ * 한글로 "2026년 10월 10일" 처럼 쓰는 곳은 "오후 1시" 가 자연스러워 그대로 둔다.
+ */
+function time24(v: string): string {
+  const t = (v ?? "").trim();
+  if (!t) return "";
+  if (/^\d{1,2}:\d{2}$/.test(t)) return t; // 이미 숫자 표기
+  const m = t.match(/(오전|오후)\s*(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?/);
+  if (!m) return t; // 직접 적은 값은 건드리지 않는다
+  const h12 = Number(m[2]) % 12;
+  const h = m[1] === "오전" ? h12 : h12 + 12;
+  return `${String(h).padStart(2, "0")}:${String(Number(m[3] ?? 0)).padStart(2, "0")}`;
+}
+
 function daysUntil(iso: string): number | null {
   const d = parseDate(iso);
   if (!d) return null;
@@ -829,9 +844,10 @@ function ClassicLayout({
             <NamesAmp data={data} t={t} heartColor="#e8c878" />
           </h1>
           {p && (
-            <p className="inv-hero-in-delay mt-3 font-cormorant text-sm tracking-[0.35em] text-white/80">
+            <p className="whitespace-nowrap inv-hero-in-delay mt-3 font-cormorant text-sm tracking-[0.35em] text-white/80">
               {p.year}. {String(p.month).padStart(2, "0")}.{" "}
               {String(p.day).padStart(2, "0")}. {p.wkEn}
+              {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
             </p>
           )}
         </div>
@@ -909,7 +925,7 @@ function ModernLayout({
           </p>
         )}
         <p className="inv-hero-in-delay mt-3 text-sm" style={{ color: t.sub }}>
-          {p ? `${p.wkEn} · ${data.weddingTime}` : data.weddingTime}
+          {p ? `${p.wkEn} · ${time24(data.weddingTime)}` : time24(data.weddingTime)}
         </p>
       </header>
       <div className="overflow-hidden">
@@ -1064,11 +1080,12 @@ function RomanticLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 pb-10 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-2.5 pb-10 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1157,9 +1174,10 @@ function BotanicalLayout({
             <NamesAmp data={data} t={t} />
           </h1>
           {p && (
-            <p className="mt-2 pb-2 font-cormorant text-base tracking-widest" style={{ color: t.sub }}>
+            <p className="whitespace-nowrap mt-2 pb-2 font-cormorant text-base tracking-widest" style={{ color: t.sub }}>
               {p.year}. {String(p.month).padStart(2, "0")}.{" "}
               {String(p.day).padStart(2, "0")}. {p.wkEn}
+              {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
             </p>
           )}
         </div>
@@ -1290,11 +1308,12 @@ function StarlightLayout({
         </h1>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}. {p.wkEn}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1402,7 +1421,7 @@ function CinemaLayout({
             }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
-            {String(p.day).padStart(2, "0")} {data.weddingTime}
+            {String(p.day).padStart(2, "0")} {time24(data.weddingTime)}
           </p>
         )}
         {/* 필름 카메라 날짜 스탬프 */}
@@ -1611,11 +1630,12 @@ function DolBearLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-4 inline-block rounded-full px-5 py-1.5 font-cormorant text-sm tracking-[0.25em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-4 inline-block rounded-full px-5 py-1.5 font-cormorant text-sm tracking-[0.25em]"
             style={{ background: "#fff", color: t.accent }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1737,11 +1757,12 @@ function DolCloudLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3.5 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3.5 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1820,10 +1841,11 @@ function DolHanbokLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.2em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.2em]"
             style={{ color: t.sub, fontFamily: t.headingFont }}
           >
             {p.year}년 {p.month}월 {p.day}일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -1901,10 +1923,11 @@ function SeniorGoldLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mb-3 mt-3 text-sm tracking-[0.25em]"
+            className="inv-hero-in-delay mb-3 mt-3 text-sm tracking-[0.1em] whitespace-nowrap"
             style={{ color: `${gold}bb` }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2007,10 +2030,11 @@ function SeniorBloomLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 text-sm tracking-[0.22em]"
+            className="inv-hero-in-delay mt-2.5 text-sm tracking-[0.1em] whitespace-nowrap"
             style={{ color: t.sub }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2103,10 +2127,11 @@ function SeniorPineLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-sm tracking-[0.25em]"
+            className="inv-hero-in-delay mt-3 text-sm tracking-[0.1em] whitespace-nowrap"
             style={{ color: "#9db4a6" }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2170,12 +2195,15 @@ function BdayPopLayout({
         >
           HAPPY BIRTHDAY
         </p>
-        <h1
-          className="inv-hero-in mt-3 text-[calc(2.1rem*var(--inv-fs))] font-extrabold tracking-tight"
-          style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in mt-3 text-[calc(2.1rem*var(--inv-fs))] font-extrabold tracking-tight"
+            style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         {/* 살짝 기울어진 폴라로이드풍 사진 */}
         <div
           className="inv-hero-in mx-auto mt-7 -rotate-2 overflow-hidden rounded-[26px] border-[6px]"
@@ -2190,11 +2218,12 @@ function BdayPopLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-7 inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.15em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-7 inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.15em]"
             style={{ background: t.accentSoft, color: t.accent }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")} {p.wkEn}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2266,19 +2295,23 @@ function BdayNeonLayout({
             <Photo data={data} t={t} className="h-full w-full" kenburns />
           </div>
         </div>
-        <h1
-          className="inv-hero-in-delay mt-8 text-[calc(1.8rem*var(--inv-fs))] font-bold tracking-wide"
-          style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in-delay mt-8 text-[calc(1.8rem*var(--inv-fs))] font-bold tracking-wide"
+            style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
             style={{ color: t.sub, fontFamily: "monospace" }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")} {p.wkEn}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2312,19 +2345,23 @@ function BdayMinimalLayout({
         >
           BIRTHDAY INVITATION
         </p>
-        <h1
-          className="inv-hero-in mt-4 text-[calc(2.4rem*var(--inv-fs))] font-extrabold leading-tight tracking-tight"
-          style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in mt-4 text-[calc(2.4rem*var(--inv-fs))] font-extrabold leading-tight tracking-tight"
+            style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         {p && (
           <p
-            className="inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
+            className="whitespace-nowrap inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
             style={{ color: t.sub }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
         {/* 알약(캡슐)형 사진 */}
@@ -2410,13 +2447,17 @@ function StarHero({
   phrase,
   kicker,
   sub,
+  title,
 }: {
   data: InvitationData;
   t: TemplateTheme;
   phrase: string;
   kicker: string;
   sub?: string;
+  // 넘기지 않으면 주인공 이름을 쓴다. 빈 문자열을 넘기면 아무것도 안 나온다
+  title?: string;
 }) {
+  const heading = title ?? data.groomName;
   const p = dateParts(data.weddingDate);
   return (
     <div className="relative overflow-hidden px-8 pb-12 pt-14 text-center">
@@ -2444,12 +2485,14 @@ function StarHero({
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
       </div>
-      <h1
-        className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
-        style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
-      >
-        {data.groomName}
-      </h1>
+      {heading && (
+        <h1
+          className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
+          style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
+        >
+          {heading}
+        </h1>
+      )}
       {sub && (
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
@@ -2460,11 +2503,12 @@ function StarHero({
       )}
       {p && (
         <p
-          className="inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
+          className="whitespace-nowrap inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
           style={{ color: t.sub }}
         >
           {p.year}. {String(p.month).padStart(2, "0")}.{" "}
           {String(p.day).padStart(2, "0")}. {p.wkEn}
+          {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
         </p>
       )}
     </div>
@@ -2592,11 +2636,12 @@ function DolGardenLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2675,10 +2720,11 @@ function DolCrayonLayout({
         </h1>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2 inline-block rounded-full px-5 py-1.5 text-sm font-bold"
+            className="whitespace-nowrap inv-hero-in-delay mt-2 inline-block rounded-full px-5 py-1.5 text-sm font-bold"
             style={{ background: t.accentSoft, color: t.accent }}
           >
             {p.year}. {p.month}. {p.day}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2799,10 +2845,11 @@ function SeniorInkLayout({
           </p>
           {p && (
             <p
-              className="inv-hero-in-delay mt-3 text-sm tracking-[0.2em]"
+              className="inv-hero-in-delay mt-3 text-sm tracking-[0.1em] whitespace-nowrap"
               style={{ color: t.sub }}
             >
               {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+              {data.weddingTime && ` · ${data.weddingTime}`}
             </p>
           )}
         </div>
@@ -2893,11 +2940,12 @@ function SeniorWarmLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.16em] whitespace-nowrap"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2924,6 +2972,7 @@ function BdayStarLayout({
         phrase="별처럼 빛나는 하루"
         kicker="HAPPY BIRTHDAY"
         sub="생일을 함께 축하해 주세요"
+        title={data.heroTitle.trim()}
       />
       <CommonBody data={data} t={t} variant="bdaystar" preview={preview} rounded="rounded-2xl" />
     </>
@@ -2992,12 +3041,15 @@ function BdayCakeLayout({
         >
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
-        <h1
-          className="inv-hero-in-delay mt-6 text-[calc(1.8rem*var(--inv-fs))] tracking-wide"
-          style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in-delay mt-6 text-[calc(1.8rem*var(--inv-fs))] tracking-wide"
+            style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -3006,11 +3058,12 @@ function BdayCakeLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3.5 inline-block rounded-full bg-white px-5 py-1.5 text-sm tracking-[0.15em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3.5 inline-block rounded-full bg-white px-5 py-1.5 text-sm tracking-[0.15em]"
             style={{ color: t.accent }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -3072,7 +3125,7 @@ function BdayBloomLayout({
           className="inv-hero-in mt-3 text-[calc(26px*var(--inv-fs))]"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
-          꽃처럼 환한 하루
+          당신이 피어나는 날
         </p>
         {/* 원형 사진 + 바깥 헤어라인 링 */}
         <div
@@ -3091,12 +3144,15 @@ function BdayBloomLayout({
             <Photo data={data} t={t} className="h-full w-full" kenburns />
           </div>
         </div>
-        <h1
-          className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
-          style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
+            style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         <div
           className="inv-hero-in-delay mx-auto mt-2.5 flex items-center justify-center gap-2"
           aria-hidden
@@ -3109,11 +3165,12 @@ function BdayBloomLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
