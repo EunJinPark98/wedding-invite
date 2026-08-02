@@ -1222,8 +1222,7 @@ export default function EditorClient({
         <Group
           title={
             <>
-              갤러리{" "}
-              <span className="font-normal text-gray-400">(선택)</span>
+              갤러리<span className="font-normal text-gray-400">(선택)</span>
             </>
           }
           step={6}
@@ -1287,9 +1286,7 @@ export default function EditorClient({
             </div>
           </div>
           <p className="text-xs text-gray-400">
-            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요. 사진첩에서 여러
-            장을 한 번에 고를 수 있고, 업로드한 사진은 자동으로 압축되어
-            저장됩니다.
+            갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요.
           </p>
         </Group>
 
