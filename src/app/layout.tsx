@@ -9,6 +9,7 @@ import {
   Nanum_Gothic,
   Gowun_Dodum,
   Cormorant_Garamond,
+  Dancing_Script,
 } from "next/font/google";
 import "./globals.css";
 
@@ -68,6 +69,15 @@ const dodum = Gowun_Dodum({
   display: "swap",
   preload: false,
   variable: "--font-dodum",
+});
+
+// 인트로 문구용 흘림체 (latin 전용) — 굵게 쓸 수 있어 크게 띄워도 힘이 산다.
+// 한글은 이 서체에 없어서 붓글씨(--font-brush)로 넘어간다 (globals.css 참고)
+const dancing = Dancing_Script({
+  weight: ["600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dancing",
 });
 
 // 영문 장식용 (latin 전용)
@@ -136,7 +146,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${myeongjo.variable} ${notoKr.variable} ${serifKr.variable} ${gowun.variable} ${brush.variable} ${song.variable} ${nanumGothic.variable} ${dodum.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${myeongjo.variable} ${notoKr.variable} ${serifKr.variable} ${gowun.variable} ${brush.variable} ${song.variable} ${nanumGothic.variable} ${dodum.variable} ${cormorant.variable} ${dancing.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

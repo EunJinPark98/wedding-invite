@@ -124,9 +124,10 @@ export default function InvitationIntro({
             />
           )}
 
+          {/* 문구 글꼴은 템플릿을 따르지 않고 흘림체로 고정한다 (inv-intro-phrase) */}
           <p
-            className={`${phraseClass} whitespace-pre-line text-[calc(1.35rem*var(--inv-fs))] leading-snug tracking-[0.04em]`}
-            style={{ color: inkColor, fontFamily: t.headingFont }}
+            className={`${phraseClass} inv-intro-phrase whitespace-pre-line text-[calc(1.75rem*var(--inv-fs))] tracking-[0.01em]`}
+            style={{ color: inkColor }}
           >
             {phrase}
           </p>

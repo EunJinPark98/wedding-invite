@@ -205,6 +205,15 @@ body {
 }
 
 /* ════════ 인트로(오프닝) 연출 ════════ */
+/* 인트로 문구 — 크게 띄우는 한 줄이라 흘려 쓴 굵은 글씨로 고정한다.
+   영문은 Dancing Script, 한글은 그 서체에 글리프가 없어 붓글씨로 넘어간다.
+   붓글씨는 굵기가 하나뿐이라 굵게는 브라우저가 대신 만들어 준다. */
+.inv-intro-phrase {
+  font-family: var(--font-dancing), var(--font-brush), cursive;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 /* 덮개 — 연출이 끝날 무렵 스르르 걷힌다.
    InvitationIntro 가 이 시간에 맞춰 요소를 지우므로 한쪽만 고치지 말 것. */
 @keyframes inv-intro-out {
