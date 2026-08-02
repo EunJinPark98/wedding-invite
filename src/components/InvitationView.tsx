@@ -31,6 +31,14 @@ const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const titleFontOf = (data: InvitationData) =>
   data.category === "birthday" ? getTitleFontFamily(data.titleFont) : "";
 
+/**
+ * 상단 문구를 비우면 그 한 줄이 통째로 빠지면서 여백까지 함께 사라져,
+ * 아래 글이 사진에 바짝 붙는다. 문구가 없을 때는 바로 다음 요소가 그
+ * 간격을 대신 갖게 한다.
+ */
+const heroGap = (data: InvitationData, withTitle: string, withoutTitle: string) =>
+  data.heroTitle.trim() ? withTitle : withoutTitle;
+
 /* ════════ 글꼴 크기 배율 ════════ */
 
 // Tailwind 기본 글자 크기(rem). text-sm 등은 `font-size: var(--text-sm)` 로
@@ -2306,7 +2314,7 @@ function BdayNeonLayout({
         )}
         {p && (
           <p
-            className="whitespace-nowrap inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
+            className={`whitespace-nowrap inv-hero-in-delay ${heroGap(data, "mt-3", "mt-9")} text-sm tracking-[0.3em]`}
             style={{ color: t.sub, fontFamily: "monospace" }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
@@ -2356,7 +2364,7 @@ function BdayMinimalLayout({
         )}
         {p && (
           <p
-            className="whitespace-nowrap inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
+            className={`whitespace-nowrap inv-hero-in ${heroGap(data, "mt-2", "mt-6")} font-cormorant text-xl tracking-[0.2em]`}
             style={{ color: t.sub }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
@@ -2495,7 +2503,7 @@ function StarHero({
       )}
       {sub && (
         <p
-          className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
+          className={`inv-hero-in-delay ${heading ? "mt-1.5" : "mt-8"} text-[calc(14px*var(--inv-fs))]`}
           style={{ color: t.sub }}
         >
           {sub}
@@ -3051,7 +3059,7 @@ function BdayCakeLayout({
           </h1>
         )}
         <p
-          className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
+          className={`inv-hero-in-delay ${heroGap(data, "mt-1.5", "mt-7")} text-[calc(14px*var(--inv-fs))]`}
           style={{ color: t.sub }}
         >
           생일을 함께 해주세요.
@@ -3154,7 +3162,7 @@ function BdayBloomLayout({
           </h1>
         )}
         <div
-          className="inv-hero-in-delay mx-auto mt-2.5 flex items-center justify-center gap-2"
+          className={`inv-hero-in-delay mx-auto ${heroGap(data, "mt-2.5", "mt-8")} flex items-center justify-center gap-2`}
           aria-hidden
         >
           <span className="h-px w-8" style={{ background: t.line }} />
