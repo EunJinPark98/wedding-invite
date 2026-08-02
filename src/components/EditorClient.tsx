@@ -536,18 +536,30 @@ function usePreviewSync(
         return Math.max(0, Math.min(r.bottom, region) - Math.max(r.top, 0));
       };
 
-      let winner: HTMLElement | null = null;
+      const groups = [
+        ...document.querySelectorAll<HTMLElement>("[data-form-section]"),
+      ].filter((g) => !g.parentElement?.closest("[data-form-section]"));
+      if (!groups.length) return;
+
+      // 페이지 끝까지 내려왔다면 마지막 단계다. 더 스크롤할 수 없으니 넓이로
+      // 재면 영영 이기지 못한다 (생일처럼 갤러리가 마지막인 경우가 그렇다).
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 4;
+
+      let winner: HTMLElement | null = atBottom
+        ? groups[groups.length - 1]
+        : null;
       let best = 0;
-      document
-        .querySelectorAll<HTMLElement>("[data-form-section]")
-        .forEach((g) => {
-          if (g.parentElement?.closest("[data-form-section]")) return; // 안쪽 묶음은 뒤에서
+      if (!winner) {
+        groups.forEach((g) => {
           const area = covered(g);
           if (area > best) {
             best = area;
             winner = g;
           }
         });
+      }
       if (!winner) return;
 
       let active = (winner as HTMLElement).dataset.formSection ?? "";
