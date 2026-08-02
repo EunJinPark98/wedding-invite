@@ -160,15 +160,6 @@ body {
   transform: none;
 }
 
-/* 에디터 미리보기 — 연출 없이 입력한 내용을 항상 그대로 보여 준다 */
-.inv-static .inv-fade,
-.inv-reveal-on .inv-static .inv-fade {
-  animation: none;
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .inv-fade,
   .inv-reveal-on .inv-fade {

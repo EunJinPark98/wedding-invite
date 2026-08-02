@@ -3256,10 +3256,7 @@ export default function InvitationView({
 
   return (
     <div
-      // 에디터 미리보기는 축소·클리핑된 틀 안이라 스크롤 등장 연출이 제대로
-      // 동작하지 않는다(요소가 화면과 교차하지 않아 계속 숨은 채로 남는다).
-      // 미리보기에서는 연출을 끄고 입력한 내용을 항상 그대로 보여 준다.
-      className={`mx-auto min-h-full w-full max-w-md${preview ? " inv-static" : ""}`}
+      className="mx-auto min-h-full w-full max-w-md"
       // 구분선 모양은 CSS 가 이 값을 보고 고른다
       data-divider={data.dividerStyle}
       style={{
@@ -3269,8 +3266,8 @@ export default function InvitationView({
         ...fontScaleVars(data.fontScale),
       }}
     >
-      {/* 스크롤에 맞춰 섹션이 나타나게 — 실제 초대장에서만 */}
-      {!preview && <ScrollReveal />}
+      {/* 스크롤에 맞춰 섹션이 나타나게 — 에디터 미리보기도 실제와 똑같이 */}
+      <ScrollReveal />
 
       {(() => {
         const Layout = LAYOUTS[template] ?? ClassicLayout;
