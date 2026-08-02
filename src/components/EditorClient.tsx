@@ -746,6 +746,20 @@ export default function EditorClient({
               );
             })}
           </div>
+          {/* 생일은 상단 사진 위에 이름 대신 직접 쓴 문구를 올린다 */}
+          {category === "birthday" && (
+            <div>
+              <Field
+                label="메인 타이틀"
+                value={data.heroTitle}
+                onChange={(v) => set("heroTitle", v)}
+                placeholder="예) 은진이의 서른 번째 생일"
+              />
+              <p className="mt-1 text-[11px] text-gray-400">
+                상단 사진 위에 크게 보여요. 비워두면 아무것도 표시되지 않아요.
+              </p>
+            </div>
+          )}
           {/* 섹션 사이 구분선 — 모양을 미리 보여 주고 고르게 한다 */}
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">

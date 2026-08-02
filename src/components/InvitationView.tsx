@@ -2138,12 +2138,15 @@ function BdayPopLayout({
         >
           HAPPY BIRTHDAY
         </p>
-        <h1
-          className="inv-hero-in mt-3 text-[calc(2.1rem*var(--inv-fs))] font-extrabold tracking-tight"
-          style={{ color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in mt-3 text-[calc(2.1rem*var(--inv-fs))] font-extrabold tracking-tight"
+            style={{ color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         {/* 살짝 기울어진 폴라로이드풍 사진 */}
         <div
           className="inv-hero-in mx-auto mt-7 -rotate-2 overflow-hidden rounded-[26px] border-[6px]"
@@ -2234,12 +2237,15 @@ function BdayNeonLayout({
             <Photo data={data} t={t} className="h-full w-full" kenburns />
           </div>
         </div>
-        <h1
-          className="inv-hero-in-delay mt-8 text-[calc(1.8rem*var(--inv-fs))] font-bold tracking-wide"
-          style={{ color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in-delay mt-8 text-[calc(1.8rem*var(--inv-fs))] font-bold tracking-wide"
+            style={{ color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         {p && (
           <p
             className="inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
@@ -2280,12 +2286,15 @@ function BdayMinimalLayout({
         >
           BIRTHDAY INVITATION
         </p>
-        <h1
-          className="inv-hero-in mt-4 text-[calc(2.4rem*var(--inv-fs))] font-extrabold leading-tight tracking-tight"
-          style={{ color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in mt-4 text-[calc(2.4rem*var(--inv-fs))] font-extrabold leading-tight tracking-tight"
+            style={{ color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         {p && (
           <p
             className="inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
@@ -2378,13 +2387,17 @@ function StarHero({
   phrase,
   kicker,
   sub,
+  title,
 }: {
   data: InvitationData;
   t: TemplateTheme;
   phrase: string;
   kicker: string;
   sub?: string;
+  // 넘기지 않으면 주인공 이름을 쓴다. 빈 문자열을 넘기면 아무것도 안 나온다
+  title?: string;
 }) {
+  const heading = title ?? data.groomName;
   const p = dateParts(data.weddingDate);
   return (
     <div className="relative overflow-hidden px-8 pb-12 pt-14 text-center">
@@ -2412,12 +2425,14 @@ function StarHero({
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
       </div>
-      <h1
-        className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
-        style={{ fontFamily: t.headingFont, color: t.ink }}
-      >
-        {data.groomName}
-      </h1>
+      {heading && (
+        <h1
+          className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
+          style={{ fontFamily: t.headingFont, color: t.ink }}
+        >
+          {heading}
+        </h1>
+      )}
       {sub && (
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
@@ -2892,6 +2907,7 @@ function BdayStarLayout({
         phrase="별처럼 빛나는 하루"
         kicker="HAPPY BIRTHDAY"
         sub="생일을 함께 축하해 주세요"
+        title={data.heroTitle.trim()}
       />
       <CommonBody data={data} t={t} variant="bdaystar" preview={preview} rounded="rounded-2xl" />
     </>
@@ -2960,12 +2976,15 @@ function BdayCakeLayout({
         >
           <Photo data={data} t={t} className="h-full w-full" kenburns />
         </div>
-        <h1
-          className="inv-hero-in-delay mt-6 text-[calc(1.8rem*var(--inv-fs))] tracking-wide"
-          style={{ fontFamily: t.headingFont, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in-delay mt-6 text-[calc(1.8rem*var(--inv-fs))] tracking-wide"
+            style={{ fontFamily: t.headingFont, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         <p
           className="inv-hero-in-delay mt-1.5 text-[calc(14px*var(--inv-fs))]"
           style={{ color: t.sub }}
@@ -3059,12 +3078,15 @@ function BdayBloomLayout({
             <Photo data={data} t={t} className="h-full w-full" kenburns />
           </div>
         </div>
-        <h1
-          className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
-          style={{ fontFamily: t.headingFont, color: t.ink }}
-        >
-          {data.groomName}
-        </h1>
+        {/* 상단 문구 — 비우면 표시하지 않는다 */}
+        {data.heroTitle.trim() && (
+          <h1
+            className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
+            style={{ fontFamily: t.headingFont, color: t.ink }}
+          >
+            {data.heroTitle}
+          </h1>
+        )}
         <div
           className="inv-hero-in-delay mx-auto mt-2.5 flex items-center justify-center gap-2"
           aria-hidden
