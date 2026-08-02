@@ -669,19 +669,22 @@ function Divider({ t, variant }: { t: TemplateTheme; variant: TemplateId }) {
 function Sec({
   label,
   index,
+  section,
   t,
   variant,
   children,
 }: {
   label: string;
   index?: string;
+  // 에디터가 폼 위치에 맞춰 미리보기를 옮길 때 찾는 표식
+  section?: string;
   t: TemplateTheme;
   variant: TemplateId;
   children: React.ReactNode;
 }) {
   const align = variant === "modern" ? "text-left" : "text-center";
   return (
-    <section className={`inv-fade px-8 py-9 ${align}`}>
+    <section className={`inv-fade px-8 py-9 ${align}`} data-inv-section={section}>
       <Label text={label} t={t} variant={variant} index={index} />
       {children}
     </section>
@@ -811,25 +814,25 @@ function ClassicLayout({
           )}
         </div>
       </div>
-      <Sec label="INVITATION" t={t} variant="classic">
+      <Sec label="INVITATION" section="greeting" t={t} variant="classic">
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="classic" />
-      <Sec label={labels.sectionCoupleLabel} t={t} variant="classic">
+      <Sec label={labels.sectionCoupleLabel} section="couple" t={t} variant="classic">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="classic" />
-      <Sec label="THE DAY" t={t} variant="classic">
+      <Sec label="THE DAY" section="date" t={t} variant="classic">
         <DateInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="classic" />
-      <Sec label="LOCATION" t={t} variant="classic">
+      <Sec label="LOCATION" section="location" t={t} variant="classic">
         <LocationInner data={data} t={t} />
       </Sec>
       {showGallery(data, preview) && (
         <>
           <Divider t={t} variant="classic" />
-          <Sec label="GALLERY" t={t} variant="classic">
+          <Sec label="GALLERY" section="gallery" t={t} variant="classic">
             <GalleryInner data={data} t={t} preview={preview} />
           </Sec>
         </>
@@ -837,7 +840,7 @@ function ClassicLayout({
       {showAccounts(data) && (
         <>
           <Divider t={t} variant="classic" />
-          <Sec label="ACCOUNT" t={t} variant="classic">
+          <Sec label="ACCOUNT" section="accounts" t={t} variant="classic">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
               {labelsOf(data).accountsLabel}
             </h3>
@@ -890,19 +893,19 @@ function ModernLayout({
       <div className="overflow-hidden">
         <Photo data={data} t={t} className="aspect-[4/5] w-full" kenburns />
       </div>
-      <Sec label="INVITATION" index="01" t={t} variant="modern">
+      <Sec label="INVITATION" section="greeting" index="01" t={t} variant="modern">
         <GreetingInner data={data} t={t} align="left" />
       </Sec>
       <Divider t={t} variant="modern" />
-      <Sec label={labelsOf(data).sectionCoupleLabel} index="02" t={t} variant="modern">
+      <Sec label={labelsOf(data).sectionCoupleLabel} section="couple" index="02" t={t} variant="modern">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="modern" />
-      <Sec label="DATE" index="03" t={t} variant="modern">
+      <Sec label="DATE" section="date" index="03" t={t} variant="modern">
         <DateInner data={data} t={t} calendar />
       </Sec>
       <Divider t={t} variant="modern" />
-      <Sec label="LOCATION" index="04" t={t} variant="modern">
+      <Sec label="LOCATION" section="location" index="04" t={t} variant="modern">
         <div className="text-left">
           <p className="text-lg" style={{ fontFamily: t.headingFont }}>
             {data.venueName}
@@ -920,7 +923,7 @@ function ModernLayout({
       {showGallery(data, preview) && (
         <>
           <Divider t={t} variant="modern" />
-          <Sec label="GALLERY" index="05" t={t} variant="modern">
+          <Sec label="GALLERY" section="gallery" index="05" t={t} variant="modern">
             <GalleryInner data={data} t={t} rounded="rounded-sm" preview={preview} />
           </Sec>
         </>
@@ -928,7 +931,7 @@ function ModernLayout({
       {showAccounts(data) && (
         <>
           <Divider t={t} variant="modern" />
-          <Sec label="ACCOUNT" index="06" t={t} variant="modern">
+          <Sec label="ACCOUNT" section="accounts" index="06" t={t} variant="modern">
             <AccountInner data={data} t={t} />
           </Sec>
         </>
@@ -1040,25 +1043,25 @@ function RomanticLayout({
           </p>
         )}
       </div>
-      <Sec label="INVITATION" t={t} variant="romantic">
+      <Sec label="INVITATION" section="greeting" t={t} variant="romantic">
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="romantic" />
-      <Sec label={labels.sectionCoupleLabel} t={t} variant="romantic">
+      <Sec label={labels.sectionCoupleLabel} section="couple" t={t} variant="romantic">
         <CoupleInner data={data} t={t} arch preview={preview} />
       </Sec>
       <Divider t={t} variant="romantic" />
-      <Sec label="OUR DAY" t={t} variant="romantic">
+      <Sec label="OUR DAY" section="date" t={t} variant="romantic">
         <DateInner data={data} t={t} heart />
       </Sec>
       <Divider t={t} variant="romantic" />
-      <Sec label="LOCATION" t={t} variant="romantic">
+      <Sec label="LOCATION" section="location" t={t} variant="romantic">
         <LocationInner data={data} t={t} />
       </Sec>
       {showGallery(data, preview) && (
         <>
           <Divider t={t} variant="romantic" />
-          <Sec label="GALLERY" t={t} variant="romantic">
+          <Sec label="GALLERY" section="gallery" t={t} variant="romantic">
             <GalleryInner data={data} t={t} rounded="rounded-2xl" preview={preview} />
           </Sec>
         </>
@@ -1066,7 +1069,7 @@ function RomanticLayout({
       {showAccounts(data) && (
         <>
           <Divider t={t} variant="romantic" />
-          <Sec label="ACCOUNT" t={t} variant="romantic">
+          <Sec label="ACCOUNT" section="accounts" t={t} variant="romantic">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
               {labelsOf(data).accountsLabel}
             </h3>
@@ -1131,25 +1134,25 @@ function BotanicalLayout({
             </p>
           )}
         </div>
-        <Sec label="INVITATION" t={t} variant="botanical">
+        <Sec label="INVITATION" section="greeting" t={t} variant="botanical">
           <GreetingInner data={data} t={t} />
         </Sec>
         <Divider t={t} variant="botanical" />
-        <Sec label={labels.sectionCoupleLabel} t={t} variant="botanical">
+        <Sec label={labels.sectionCoupleLabel} section="couple" t={t} variant="botanical">
           <CoupleInner data={data} t={t} preview={preview} />
         </Sec>
         <Divider t={t} variant="botanical" />
-        <Sec label="THE DAY" t={t} variant="botanical">
+        <Sec label="THE DAY" section="date" t={t} variant="botanical">
           <DateInner data={data} t={t} />
         </Sec>
         <Divider t={t} variant="botanical" />
-        <Sec label="LOCATION" t={t} variant="botanical">
+        <Sec label="LOCATION" section="location" t={t} variant="botanical">
           <LocationInner data={data} t={t} />
         </Sec>
         {showGallery(data, preview) && (
           <>
             <Divider t={t} variant="botanical" />
-            <Sec label="GALLERY" t={t} variant="botanical">
+            <Sec label="GALLERY" section="gallery" t={t} variant="botanical">
               <GalleryInner data={data} t={t} preview={preview} />
             </Sec>
           </>
@@ -1157,7 +1160,7 @@ function BotanicalLayout({
         {showAccounts(data) && (
           <>
             <Divider t={t} variant="botanical" />
-            <Sec label="ACCOUNT" t={t} variant="botanical">
+            <Sec label="ACCOUNT" section="accounts" t={t} variant="botanical">
               <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
                 {labelsOf(data).accountsLabel}
               </h3>
@@ -1266,25 +1269,25 @@ function StarlightLayout({
           </p>
         )}
       </div>
-      <Sec label="INVITATION" t={t} variant="starlight">
+      <Sec label="INVITATION" section="greeting" t={t} variant="starlight">
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="starlight" />
-      <Sec label={labels.sectionCoupleLabel} t={t} variant="starlight">
+      <Sec label={labels.sectionCoupleLabel} section="couple" t={t} variant="starlight">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="starlight" />
-      <Sec label="THE DAY" t={t} variant="starlight">
+      <Sec label="THE DAY" section="date" t={t} variant="starlight">
         <DateInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="starlight" />
-      <Sec label="LOCATION" t={t} variant="starlight">
+      <Sec label="LOCATION" section="location" t={t} variant="starlight">
         <LocationInner data={data} t={t} />
       </Sec>
       {showGallery(data, preview) && (
         <>
           <Divider t={t} variant="starlight" />
-          <Sec label="GALLERY" t={t} variant="starlight">
+          <Sec label="GALLERY" section="gallery" t={t} variant="starlight">
             <GalleryInner data={data} t={t} rounded="rounded-2xl" preview={preview} />
           </Sec>
         </>
@@ -1292,7 +1295,7 @@ function StarlightLayout({
       {showAccounts(data) && (
         <>
           <Divider t={t} variant="starlight" />
-          <Sec label="ACCOUNT" t={t} variant="starlight">
+          <Sec label="ACCOUNT" section="accounts" t={t} variant="starlight">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
               {labelsOf(data).accountsLabel}
             </h3>
@@ -1395,25 +1398,25 @@ function CinemaLayout({
       >
         <LetterReveal text="OUR MOMENT, FOREVER" />
       </p>
-      <Sec label="INVITATION" t={t} variant="cinema">
+      <Sec label="INVITATION" section="greeting" t={t} variant="cinema">
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="cinema" />
-      <Sec label={labels.sectionCoupleLabel} t={t} variant="cinema">
+      <Sec label={labels.sectionCoupleLabel} section="couple" t={t} variant="cinema">
         <CoupleInner data={data} t={t} preview={preview} />
       </Sec>
       <Divider t={t} variant="cinema" />
-      <Sec label="THE DAY" t={t} variant="cinema">
+      <Sec label="THE DAY" section="date" t={t} variant="cinema">
         <DateInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant="cinema" />
-      <Sec label="LOCATION" t={t} variant="cinema">
+      <Sec label="LOCATION" section="location" t={t} variant="cinema">
         <LocationInner data={data} t={t} />
       </Sec>
       {showGallery(data, preview) && (
         <>
           <Divider t={t} variant="cinema" />
-          <Sec label="GALLERY" t={t} variant="cinema">
+          <Sec label="GALLERY" section="gallery" t={t} variant="cinema">
             <GalleryInner data={data} t={t} rounded="rounded-sm" preview={preview} />
           </Sec>
         </>
@@ -1421,7 +1424,7 @@ function CinemaLayout({
       {showAccounts(data) && (
         <>
           <Divider t={t} variant="cinema" />
-          <Sec label="ACCOUNT" t={t} variant="cinema">
+          <Sec label="ACCOUNT" section="accounts" t={t} variant="cinema">
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
               {labelsOf(data).accountsLabel}
             </h3>
@@ -1455,25 +1458,25 @@ function CommonBody({
   const labels = labelsOf(data);
   return (
     <>
-      <Sec label="INVITATION" t={t} variant={variant}>
+      <Sec label="INVITATION" section="greeting" t={t} variant={variant}>
         <GreetingInner data={data} t={t} />
       </Sec>
       <Divider t={t} variant={variant} />
-      <Sec label={labels.sectionCoupleLabel} t={t} variant={variant}>
+      <Sec label={labels.sectionCoupleLabel} section="couple" t={t} variant={variant}>
         <CoupleInner data={data} t={t} arch={arch} preview={preview} />
       </Sec>
       <Divider t={t} variant={variant} />
-      <Sec label="THE DAY" t={t} variant={variant}>
+      <Sec label="THE DAY" section="date" t={t} variant={variant}>
         <DateInner data={data} t={t} heart={heart} />
       </Sec>
       <Divider t={t} variant={variant} />
-      <Sec label="LOCATION" t={t} variant={variant}>
+      <Sec label="LOCATION" section="location" t={t} variant={variant}>
         <LocationInner data={data} t={t} />
       </Sec>
       {showGallery(data, preview) && (
         <>
           <Divider t={t} variant={variant} />
-          <Sec label="GALLERY" t={t} variant={variant}>
+          <Sec label="GALLERY" section="gallery" t={t} variant={variant}>
             <GalleryInner data={data} t={t} rounded={rounded} preview={preview} />
           </Sec>
         </>
@@ -1481,7 +1484,7 @@ function CommonBody({
       {showAccounts(data) && (
         <>
           <Divider t={t} variant={variant} />
-          <Sec label="ACCOUNT" t={t} variant={variant}>
+          <Sec label="ACCOUNT" section="accounts" t={t} variant={variant}>
             <h3 className="mb-6 text-base" style={{ fontFamily: t.headingFont }}>
               {labels.accountsLabel}
             </h3>

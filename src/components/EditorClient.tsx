@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
@@ -397,14 +397,21 @@ const SELECT_CLASS = `${INPUT_CLASS} inv-select`;
 function Group({
   title,
   step,
+  previewSection,
   children,
 }: {
   title: string;
   step?: number;
+  // 이 칸을 채우고 있을 때 미리보기가 보여 줄 초대장 섹션
+  // (InvitationView 의 data-inv-section 과 같은 값, "top"이면 맨 위)
+  previewSection?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+    <section
+      data-form-section={previewSection}
+      className="rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]"
+    >
       <div className="mb-4 flex items-center gap-2.5">
         {step !== undefined && (
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold-50 text-[11px] font-semibold text-gold-400">
@@ -418,6 +425,95 @@ function Group({
       <div className="space-y-3.5">{children}</div>
     </section>
   );
+}
+
+/* ───────── 폼 ↔ 미리보기 스크롤 맞추기 ───────── */
+// 모바일 미니 미리보기 — 390px 폭으로 그린 뒤 상자 크기로 줄여 보여 준다
+const MINI_W = 126;
+const MINI_H = 182;
+const MINI_CONTENT_W = 390;
+const MINI_SCALE = MINI_W / MINI_CONTENT_W;
+
+/**
+ * 폼에서 지금 보고 있는 단계에 맞춰 미리보기도 그 대목으로 옮긴다.
+ * (신랑·신부 칸을 보고 있으면 미리보기도 두 사람이 나오는 자리로)
+ *
+ * 단계가 "바뀔 때만" 움직인다. 스크롤할 때마다 따라 움직이면 미리보기를
+ * 직접 넘겨 보려는 사람과 서로 밀어내게 된다.
+ *
+ * 반환값은 미니 미리보기를 끌어올릴 거리(초대장 기준 px). 미니 쪽은
+ * 스크롤 상자가 아니라 축소해 놓은 그림이라 transform 으로 옮겨야 한다.
+ */
+function usePreviewSync(
+  desk: React.RefObject<HTMLDivElement | null>,
+  mini: React.RefObject<HTMLDivElement | null>
+) {
+  const [miniShift, setMiniShift] = useState(0);
+
+  useEffect(() => {
+    // 초대장 맨 위에서 그 섹션까지의 거리. 지금 어디까지 내려와 있든 같은 값이
+    // 나와야 해서(=절대 위치) 스크롤 상자면 scrollTop 을 더해 준다.
+    const offsetIn = (box: HTMLElement, key: string, scale = 1) => {
+      if (key === "top") return 0;
+      const el = box.querySelector<HTMLElement>(`[data-inv-section="${key}"]`);
+      if (!el) return null;
+      return (
+        (el.getBoundingClientRect().top - box.getBoundingClientRect().top) / scale +
+        box.scrollTop
+      );
+    };
+
+    const move = (key: string) => {
+      const box = desk.current;
+      if (box) {
+        const top = offsetIn(box, key);
+        if (top !== null) {
+          box.scrollTo({ top: Math.max(0, top - 8), behavior: "smooth" });
+        }
+      }
+      const small = mini.current;
+      if (small) {
+        const top = offsetIn(small, key, MINI_SCALE);
+        if (top !== null) {
+          // 아래쪽 섹션이라도 빈 여백만 보이지 않게 끝을 넘지 않는다
+          const max = Math.max(0, small.offsetHeight - MINI_H / MINI_SCALE);
+          setMiniShift(Math.min(Math.max(0, top - 6), max));
+        }
+      }
+    };
+
+    let current = "";
+    let raf = 0;
+    const sync = () => {
+      raf = 0;
+      // 화면 위쪽 1/3 선을 지난 마지막 단계를 "지금 보고 있는 곳"으로 본다
+      const line = window.innerHeight * 0.33;
+      let active = "";
+      document
+        .querySelectorAll<HTMLElement>("[data-form-section]")
+        .forEach((g) => {
+          if (g.getBoundingClientRect().top <= line) {
+            active = g.dataset.formSection ?? "";
+          }
+        });
+      if (!active || active === current) return;
+      current = active;
+      move(active);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(sync);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // 첫 위치도 맞춰 둔다 (effect 안에서 바로 setState 하지 않도록 한 박자 뒤)
+    raf = requestAnimationFrame(sync);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [desk, mini]);
+
+  return miniShift;
 }
 
 function FontPicker({
@@ -497,6 +593,11 @@ export default function EditorClient({
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
   const photoSectionRef = useRef<HTMLDivElement>(null);
+
+  // 폼을 내리면 미리보기도 같은 대목으로 따라온다
+  const deskPreviewRef = useRef<HTMLDivElement>(null);
+  const miniPreviewRef = useRef<HTMLDivElement>(null);
+  const miniShift = usePreviewSync(deskPreviewRef, miniPreviewRef);
 
   // 예시 사진 그대로거나 비어있으면 본인 대표 사진 등록 필요
   const needMainPhoto = !data.mainPhotoUrl || isSamplePhoto(data.mainPhotoUrl);
@@ -716,7 +817,7 @@ export default function EditorClient({
           </p>
         </div>
 
-        <Group title="메인" step={1}>
+        <Group title="메인" step={1} previewSection="top">
           <div className="grid grid-cols-2 gap-3">
             {catTemplates.map((t) => {
               const selected = template === t.id;
@@ -856,7 +957,7 @@ export default function EditorClient({
           </div>
         </Group>
 
-        <Group title="글꼴" step={2}>
+        <Group title="글꼴" step={2} previewSection="top">
           <div>
             <span className="mb-2 block text-xs font-medium text-gray-500">
               메인 글꼴 · 제목/이름
@@ -914,7 +1015,7 @@ export default function EditorClient({
           </div>
         </Group>
 
-        <Group title={labels.groupTitle} step={3}>
+        <Group title={labels.groupTitle} step={3} previewSection="couple">
           {/* 칠순 · 팔순 · 구순 · 백수 선택 — 초대장 문구가 통째로 바뀜 */}
           {category === "senior" && (
             <div>
@@ -1120,7 +1221,7 @@ export default function EditorClient({
           </p>
         </Group>
 
-        <Group title={labels.dateSectionTitle} step={4}>
+        <Group title={labels.dateSectionTitle} step={4} previewSection="date">
           {/* 좁은 화면에서 날짜 칸이 눌리지 않도록 한 줄씩 둔다 */}
           <Field
             label={labels.dateFieldLabel}
@@ -1169,7 +1270,7 @@ export default function EditorClient({
           </p>
         </Group>
 
-        <Group title="인사말" step={5}>
+        <Group title="인사말" step={5} previewSection="greeting">
           <Field
             label="제목"
             value={data.greetingTitle}
@@ -1204,7 +1305,7 @@ export default function EditorClient({
           </label>
         </Group>
 
-        <Group title="갤러리" step={6}>
+        <Group title="갤러리" step={6} previewSection="gallery">
           <div>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               갤러리 사진{" "}
@@ -1272,7 +1373,7 @@ export default function EditorClient({
 
         {/* 생일은 축하금을 받는 자리가 아니라 계좌 단계를 두지 않는다 */}
         {labels.showAccounts && (
-        <Group title={labels.accountsGroupTitle} step={7}>
+        <Group title={labels.accountsGroupTitle} step={7} previewSection="accounts">
           <div className="space-y-3">
             {data.accounts.map((a, i) => (
               <div
@@ -1352,7 +1453,7 @@ export default function EditorClient({
           LIVE PREVIEW
         </p>
         <div className="mx-auto h-full max-w-[380px] overflow-hidden rounded-[2rem] border-8 border-gray-800 shadow-xl">
-          <div className="h-full overflow-y-auto">
+          <div ref={deskPreviewRef} className="h-full overflow-y-auto">
             <InvitationView template={template} data={data} preview />
           </div>
         </div>
@@ -1361,15 +1462,18 @@ export default function EditorClient({
       {/* 미리보기 — 모바일(우상단 미니, 탭하면 확대) */}
       <div
         className="fixed right-3 top-16 z-40 overflow-hidden rounded-xl border-2 border-gray-800 bg-white shadow-lg md:hidden"
-        style={{ width: 126, height: 182 }}
+        style={{ width: MINI_W, height: MINI_H }}
       >
-        {/* 축소된 실시간 미리보기 (클릭은 위 오버레이가 처리) */}
+        {/* 축소된 실시간 미리보기 (클릭은 위 오버레이가 처리).
+            translateY 는 scale 안쪽이라 초대장 기준 거리를 그대로 쓰면 된다. */}
         <div
+          ref={miniPreviewRef}
           className="pointer-events-none"
           style={{
-            width: 390,
+            width: MINI_CONTENT_W,
             transformOrigin: "top left",
-            transform: `scale(${126 / 390})`,
+            transform: `scale(${MINI_SCALE}) translateY(${-miniShift}px)`,
+            transition: "transform 0.4s ease",
           }}
         >
           <InvitationView template={template} data={data} preview />
