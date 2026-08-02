@@ -1873,6 +1873,7 @@ function SeniorGoldLayout({
             style={{ color: `${gold}bb` }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -1979,6 +1980,7 @@ function SeniorBloomLayout({
             style={{ color: t.sub }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2075,6 +2077,7 @@ function SeniorPineLayout({
             style={{ color: "#9db4a6" }}
           >
             {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2786,6 +2789,7 @@ function SeniorInkLayout({
               style={{ color: t.sub }}
             >
               {p.year}년 {p.month}월 {p.day}일 {p.wkKo}요일
+              {data.weddingTime && ` · ${data.weddingTime}`}
             </p>
           )}
         </div>
@@ -2881,6 +2885,7 @@ function SeniorWarmLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>

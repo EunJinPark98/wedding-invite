@@ -147,7 +147,7 @@ export const MAX_GALLERY = 20;
 // 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 초대장 제작에는 사용 불가
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
 export const SAMPLE_BABY_PHOTO = "/baby.png";
-export const SAMPLE_BIRTHDAY_PHOTO = "/birthday.jpg";
+export const SAMPLE_BIRTHDAY_PHOTO = "/birthday-party.png";
 export const SAMPLE_SENIOR_PHOTO = "/grandmama.png";
 // 예시 사진 전체 — 제작 시 본인 사진으로 교체했는지 검사할 때 사용
 export const SAMPLE_PHOTOS: readonly string[] = [
@@ -384,7 +384,7 @@ const CATEGORY_SAMPLE: Record<
     venueAddress: "서울특별시 종로구 세종대로 175",
   },
   birthday: {
-    groomName: "박은진",
+    groomName: "김생일",
     brideName: "",
     groomFather: "",
     groomMother: "",
@@ -434,8 +434,10 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     bridePhotoUrl: "",
     // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
     gallery: ["", "", ""],
-    groomPhone: "010-1234-5678",
-    bridePhone: "010-8765-4321",
+    // 생일·칠순은 연락처가 선택 사항이라 예시 번호를 넣지 않는다
+    groomPhone:
+      category === "birthday" || category === "senior" ? "" : "010-1234-5678",
+    bridePhone: category === "wedding" ? "010-8765-4321" : "",
     accounts:
       // 생일은 축하금 섹션 자체를 두지 않는다
       category === "birthday"
