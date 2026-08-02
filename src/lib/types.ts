@@ -229,6 +229,8 @@ export interface InvitationData {
   fontBody: string; // 서브(본문)
   // 글꼴 크기 배율 (FONT_SCALES 중 하나, 1=보통)
   fontScale: number;
+  // 상단 사진 위 큰 문구 (생일 전용 — 비우면 아무것도 표시하지 않음)
+  heroTitle: string;
   // 사진
   mainPhotoUrl: string;
   // 대표 사진 모션 (HeroMotion id)
@@ -293,6 +295,7 @@ export const normalizeData = (
   fontBody: d?.fontBody ?? "default",
   // 목록에 없는 값(과거 데이터·조작된 입력)은 기본 배율로 되돌린다
   fontScale: isFontScale(d?.fontScale) ? d!.fontScale! : DEFAULT_FONT_SCALE,
+  heroTitle: d?.heroTitle ?? "",
   mainPhotoUrl: d?.mainPhotoUrl ?? "",
   heroMotion: HERO_MOTIONS.some((m) => m.id === d?.heroMotion)
     ? (d!.heroMotion as HeroMotion)
@@ -422,6 +425,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     fontHeading: "default",
     fontBody: "default",
     fontScale: DEFAULT_FONT_SCALE,
+    heroTitle: "",
     // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
     mainPhotoUrl: s.mainPhoto,
     heroMotion: "zoomin",
