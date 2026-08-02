@@ -19,6 +19,7 @@ import {
   DOL_KINDS,
   FONT_SCALES,
   HERO_MOTIONS,
+  INTROS,
   MAX_GALLERY,
   SENIOR_AGES,
   dolGreetingMessage,
@@ -374,6 +375,36 @@ function Field({
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         className={INPUT_CLASS}
+      />
+    </label>
+  );
+}
+
+// 줄바꿈이 필요한 짧은 안내문용 (오시는 길 등)
+function TextareaField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  rows = 2,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  rows?: number;
+}) {
+  return (
+    <label className="block min-w-0">
+      <span className="mb-1.5 block text-xs font-medium text-gray-500">
+        {label}
+      </span>
+      <textarea
+        value={value}
+        rows={rows}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${INPUT_CLASS} leading-7`}
       />
     </label>
   );
@@ -854,6 +885,43 @@ export default function EditorClient({
               })}
             </div>
           </div>
+          {/* 인트로 — 청첩장을 열자마자 잠깐 지나가는 첫 화면 */}
+          {data.category === "wedding" && (
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                인트로
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {INTROS.map((v) => {
+                  const selected = data.intro === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => set("intro", v.id)}
+                      aria-pressed={selected}
+                      className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                        selected
+                          ? "border-gold-400 bg-gold-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <span className="block text-sm font-medium text-gray-800">
+                        {v.label}
+                      </span>
+                      <span className="mt-0.5 block text-[11px] text-gray-400">
+                        {v.desc}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-[11px] text-gray-400">
+                고르면 미리보기에서 바로 다시 재생돼요. 하객이 화면을 누르면
+                건너뛸 수 있어요.
+              </p>
+            </div>
+          )}
         </Group>
 
         <Group title="글꼴" step={2}>
@@ -1157,16 +1225,37 @@ export default function EditorClient({
                 onSelect={(addr) => set("venueAddress", addr)}
               />
             </div>
-            <p className="mt-1 text-[11px] text-gray-400">
-              검색으로 넣으면 초대장 지도와 길찾기가 정확하게 잡혀요.
-            </p>
           </div>
-          <p className="text-xs text-gray-400">
-            {expiryDate
-              ? `${expiryDate}에 링크가 닫히고 사진까지 완전히 삭제돼요.`
-              : "행사 다음 날 링크가 닫히고 사진까지 완전히 삭제돼요."}{" "}
-            사진은 미리 따로 보관해 주세요.
-          </p>
+          {/* 오시는 길 안내 — 초대장에서는 지도 자리에 펼쳐 볼 수 있다 */}
+          <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3.5">
+            <span className="block text-xs font-medium text-gray-500">
+              오시는 길 안내 (선택)
+            </span>
+            <p className="mt-1 text-[11px] text-gray-400">
+              적어 두면 초대장 지도 아래에 &lsquo;오시는 길 안내&rsquo; 버튼이
+              생겨요. 비워 두면 버튼도 나오지 않아요.
+            </p>
+            <div className="mt-3 space-y-3">
+              <TextareaField
+                label="지하철"
+                value={data.directionsSubway}
+                onChange={(v) => set("directionsSubway", v)}
+                placeholder={"2호선 강남역 3번 출구\n도보 5분"}
+              />
+              <TextareaField
+                label="버스 · 대중교통"
+                value={data.directionsBus}
+                onChange={(v) => set("directionsBus", v)}
+                placeholder={"간선 140, 401\n강남역 정류장 하차"}
+              />
+              <TextareaField
+                label="주차"
+                value={data.directionsParking}
+                onChange={(v) => set("directionsParking", v)}
+                placeholder={"건물 지하 1~3층\n2시간 무료"}
+              />
+            </div>
+          </div>
         </Group>
 
         <Group title="인사말" step={5}>

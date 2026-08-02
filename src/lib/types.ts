@@ -114,6 +114,22 @@ export const HERO_MOTIONS = [
 export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 
 /**
+ * 인트로(오프닝) 연출 — 청첩장을 열면 잠깐 지나가는 첫 화면.
+ * 결혼 청첩장에서만 고를 수 있고, "none"이면 바로 본문이 열린다.
+ * 실제 그림은 InvitationIntro + globals.css 의 inv-intro-* 가 그린다.
+ */
+export const INTROS = [
+  { id: "none", label: "사용 안 함", desc: "인트로 없이 바로 열림" },
+  { id: "fade", label: "심플 페이드", desc: "이름과 날짜가 은은하게" },
+  { id: "curtain", label: "커튼 열림", desc: "양옆으로 갈라지며" },
+  { id: "photo", label: "사진 인트로", desc: "대표 사진 위에 이름이" },
+  { id: "envelope", label: "봉투 열기", desc: "봉투가 열리고 카드가" },
+] as const;
+export type IntroStyle = (typeof INTROS)[number]["id"];
+export const isIntroStyle = (v: unknown): v is IntroStyle =>
+  INTROS.some((i) => i.id === v);
+
+/**
  * 섹션 사이 구분선 디자인.
  * 실제 모양은 CSS 가 초대장 루트의 data-divider 값을 보고 고른다.
  */
@@ -221,6 +237,13 @@ export interface InvitationData {
   venueName: string;
   venueHall: string;
   venueAddress: string;
+  // 오시는 길 안내 — 지도 자리에 펼쳐 보는 교통편 안내.
+  // 셋 다 비어 있으면 초대장에 안내 버튼 자체가 나오지 않는다.
+  directionsSubway: string;
+  directionsBus: string;
+  directionsParking: string;
+  // 인트로(오프닝) 연출 (IntroStyle, "none"=사용 안 함 · 결혼 청첩장 전용)
+  intro: string;
   // 인사말
   greetingTitle: string;
   greetingMessage: string;
@@ -287,6 +310,11 @@ export const normalizeData = (
   venueName: d?.venueName ?? "",
   venueHall: d?.venueHall ?? "",
   venueAddress: d?.venueAddress ?? "",
+  directionsSubway: d?.directionsSubway ?? "",
+  directionsBus: d?.directionsBus ?? "",
+  directionsParking: d?.directionsParking ?? "",
+  // 목록에 없는 값(과거 데이터·조작된 입력)은 인트로 없음으로 되돌린다
+  intro: isIntroStyle(d?.intro) ? d!.intro! : "none",
   greetingTitle: d?.greetingTitle ?? "",
   greetingMessage: d?.greetingMessage ?? "",
   fontHeading: d?.fontHeading ?? "default",
@@ -417,6 +445,11 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     venueName: s.venueName,
     venueHall: s.venueHall,
     venueAddress: s.venueAddress,
+    // 오시는 길·인트로는 직접 채우는 항목이라 비워 둔다 (안 쓰면 그대로 안 나옴)
+    directionsSubway: "",
+    directionsBus: "",
+    directionsParking: "",
+    intro: "none",
     greetingTitle: s.greetingTitle,
     greetingMessage: s.greetingMessage,
     fontHeading: "default",

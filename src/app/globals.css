@@ -204,6 +204,136 @@ body {
   }
 }
 
+/* ════════ 인트로(오프닝) 연출 ════════ */
+/* 덮개 — 연출이 끝날 무렵 스르르 걷힌다.
+   InvitationIntro 가 이 시간에 맞춰 요소를 지우므로 한쪽만 고치지 말 것. */
+@keyframes inv-intro-out {
+  to {
+    opacity: 0;
+  }
+}
+.inv-intro {
+  animation: inv-intro-out 0.8s ease-out 2.1s both;
+}
+
+/* 이름·날짜가 떠오른다 */
+@keyframes inv-intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    letter-spacing: 0.3em;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-intro-rise {
+  animation: inv-intro-rise 1.2s ease-out both;
+}
+.inv-intro-rise-2 {
+  animation: inv-intro-rise 1.2s ease-out 0.45s both;
+}
+
+/* 커튼 — 이름을 보여준 뒤 양옆으로 갈라진다 */
+@keyframes inv-intro-curtain-l {
+  0%,
+  50% {
+    transform: none;
+  }
+  100% {
+    transform: translateX(-101%);
+  }
+}
+@keyframes inv-intro-curtain-r {
+  0%,
+  50% {
+    transform: none;
+  }
+  100% {
+    transform: translateX(101%);
+  }
+}
+.inv-intro-curtain-l {
+  animation: inv-intro-curtain-l 2.6s cubic-bezier(0.7, 0, 0.25, 1) both;
+}
+.inv-intro-curtain-r {
+  animation: inv-intro-curtain-r 2.6s cubic-bezier(0.7, 0, 0.25, 1) both;
+}
+
+/* 사진 — 천천히 확대되며 물러난다 */
+@keyframes inv-intro-zoom {
+  from {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.inv-intro-zoom {
+  animation: inv-intro-zoom 3.2s ease-out both;
+}
+
+/* 봉투 — 덮개가 젖혀지고 안의 카드가 떠오른다 */
+@keyframes inv-intro-flap {
+  0%,
+  18% {
+    transform: rotateX(0deg);
+  }
+  62%,
+  100% {
+    transform: rotateX(-172deg);
+  }
+}
+@keyframes inv-intro-letter {
+  0%,
+  40% {
+    transform: translateY(26px);
+    opacity: 0;
+  }
+  75%,
+  100% {
+    transform: translateY(-30px);
+    opacity: 1;
+  }
+}
+@keyframes inv-intro-envelope-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-intro-flap {
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  animation: inv-intro-flap 2.4s ease-in-out both;
+}
+.inv-intro-letter {
+  animation: inv-intro-letter 2.4s ease-out both;
+}
+.inv-intro-card {
+  animation: inv-intro-envelope-in 0.9s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* 인트로 자체를 건너뛰지만, 혹시 그려지더라도 움직이지는 않게 */
+  .inv-intro,
+  .inv-intro-rise,
+  .inv-intro-rise-2,
+  .inv-intro-curtain-l,
+  .inv-intro-curtain-r,
+  .inv-intro-zoom,
+  .inv-intro-flap,
+  .inv-intro-letter,
+  .inv-intro-card {
+    animation: none;
+  }
+}
+
 /* ── 대표 사진 모션 4종 (업체 청첩장에서 널리 쓰는 연출) ── */
 /* 1. 줌 인: 천천히 확대되는 시네마틱 연출 */
 @keyframes inv-kenburns {
