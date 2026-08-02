@@ -164,6 +164,22 @@ body {
   transform: none;
 }
 
+/* 프로필 사진(신랑·신부)도 같은 방식으로 다룬다.
+   CSS 의 view() 만 쓰면 에디터 미리보기처럼 축소·클리핑된 틀 안에서
+   진행도가 0 에 머물러 사진이 opacity:0 인 채로 안 보인다. */
+.inv-reveal-on .inv-zoom {
+  animation: none;
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 0.9s ease-out,
+    transform 0.9s ease-out;
+}
+.inv-reveal-on .inv-zoom.inv-in {
+  opacity: 1;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .inv-fade,
   .inv-reveal-on .inv-fade {
