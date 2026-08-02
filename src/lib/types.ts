@@ -114,11 +114,6 @@ export const HERO_MOTIONS = [
 export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 
 /**
- * 인트로(오프닝) 연출 — 청첩장을 열면 잠깐 지나가는 첫 화면.
- * 결혼 청첩장에서만 고를 수 있고, "none"이면 바로 본문이 열린다.
- * 실제 그림은 InvitationIntro + globals.css 의 inv-intro-* 가 그린다.
- */
-/**
  * 인트로(오프닝) 연출 — 초대장을 열면 잠깐 지나가는 첫 화면.
  * "none"이면 바로 본문이 열린다.
  *
@@ -503,7 +498,9 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     directionsParking: "",
     // 인트로는 기본으로 쓰지 않되, 켜면 바로 보이도록 예시 문구는 채워 둔다
     intro: "none",
-    introText: category === "wedding" ? "We are getting married!" : "",
+    // 인트로 문구도 종류마다 예시를 채워 둔다 — 비어 있으면 이름이 대신 떠서
+    // 어떤 자리인지 알기 어렵다
+    introText: introPlaceholder(category),
     greetingTitle: s.greetingTitle,
     greetingMessage: s.greetingMessage,
     fontHeading: "default",
