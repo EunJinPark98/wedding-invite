@@ -7,7 +7,13 @@ import InvitationView from "./InvitationView";
 import AuthStatus from "./AuthStatus";
 import KakaoShareButton from "./KakaoShareButton";
 import AddressSearch from "./AddressSearch";
-import { getTemplatesByCategory, findTheme, FONTS } from "@/lib/templates";
+import {
+  getTemplatesByCategory,
+  findTheme,
+  getTitleFontFamily,
+  FONTS,
+  TITLE_FONTS,
+} from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
@@ -875,6 +881,37 @@ export default function EditorClient({
               onChange={(id) => set("fontBody", id)}
             />
           </div>
+          {/* 생일은 맨 위 이름 한 줄이 첫인상을 좌우해 따로 고를 수 있게 둔다 */}
+          {data.category === "birthday" && (
+            <div>
+              <span className="mb-2 block text-xs font-medium text-gray-500">
+                메인 타이틀 글꼴 · 주인공 이름
+              </span>
+              <select
+                value={data.titleFont}
+                onChange={(e) => set("titleFont", e.target.value)}
+                aria-label="메인 타이틀 글꼴"
+                className={`${SELECT_CLASS} text-base`}
+                // 고른 글꼴이 어떤 모양인지 닫혀 있을 때도 보이게
+                style={{
+                  fontFamily: getTitleFontFamily(data.titleFont) || undefined,
+                }}
+              >
+                {TITLE_FONTS.map((f) => (
+                  <option
+                    key={f.id}
+                    value={f.id}
+                    style={{ fontFamily: f.family || undefined }}
+                  >
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1.5 text-[11px] text-gray-400">
+                맨 위에 크게 들어가는 이름에만 적용돼요.
+              </p>
+            </div>
+          )}
           <div>
             <span className="mb-2 block text-xs font-medium text-gray-500">
               글꼴 크기

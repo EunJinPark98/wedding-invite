@@ -227,6 +227,9 @@ export interface InvitationData {
   // 글꼴 (FontId, "default"=템플릿 기본)
   fontHeading: string; // 메인(제목·이름)
   fontBody: string; // 서브(본문)
+  // 맨 위 메인 타이틀(주인공 이름)만 따로 — 생일 초대장에서만 고를 수 있다.
+  // "default"면 템플릿이 정한 글꼴을 그대로 쓴다. (TITLE_FONTS)
+  titleFont: string;
   // 글꼴 크기 배율 (FONT_SCALES 중 하나, 1=보통)
   fontScale: number;
   // 사진
@@ -291,6 +294,7 @@ export const normalizeData = (
   greetingMessage: d?.greetingMessage ?? "",
   fontHeading: d?.fontHeading ?? "default",
   fontBody: d?.fontBody ?? "default",
+  titleFont: d?.titleFont ?? "default",
   // 목록에 없는 값(과거 데이터·조작된 입력)은 기본 배율로 되돌린다
   fontScale: isFontScale(d?.fontScale) ? d!.fontScale! : DEFAULT_FONT_SCALE,
   mainPhotoUrl: d?.mainPhotoUrl ?? "",
@@ -421,6 +425,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     greetingMessage: s.greetingMessage,
     fontHeading: "default",
     fontBody: "default",
+    titleFont: "default",
     fontScale: DEFAULT_FONT_SCALE,
     // 대표 사진: 미리보기용 예시 (제작 시에는 본인 사진으로 교체 필수)
     mainPhotoUrl: s.mainPhoto,

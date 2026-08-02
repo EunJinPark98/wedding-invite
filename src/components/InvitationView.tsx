@@ -4,7 +4,12 @@ import {
   type InvitationData,
   type TemplateId,
 } from "@/lib/types";
-import { getTheme, getFontFamily, type TemplateTheme } from "@/lib/templates";
+import {
+  getTheme,
+  getFontFamily,
+  getTitleFontFamily,
+  type TemplateTheme,
+} from "@/lib/templates";
 import { labelsOf } from "@/lib/categories";
 import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
@@ -14,6 +19,16 @@ import ScrollReveal from "./ScrollReveal";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+/**
+ * 맨 위 메인 타이틀(주인공 이름)에 따로 고른 글꼴.
+ *
+ * 생일 초대장에서만 고를 수 있는 값이라, 다른 종류에서는 예전 데이터가
+ * 남아 있더라도 무시한다. 고르지 않았으면 "" 를 돌려주므로 부르는 쪽에서
+ * 템플릿이 정한 글꼴로 넘어가면 된다.
+ */
+const titleFontOf = (data: InvitationData) =>
+  data.category === "birthday" ? getTitleFontFamily(data.titleFont) : "";
 
 /* ════════ 글꼴 크기 배율 ════════ */
 
@@ -2140,7 +2155,7 @@ function BdayPopLayout({
         </p>
         <h1
           className="inv-hero-in mt-3 text-[calc(2.1rem*var(--inv-fs))] font-extrabold tracking-tight"
-          style={{ color: t.ink }}
+          style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
         >
           {data.groomName}
         </h1>
@@ -2236,7 +2251,7 @@ function BdayNeonLayout({
         </div>
         <h1
           className="inv-hero-in-delay mt-8 text-[calc(1.8rem*var(--inv-fs))] font-bold tracking-wide"
-          style={{ color: t.ink }}
+          style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
         >
           {data.groomName}
         </h1>
@@ -2282,7 +2297,7 @@ function BdayMinimalLayout({
         </p>
         <h1
           className="inv-hero-in mt-4 text-[calc(2.4rem*var(--inv-fs))] font-extrabold leading-tight tracking-tight"
-          style={{ color: t.ink }}
+          style={{ fontFamily: titleFontOf(data) || undefined, color: t.ink }}
         >
           {data.groomName}
         </h1>
@@ -2414,7 +2429,7 @@ function StarHero({
       </div>
       <h1
         className="inv-hero-in-delay mt-7 text-2xl tracking-wide"
-        style={{ fontFamily: t.headingFont, color: t.ink }}
+        style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
       >
         {data.groomName}
       </h1>
@@ -2962,7 +2977,7 @@ function BdayCakeLayout({
         </div>
         <h1
           className="inv-hero-in-delay mt-6 text-[calc(1.8rem*var(--inv-fs))] tracking-wide"
-          style={{ fontFamily: t.headingFont, color: t.ink }}
+          style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
         >
           {data.groomName}
         </h1>
@@ -3061,7 +3076,7 @@ function BdayBloomLayout({
         </div>
         <h1
           className="inv-hero-in-delay mt-6 text-[calc(1.7rem*var(--inv-fs))] tracking-[0.1em]"
-          style={{ fontFamily: t.headingFont, color: t.ink }}
+          style={{ fontFamily: titleFontOf(data) || t.headingFont, color: t.ink }}
         >
           {data.groomName}
         </h1>
