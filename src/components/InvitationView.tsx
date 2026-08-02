@@ -1579,11 +1579,12 @@ function DolBearLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-4 inline-block rounded-full px-5 py-1.5 font-cormorant text-sm tracking-[0.25em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-4 inline-block rounded-full px-5 py-1.5 font-cormorant text-sm tracking-[0.25em]"
             style={{ background: "#fff", color: t.accent }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -1705,11 +1706,12 @@ function DolCloudLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3.5 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3.5 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -1788,10 +1790,11 @@ function DolHanbokLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.2em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3 text-[calc(15px*var(--inv-fs))] tracking-[0.2em]"
             style={{ color: t.sub, fontFamily: t.headingFont }}
           >
             {p.year}년 {p.month}월 {p.day}일
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2164,11 +2167,12 @@ function BdayPopLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-7 inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.15em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-7 inline-block rounded-full px-6 py-2 text-sm font-semibold tracking-[0.15em]"
             style={{ background: t.accentSoft, color: t.accent }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")} {p.wkEn}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2251,11 +2255,12 @@ function BdayNeonLayout({
         )}
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3 text-sm tracking-[0.3em]"
             style={{ color: t.sub, fontFamily: "monospace" }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")} {p.wkEn}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2300,11 +2305,12 @@ function BdayMinimalLayout({
         )}
         {p && (
           <p
-            className="inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
+            className="whitespace-nowrap inv-hero-in mt-2 font-cormorant text-xl tracking-[0.2em]"
             style={{ color: t.sub }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
         {/* 알약(캡슐)형 사진 */}
@@ -2446,11 +2452,12 @@ function StarHero({
       )}
       {p && (
         <p
-          className="inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
+          className="whitespace-nowrap inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
           style={{ color: t.sub }}
         >
           {p.year}. {String(p.month).padStart(2, "0")}.{" "}
           {String(p.day).padStart(2, "0")}. {p.wkEn}
+          {data.weddingTime && ` · ${data.weddingTime}`}
         </p>
       )}
     </div>
@@ -2578,11 +2585,12 @@ function DolGardenLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2661,10 +2669,11 @@ function DolCrayonLayout({
         </h1>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2 inline-block rounded-full px-5 py-1.5 text-sm font-bold"
+            className="whitespace-nowrap inv-hero-in-delay mt-2 inline-block rounded-full px-5 py-1.5 text-sm font-bold"
             style={{ background: t.accentSoft, color: t.accent }}
           >
             {p.year}. {p.month}. {p.day}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -2998,11 +3007,12 @@ function BdayCakeLayout({
         </p>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3.5 inline-block rounded-full bg-white px-5 py-1.5 text-sm tracking-[0.15em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3.5 inline-block rounded-full bg-white px-5 py-1.5 text-sm tracking-[0.15em]"
             style={{ color: t.accent }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
@@ -3104,11 +3114,12 @@ function BdayBloomLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-2.5 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {data.weddingTime && ` · ${data.weddingTime}`}
           </p>
         )}
       </div>
