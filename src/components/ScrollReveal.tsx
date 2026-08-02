@@ -22,6 +22,10 @@ import { useEffect } from "react";
 // 않도록, 마지막 하나가 사라질 때만 정리한다.
 let mounted = 0;
 
+// 나타나는 연출을 붙일 대상.
+// 글씨(.inv-fade) 와 프로필 사진(.inv-zoom) 이 같은 방식으로 움직인다.
+const TARGETS = ".inv-fade, .inv-zoom";
+
 /**
  * "첫 화면"으로 볼 경계선의 y 좌표.
  *
@@ -62,7 +66,7 @@ export default function ScrollReveal() {
     // 뒤바뀌면 opacity:0 이 확정된 뒤 inv-in 이 붙어, 첫 화면 글씨가
     // 사라졌다 나타나는 깜빡임이 생긴다.
     const inFirstScreen = [
-      ...document.querySelectorAll<HTMLElement>(".inv-fade"),
+      ...document.querySelectorAll<HTMLElement>(TARGETS),
     ].filter((el) => el.getBoundingClientRect().top < firstScreenBottom(el));
 
     // 아래 두 줄 사이에는 화면이 다시 그려지지 않는다
@@ -87,7 +91,7 @@ export default function ScrollReveal() {
 
     const watch = () =>
       document
-        .querySelectorAll(".inv-fade:not(.inv-in)")
+        .querySelectorAll(`${TARGETS.split(", ").map((t) => `${t}:not(.inv-in)`).join(", ")}`)
         .forEach((el) => io.observe(el));
     watch();
 
@@ -101,7 +105,11 @@ export default function ScrollReveal() {
     const mo = new MutationObserver((records) => {
       for (const r of records) {
         const target = r.target as Element;
-        if (r.type === "childList" || target.classList?.contains("inv-fade")) {
+        if (
+          r.type === "childList" ||
+          target.classList?.contains("inv-fade") ||
+          target.classList?.contains("inv-zoom")
+        ) {
           watch();
           return;
         }
