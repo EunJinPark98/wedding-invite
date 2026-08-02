@@ -32,6 +32,18 @@ const SPARKS = [
   { left: "56%", top: "88%", size: 3, delay: 1.7 },
 ];
 
+// 꽃잎 흩날림 — 자리·속도·기울기를 고정해 매번 같은 그림이 나오게 한다
+const PETALS = [
+  { left: "8%", size: 13, dur: 4.2, delay: 0, sway: 26, tilt: -18 },
+  { left: "21%", size: 9, dur: 5.1, delay: 0.9, sway: -20, tilt: 24 },
+  { left: "34%", size: 15, dur: 4.6, delay: 0.35, sway: 30, tilt: 12 },
+  { left: "47%", size: 10, dur: 5.6, delay: 1.5, sway: -26, tilt: -30 },
+  { left: "59%", size: 14, dur: 4.4, delay: 0.15, sway: 22, tilt: 20 },
+  { left: "71%", size: 9, dur: 5.3, delay: 1.1, sway: -30, tilt: -14 },
+  { left: "84%", size: 12, dur: 4.8, delay: 0.6, sway: 24, tilt: 28 },
+  { left: "93%", size: 10, dur: 5.8, delay: 1.8, sway: -18, tilt: -22 },
+];
+
 const dateText = (weddingDate: string) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(weddingDate.trim());
   return m ? `${m[1]}. ${m[2]}. ${m[3]}` : "";
@@ -62,8 +74,10 @@ export default function InvitationIntro({
   const names = [data.groomName, data.brideName].filter(Boolean).join("  ♥  ");
   // 적어 둔 문구가 주인공. 비워 두면 두 사람 이름이 그 자리를 대신한다.
   const phrase = data.introText.trim() || names;
-  const sub = data.introText.trim() ? names : "";
-  const date = dateText(data.weddingDate);
+  // 꽃잎은 문구 한 줄만 남기는 연출이라 이름·날짜를 함께 두지 않는다
+  const bare = style === "petal";
+  const sub = !bare && data.introText.trim() ? names : "";
+  const date = bare ? "" : dateText(data.weddingDate);
 
   const dark = style === "star" || style === "photo";
   const background =
@@ -72,13 +86,17 @@ export default function InvitationIntro({
   const subColor = dark ? "#ded5c4" : t.sub;
   const accentColor = style === "star" ? "#e2c579" : dark ? "#f0e5d2" : t.accent;
 
-  // 문구에 걸리는 연출 — 연출별로 클래스만 갈아 끼운다
+  // 문구에 걸리는 연출 — 연출별로 클래스만 갈아 끼운다.
+  // 어느 것도 자간을 건드리지 않는다. 자간이 변하면 글자 폭이 달라져
+  // 재생 도중에 줄바꿈이 다시 계산되고, 두 줄이던 문구가 한 줄로 튄다.
   const phraseClass =
     style === "blur"
       ? "inv-intro-blur"
       : style === "line"
         ? "inv-intro-wipe"
-        : "inv-intro-rise";
+        : style === "petal"
+          ? "inv-intro-sway"
+          : "inv-intro-phrase-in";
 
   return (
     <div
@@ -93,6 +111,29 @@ export default function InvitationIntro({
             className="inv-intro-photo absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${data.mainPhotoUrl})` }}
           />
+        )}
+
+        {style === "petal" && (
+          <div className="pointer-events-none absolute inset-0">
+            {PETALS.map((p, i) => (
+              <span
+                key={i}
+                className="inv-intro-petal"
+                style={
+                  {
+                    left: p.left,
+                    width: p.size,
+                    height: p.size * 1.35,
+                    background: t.accent,
+                    animationDuration: `${p.dur}s`,
+                    animationDelay: `${p.delay}s`,
+                    "--petal-sway": `${p.sway}px`,
+                    "--petal-tilt": `${p.tilt}deg`,
+                  } as React.CSSProperties
+                }
+              />
+            ))}
+          </div>
         )}
 
         {style === "star" && (
@@ -126,7 +167,7 @@ export default function InvitationIntro({
 
           {/* 문구 글꼴은 템플릿을 따르지 않고 흘림체로 고정한다 (inv-intro-phrase) */}
           <p
-            className={`${phraseClass} inv-intro-phrase whitespace-pre-line text-[calc(1.75rem*var(--inv-fs))] tracking-[0.01em]`}
+            className={`${phraseClass} inv-intro-phrase whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
             style={{ color: inkColor }}
           >
             {phrase}

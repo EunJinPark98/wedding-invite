@@ -124,6 +124,7 @@ export const INTROS = [
   { id: "line", label: "라인 리빌", desc: "선을 따라 문구가 드러나요" },
   { id: "photo", label: "사진 페이드", desc: "사진이 밝아지며 문구가" },
   { id: "star", label: "별빛", desc: "반짝임 속에 문구가 떠올라요" },
+  { id: "petal", label: "꽃잎", desc: "꽃잎이 흩날리고 문구만" },
 ] as const;
 export type IntroStyle = (typeof INTROS)[number]["id"];
 export const isIntroStyle = (v: unknown): v is IntroStyle =>

@@ -225,7 +225,6 @@ body {
   from {
     opacity: 0;
     transform: translateY(16px);
-    letter-spacing: 0.3em;
   }
   to {
     opacity: 1;
@@ -239,20 +238,92 @@ body {
   animation: inv-intro-rise 1.2s ease-out 0.45s both;
 }
 
-/* 글씨 번짐 — 번진 글씨가 자간을 좁히며 또렷해진다 */
+/* 문구 등장 연출 공통 주의 —
+   자간(letter-spacing)은 절대 애니메이션하지 않는다. 글자 폭이 변하면
+   재생 도중에 줄바꿈이 다시 계산돼, 두 줄이던 문구가 한 줄로 튄다.
+   같은 느낌은 transform(scale) 으로 낸다. 이건 배치를 건드리지 않는다. */
+
+/* 글씨 번짐 — 번진 글씨가 조여들며 또렷해진다 */
 @keyframes inv-intro-blur {
   from {
     opacity: 0;
     filter: blur(14px);
-    letter-spacing: 0.5em;
+    transform: scale(1.12);
   }
   to {
     opacity: 1;
     filter: blur(0);
+    transform: none;
   }
 }
 .inv-intro-blur {
   animation: inv-intro-blur 1.8s ease-out both;
+}
+
+/* 문구가 떠오른다 (사진·별빛) */
+@keyframes inv-intro-phrase-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-intro-phrase-in {
+  animation: inv-intro-phrase-in 1.3s ease-out both;
+}
+
+/* 꽃잎 — 문구가 바람에 실린 듯 살짝 흔들리며 떠오른다 */
+@keyframes inv-intro-sway {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) rotate(-1.2deg);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(0) rotate(0.7deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.inv-intro-sway {
+  animation: inv-intro-sway 2.2s ease-out both;
+}
+
+/* 흩날리는 꽃잎 한 장 */
+@keyframes inv-intro-petal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -18vh, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(var(--petal-sway), 34vh, 0)
+      rotate(calc(var(--petal-tilt) * 4));
+  }
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 86vh, 0) rotate(calc(var(--petal-tilt) * 9));
+  }
+}
+.inv-intro-petal {
+  position: absolute;
+  top: 0;
+  /* 한쪽만 둥근 꽃잎 모양 */
+  border-radius: 50% 0 50% 50%;
+  opacity: 0;
+  animation-name: inv-intro-petal;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 
 /* 라인 리빌 — 가는 선이 좌우로 그어지고, 그 사이로 문구가 닦이듯 드러난다 */
@@ -309,6 +380,9 @@ body {
   .inv-intro-rise,
   .inv-intro-rise-2,
   .inv-intro-blur,
+  .inv-intro-phrase-in,
+  .inv-intro-sway,
+  .inv-intro-petal,
   .inv-intro-line,
   .inv-intro-wipe,
   .inv-intro-photo {
