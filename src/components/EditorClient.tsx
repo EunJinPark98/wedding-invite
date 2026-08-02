@@ -524,8 +524,10 @@ function usePreviewSync(
     let raf = 0;
     const sync = () => {
       raf = 0;
-      // 화면 위쪽 1/3 선을 지난 마지막 단계를 "지금 보고 있는 곳"으로 본다
-      const line = window.innerHeight * 0.33;
+      // 화면 위쪽 선을 지난 마지막 단계를 "지금 보고 있는 곳"으로 본다.
+      // 선을 너무 아래에 두면 아직 날짜를 채우는 중인데 바로 아래 장소 칸이
+      // 먼저 선을 넘어서, 미리보기가 성급하게 지도로 넘어가 버린다.
+      const line = window.innerHeight * 0.2;
       let active = "";
       document
         .querySelectorAll<HTMLElement>("[data-form-section]")
@@ -1340,60 +1342,63 @@ export default function EditorClient({
             value={data.weddingTime}
             onChange={(v) => set("weddingTime", v)}
           />
-          <Field
-            label={labels.venueLabel}
-            value={data.venueName}
-            onChange={(v) => set("venueName", v)}
-          />
-          <Field
-            label="홀 / 층"
-            value={data.venueHall}
-            onChange={(v) => set("venueHall", v)}
-          />
-          <div>
-            <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              주소
-            </span>
-            <div className="flex flex-wrap items-start gap-2">
-              <input
-                value={data.venueAddress}
-                onChange={(e) => set("venueAddress", e.target.value)}
-                placeholder="주소 검색으로 채워 주세요"
-                className={`${INPUT_CLASS} min-w-0 flex-1`}
-              />
-              <AddressSearch
-                onSelect={(addr) => set("venueAddress", addr)}
-              />
+          {/* 여기서부터는 날짜가 아니라 장소 이야기라, 미리보기도 지도 쪽을 본다 */}
+          <div className="space-y-3.5" data-form-section="location">
+            <Field
+              label={labels.venueLabel}
+              value={data.venueName}
+              onChange={(v) => set("venueName", v)}
+            />
+            <Field
+              label="홀 / 층"
+              value={data.venueHall}
+              onChange={(v) => set("venueHall", v)}
+            />
+            <div>
+              <span className="mb-1.5 block text-xs font-medium text-gray-500">
+                주소
+              </span>
+              <div className="flex flex-wrap items-start gap-2">
+                <input
+                  value={data.venueAddress}
+                  onChange={(e) => set("venueAddress", e.target.value)}
+                  placeholder="주소 검색으로 채워 주세요"
+                  className={`${INPUT_CLASS} min-w-0 flex-1`}
+                />
+                <AddressSearch
+                  onSelect={(addr) => set("venueAddress", addr)}
+                />
+              </div>
             </div>
-          </div>
-          {/* 오시는 길 안내 — 초대장에서는 지도 자리에 펼쳐 볼 수 있다 */}
-          <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3.5">
-            <span className="block text-xs font-medium text-gray-500">
-              오시는 길 안내 (선택)
-            </span>
-            <p className="mt-1 text-[11px] text-gray-400">
-              적어 두면 초대장 지도 아래에 &lsquo;오시는 길 안내&rsquo; 버튼이
-              생겨요. 비워 두면 버튼도 나오지 않아요.
-            </p>
-            <div className="mt-3 space-y-3">
-              <TextareaField
-                label="지하철"
-                value={data.directionsSubway}
-                onChange={(v) => set("directionsSubway", v)}
-                placeholder={"2호선 강남역 3번 출구\n도보 5분"}
-              />
-              <TextareaField
-                label="버스 · 대중교통"
-                value={data.directionsBus}
-                onChange={(v) => set("directionsBus", v)}
-                placeholder={"간선 140, 401\n강남역 정류장 하차"}
-              />
-              <TextareaField
-                label="주차"
-                value={data.directionsParking}
-                onChange={(v) => set("directionsParking", v)}
-                placeholder={"건물 지하 1~3층\n2시간 무료"}
-              />
+            {/* 오시는 길 안내 — 초대장에서는 지도 자리에 펼쳐 볼 수 있다 */}
+            <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3.5">
+              <span className="block text-xs font-medium text-gray-500">
+                오시는 길 안내 (선택)
+              </span>
+              <p className="mt-1 text-[11px] text-gray-400">
+                적어 두면 초대장 지도 아래에 &lsquo;오시는 길 안내&rsquo; 버튼이
+                생겨요. 비워 두면 버튼도 나오지 않아요.
+              </p>
+              <div className="mt-3 space-y-3">
+                <TextareaField
+                  label="지하철"
+                  value={data.directionsSubway}
+                  onChange={(v) => set("directionsSubway", v)}
+                  placeholder={"2호선 강남역 3번 출구\n도보 5분"}
+                />
+                <TextareaField
+                  label="버스 · 대중교통"
+                  value={data.directionsBus}
+                  onChange={(v) => set("directionsBus", v)}
+                  placeholder={"간선 140, 401\n강남역 정류장 하차"}
+                />
+                <TextareaField
+                  label="주차"
+                  value={data.directionsParking}
+                  onChange={(v) => set("directionsParking", v)}
+                  placeholder={"건물 지하 1~3층\n2시간 무료"}
+                />
+              </div>
             </div>
           </div>
         </Group>

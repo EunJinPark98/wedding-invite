@@ -3,6 +3,44 @@
 import { useState } from "react";
 import type { TemplateTheme } from "@/lib/templates";
 
+/* 오시는 길 안내 아이콘 — 초대장 톤에 맞춰 가는 선으로만 그린다 */
+const iconProps = {
+  width: 15,
+  height: 15,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.6,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+
+const SubwayIcon = () => (
+  <svg {...iconProps}>
+    <rect x="5" y="3" width="14" height="13" rx="4" />
+    <path d="M5 10.5h14M9.5 21l-2-2.5M14.5 21l2-2.5M7 21h10" />
+    <circle cx="9" cy="13.4" r="0.9" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="13.4" r="0.9" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const BusIcon = () => (
+  <svg {...iconProps}>
+    <rect x="3" y="4" width="18" height="12" rx="3" />
+    <path d="M3 9.5h18M7.5 20v-2M16.5 20v-2" />
+    <circle cx="7.5" cy="13" r="0.9" fill="currentColor" stroke="none" />
+    <circle cx="16.5" cy="13" r="0.9" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const ParkingIcon = () => (
+  <svg {...iconProps}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+    <path d="M10 16.5v-9h3a2.6 2.6 0 0 1 0 5.2h-3" />
+  </svg>
+);
+
 /**
  * 오시는 길 지도 — 실제 지도 임베드(구글, 키 불필요) + 네이버 길찾기 + 주소 복사.
  * 지도 픽셀이 필요 없는 경우(주소 미입력)엔 렌더링하지 않음.
@@ -34,9 +72,9 @@ export default function MapSection({
 
   const rounded = square ? "rounded-sm" : "rounded-2xl";
   const directions = [
-    { icon: "🚇", label: "지하철", text: subway.trim() },
-    { icon: "🚌", label: "버스 · 대중교통", text: bus.trim() },
-    { icon: "🅿️", label: "주차", text: parking.trim() },
+    { Icon: SubwayIcon, label: "지하철", text: subway.trim() },
+    { Icon: BusIcon, label: "버스 · 대중교통", text: bus.trim() },
+    { Icon: ParkingIcon, label: "주차", text: parking.trim() },
   ].filter((d) => d.text);
   const hasDirections = directions.length > 0;
 
@@ -58,10 +96,11 @@ export default function MapSection({
           {directions.map((d, i) => (
             <div key={d.label} className={i > 0 ? "mt-4" : ""}>
               <p
-                className="text-[calc(12.5px*var(--inv-fs))] font-semibold tracking-[0.02em]"
+                className="flex items-center gap-1.5 text-[calc(12.5px*var(--inv-fs))] font-semibold tracking-[0.02em]"
                 style={{ color: t.accent }}
               >
-                <span aria-hidden>{d.icon}</span> {d.label}
+                <d.Icon />
+                {d.label}
               </p>
               <p
                 className="mt-1.5 whitespace-pre-line text-[calc(13px*var(--inv-fs))] leading-[1.9]"
