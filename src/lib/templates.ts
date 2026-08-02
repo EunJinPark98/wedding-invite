@@ -468,3 +468,21 @@ export const FONTS: FontOption[] = [
 
 export const getFontFamily = (id: string): string =>
   FONTS.find((f) => f.id === id)?.family ?? "";
+
+/* ───────── 메인 타이틀 글꼴 (생일 초대장) ───────── */
+// 맨 위 주인공 이름은 글자가 크고 몇 자 안 돼서, 본문용까지 다 늘어놓기보다
+// 큼직하게 키웠을 때 보기 좋은 서체만 추려 둔다.
+//  - 본고딕: 굵고 또렷해 이름이 가장 잘 읽힌다
+//  - 본명조: 획이 시원하게 뻗는 제목용 명조
+//  - 고운바탕: 부드러운 명조, 화사한 템플릿과 잘 어울린다
+//  - 송명: 획 대비가 뚜렷한 제목용 명조
+//  - 붓글씨: 손으로 쓴 듯한 축하 카드 느낌
+const TITLE_FONT_IDS = ["default", "noto", "serifkr", "gowun", "song", "brush"];
+
+export const TITLE_FONTS: FontOption[] = TITLE_FONT_IDS.flatMap((id) =>
+  FONTS.filter((f) => f.id === id)
+);
+
+// 목록에 없는 값(과거 데이터·조작된 입력)은 템플릿 기본으로 되돌린다
+export const getTitleFontFamily = (id: string): string =>
+  TITLE_FONTS.find((f) => f.id === id)?.family ?? "";
