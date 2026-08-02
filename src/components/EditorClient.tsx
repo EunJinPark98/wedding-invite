@@ -524,25 +524,18 @@ function usePreviewSync(
     let raf = 0;
     const sync = () => {
       raf = 0;
-      // 화면 위쪽을 가장 많이 차지한 단계를 "지금 보고 있는 곳"으로 본다.
-      //
-      // 선 하나를 그어 "그 선을 넘었나"로 고르면 단계 길이에 휘둘린다.
-      // 선을 위에 두면 한참 스크롤해야 미리보기가 따라오고, 아래에 두면
-      // 갤러리처럼 짧은 단계는 선 안에 들어오지도 못해 건너뛰어 버린다.
-      // 넓이로 재면 길이와 상관없이 눈에 가장 많이 들어온 단계가 이긴다.
-      const region = window.innerHeight * 0.55;
-      const covered = (el: HTMLElement) => {
-        const r = el.getBoundingClientRect();
-        return Math.max(0, Math.min(r.bottom, region) - Math.max(r.top, 0));
-      };
+      // 단계 제목이 화면 한가운데까지 올라오면 그 대목으로 옮긴다.
+      // (더 아래에 두면 굼떠 보이고, 더 위에 두면 한참 스크롤해야 따라온다)
+      const h = window.innerHeight;
+      const line = h * 0.5;
 
       const groups = [
         ...document.querySelectorAll<HTMLElement>("[data-form-section]"),
       ].filter((g) => !g.parentElement?.closest("[data-form-section]"));
       if (!groups.length) return;
 
-      // 페이지 끝까지 내려왔다면 마지막 단계다. 더 스크롤할 수 없으니 넓이로
-      // 재면 영영 이기지 못한다 (생일처럼 갤러리가 마지막인 경우가 그렇다).
+      // 페이지 끝까지 내려왔다면 마지막 단계다. 더 스크롤할 수 없어 마지막
+      // 단계는 한가운데까지 올라오지 못한다 (생일은 갤러리가 마지막이다).
       const atBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 4;
@@ -550,25 +543,23 @@ function usePreviewSync(
       let winner: HTMLElement | null = atBottom
         ? groups[groups.length - 1]
         : null;
-      let best = 0;
       if (!winner) {
         groups.forEach((g) => {
-          const area = covered(g);
-          if (area > best) {
-            best = area;
-            winner = g;
-          }
+          if (g.getBoundingClientRect().top <= line) winner = g;
         });
       }
       if (!winner) return;
 
       let active = (winner as HTMLElement).dataset.formSection ?? "";
-      // 그 단계 안의 작은 묶음(일시·장소 안의 장소 칸)이 화면을 거의 채웠다면
-      // 그쪽을 본다. 아직 날짜를 채우는 중에 지도로 넘어가지 않을 만큼만.
+      // 단계 안의 작은 묶음(일시·장소 안의 장소 칸)은 더 위까지 올라와야
+      // 인정한다. 같은 선을 쓰면 아직 날짜를 채우는 중인데 바로 아래 장소
+      // 칸이 먼저 선을 넘어 미리보기가 성급히 지도로 넘어간다.
       (winner as HTMLElement)
         .querySelectorAll<HTMLElement>("[data-form-section]")
         .forEach((n) => {
-          if (covered(n) >= region * 0.6) active = n.dataset.formSection ?? "";
+          if (n.getBoundingClientRect().top <= h * 0.25) {
+            active = n.dataset.formSection ?? "";
+          }
         });
       if (!active || active === current) return;
       current = active;
