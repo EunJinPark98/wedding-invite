@@ -3093,7 +3093,7 @@ function BdayBloomLayout({
           className="inv-hero-in mt-3 text-[calc(26px*var(--inv-fs))]"
           style={{ fontFamily: "var(--font-brush)", color: t.accent }}
         >
-          꽃처럼 환한 하루
+          당신이 피어나는 날
         </p>
         {/* 원형 사진 + 바깥 헤어라인 링 */}
         <div
