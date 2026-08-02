@@ -118,17 +118,57 @@ export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
  * 결혼 청첩장에서만 고를 수 있고, "none"이면 바로 본문이 열린다.
  * 실제 그림은 InvitationIntro + globals.css 의 inv-intro-* 가 그린다.
  */
-export const INTROS = [
+/**
+ * 인트로(오프닝) 연출 — 초대장을 열면 잠깐 지나가는 첫 화면.
+ * "none"이면 바로 본문이 열린다.
+ *
+ * 앞의 다섯 가지는 종류를 가리지 않고 쓰고, 마지막 하나만 종류에 맞춰
+ * 바꾼다 (결혼=꽃잎, 돌잔치=풍선, 칠순=먹, 생일=컨페티).
+ * 실제 그림은 InvitationIntro + globals.css 의 inv-intro-* 가 그린다.
+ */
+const INTRO_COMMON = [
   { id: "none", label: "사용 안 함", desc: "인트로 없이 바로 열림" },
   { id: "blur", label: "글씨 번짐", desc: "문구가 번지듯 또렷해져요" },
   { id: "line", label: "라인 리빌", desc: "선을 따라 문구가 드러나요" },
   { id: "photo", label: "사진 페이드", desc: "사진이 서서히 밝아져요" },
   { id: "star", label: "별빛", desc: "반짝임 속에 떠올라요" },
-  { id: "petal", label: "꽃잎", desc: "꽃잎 날리며 한 글자씩" },
 ] as const;
-export type IntroStyle = (typeof INTROS)[number]["id"];
+
+const INTRO_LAST = {
+  wedding: { id: "petal", label: "꽃잎", desc: "꽃잎 날리며 한 글자씩" },
+  doljanchi: { id: "balloon", label: "풍선", desc: "풍선이 두둥실 떠올라요" },
+  senior: { id: "ink", label: "먹번짐", desc: "먹이 번지듯 스며들어요" },
+  birthday: { id: "confetti", label: "컨페티", desc: "색종이가 쏟아져요" },
+} as const;
+
+export const INTROS = [...INTRO_COMMON, INTRO_LAST.wedding] as const;
+
+/** 종류에 맞는 인트로 6종 */
+export const getIntros = (category: Category) => [
+  ...INTRO_COMMON,
+  INTRO_LAST[category] ?? INTRO_LAST.wedding,
+];
+
+export type IntroStyle =
+  | (typeof INTRO_COMMON)[number]["id"]
+  | (typeof INTRO_LAST)[keyof typeof INTRO_LAST]["id"];
+
+const ALL_INTRO_IDS: readonly string[] = [
+  ...INTRO_COMMON.map((i) => i.id),
+  ...Object.values(INTRO_LAST).map((i) => i.id),
+];
 export const isIntroStyle = (v: unknown): v is IntroStyle =>
-  INTROS.some((i) => i.id === v);
+  typeof v === "string" && ALL_INTRO_IDS.includes(v);
+
+/** 종류별 인트로 문구 예시 (에디터 입력칸의 안내 문구) */
+export const introPlaceholder = (category: Category) =>
+  category === "doljanchi"
+    ? "우리 아기 첫 생일이에요"
+    : category === "senior"
+      ? "귀한 걸음으로 빛내 주세요"
+      : category === "birthday"
+        ? "오늘은 내 생일!"
+        : "We are getting married!";
 
 /**
  * 섹션 사이 구분선 디자인.
@@ -159,7 +199,7 @@ export const isFontScale = (v: unknown): v is number =>
   FONT_SCALES.some((s) => s.value === v);
 
 // 갤러리 사진 최대 장수 — 페이지 로딩 속도를 위한 기술적 한도 (요금제 아님)
-export const MAX_GALLERY = 20;
+export const MAX_GALLERY = 19;
 
 // 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 초대장 제작에는 사용 불가
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";

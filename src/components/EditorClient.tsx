@@ -25,7 +25,8 @@ import {
   DOL_KINDS,
   FONT_SCALES,
   HERO_MOTIONS,
-  INTROS,
+  getIntros,
+  introPlaceholder,
   MAX_GALLERY,
   SENIOR_AGES,
   dolGreetingMessage,
@@ -917,13 +918,12 @@ export default function EditorClient({
           </div>
           {/* 인트로 — 청첩장을 열자마자 잠깐 지나가는 첫 화면.
               템플릿과 함께 첫인상을 정하는 항목이라 바로 아래에 둔다. */}
-          {data.category === "wedding" && (
-            <div>
+          <div>
               <span className="mb-1.5 block text-xs font-medium text-gray-500">
                 인트로
               </span>
               <div className="grid grid-cols-2 gap-2">
-                {INTROS.map((v) => {
+                {getIntros(category).map((v) => {
                   const selected = data.intro === v.id;
                   return (
                     <button
@@ -954,12 +954,11 @@ export default function EditorClient({
                     label="인트로 문구"
                     value={data.introText}
                     onChange={(v) => set("introText", v)}
-                    placeholder="We are getting married!"
+                    placeholder={introPlaceholder(category)}
                   />
                 </div>
               )}
             </div>
-          )}
           {/* 생일은 상단 사진 위에 이름 대신 직접 쓴 문구를 올린다 */}
           {category === "birthday" && (
             <div>

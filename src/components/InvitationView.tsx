@@ -578,9 +578,6 @@ function GalleryInner({
   return (
     <>
       <GalleryAlbum images={gallery} rounded={rounded} />
-      <p className="inv-fade mt-4 text-xs" style={{ color: t.sub }}>
-        사진을 누르면 크게 볼 수 있어요
-      </p>
     </>
   );
 }
@@ -733,24 +730,6 @@ function Sec({
       <Label text={label} t={t} variant={variant} index={index} />
       {children}
     </section>
-  );
-}
-
-// 알파벳이 한 글자씩 나타나는 텍스트 (모던 히어로)
-function LetterReveal({ text }: { text: string }) {
-  return (
-    <span aria-label={text}>
-      {text.split("").map((ch, i) => (
-        <span
-          key={i}
-          aria-hidden
-          className="inv-letter"
-          style={{ animationDelay: `${0.4 + i * 0.07}s` }}
-        >
-          {ch === " " ? " " : ch}
-        </span>
-      ))}
-    </span>
   );
 }
 
@@ -1448,12 +1427,6 @@ function CinemaLayout({
           </span>
         )}
       </div>
-      <p
-        className="pt-10 text-center font-cormorant text-[calc(15px*var(--inv-fs))] tracking-[0.3em]"
-        style={{ color: t.accent }}
-      >
-        <LetterReveal text="OUR MOMENT, FOREVER" />
-      </p>
       <Sec label="INVITATION" section="greeting" t={t} variant="cinema">
         <GreetingInner data={data} t={t} />
       </Sec>
@@ -3354,8 +3327,8 @@ export default function InvitationView({
     bodyFont: bodyFam || base.bodyFont,
   };
   const fp = dateParts(data.weddingDate);
-  // 인트로는 결혼 청첩장에만 둔다 (다른 종류에 값이 남아 있어도 무시)
-  const intro = data.category === "wedding" ? data.intro : "none";
+  // 인트로는 종류마다 마지막 한 가지 연출만 다르다 (getIntros 참고)
+  const intro = data.intro;
 
   return (
     <div
