@@ -10,9 +10,9 @@ import AddressSearch from "./AddressSearch";
 import {
   getTemplatesByCategory,
   findTheme,
-  getTitleFontFamily,
   FONTS,
   TITLE_FONTS,
+  type FontOption,
 } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
 import { fileToCompressedBlob } from "@/lib/image";
@@ -429,13 +429,16 @@ function Group({
 function FontPicker({
   value,
   onChange,
+  // 메인 타이틀처럼 일부 서체만 보여줘야 하는 곳에서 목록을 좁혀 쓴다
+  options = FONTS,
 }: {
   value: string;
   onChange: (id: string) => void;
+  options?: FontOption[];
 }) {
   return (
     <div className="grid grid-cols-3 gap-2">
-      {FONTS.map((f) => {
+      {options.map((f) => {
         const selected = value === f.id;
         return (
           <button
@@ -881,37 +884,6 @@ export default function EditorClient({
               onChange={(id) => set("fontBody", id)}
             />
           </div>
-          {/* 생일은 맨 위 이름 한 줄이 첫인상을 좌우해 따로 고를 수 있게 둔다 */}
-          {data.category === "birthday" && (
-            <div>
-              <span className="mb-2 block text-xs font-medium text-gray-500">
-                메인 타이틀 글꼴 · 주인공 이름
-              </span>
-              <select
-                value={data.titleFont}
-                onChange={(e) => set("titleFont", e.target.value)}
-                aria-label="메인 타이틀 글꼴"
-                className={`${SELECT_CLASS} text-base`}
-                // 고른 글꼴이 어떤 모양인지 닫혀 있을 때도 보이게
-                style={{
-                  fontFamily: getTitleFontFamily(data.titleFont) || undefined,
-                }}
-              >
-                {TITLE_FONTS.map((f) => (
-                  <option
-                    key={f.id}
-                    value={f.id}
-                    style={{ fontFamily: f.family || undefined }}
-                  >
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1.5 text-[11px] text-gray-400">
-                맨 위에 크게 들어가는 이름에만 적용돼요.
-              </p>
-            </div>
-          )}
           <div>
             <span className="mb-2 block text-xs font-medium text-gray-500">
               글꼴 크기
@@ -1031,6 +1003,22 @@ export default function EditorClient({
               />
             )}
           </div>
+          {/* 맨 위에 크게 들어가는 이름이라, 적는 칸 바로 아래에서 글꼴을 고른다 */}
+          {category === "birthday" && (
+            <div>
+              <span className="mb-2 block text-xs font-medium text-gray-500">
+                메인 타이틀 글꼴
+              </span>
+              <FontPicker
+                value={data.titleFont}
+                onChange={(id) => set("titleFont", id)}
+                options={TITLE_FONTS}
+              />
+              <p className="mt-1.5 text-[11px] text-gray-400">
+                맨 위에 크게 들어가는 이름에만 적용돼요.
+              </p>
+            </div>
+          )}
           {/* 아기 성별 — 초대장에서 이름 옆에 함께 표시 */}
           {category === "doljanchi" && (
             <div>
