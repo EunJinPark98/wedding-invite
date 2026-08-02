@@ -819,9 +819,10 @@ function ClassicLayout({
             <NamesAmp data={data} t={t} heartColor="#e8c878" />
           </h1>
           {p && (
-            <p className="inv-hero-in-delay mt-3 font-cormorant text-sm tracking-[0.35em] text-white/80">
+            <p className="whitespace-nowrap inv-hero-in-delay mt-3 font-cormorant text-sm tracking-[0.35em] text-white/80">
               {p.year}. {String(p.month).padStart(2, "0")}.{" "}
               {String(p.day).padStart(2, "0")}. {p.wkEn}
+              {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
             </p>
           )}
         </div>
@@ -899,7 +900,7 @@ function ModernLayout({
           </p>
         )}
         <p className="inv-hero-in-delay mt-3 text-sm" style={{ color: t.sub }}>
-          {p ? `${p.wkEn} · ${data.weddingTime}` : data.weddingTime}
+          {p ? `${p.wkEn} · ${time24(data.weddingTime)}` : time24(data.weddingTime)}
         </p>
       </header>
       <div className="overflow-hidden">
@@ -1047,11 +1048,12 @@ function RomanticLayout({
         </div>
         {p && (
           <p
-            className="inv-hero-in-delay mt-2.5 pb-10 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-2.5 pb-10 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1140,9 +1142,10 @@ function BotanicalLayout({
             <NamesAmp data={data} t={t} />
           </h1>
           {p && (
-            <p className="mt-2 pb-2 font-cormorant text-base tracking-widest" style={{ color: t.sub }}>
+            <p className="whitespace-nowrap mt-2 pb-2 font-cormorant text-base tracking-widest" style={{ color: t.sub }}>
               {p.year}. {String(p.month).padStart(2, "0")}.{" "}
               {String(p.day).padStart(2, "0")}. {p.wkEn}
+              {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
             </p>
           )}
         </div>
@@ -1273,11 +1276,12 @@ function StarlightLayout({
         </h1>
         {p && (
           <p
-            className="inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
+            className="whitespace-nowrap inv-hero-in-delay mt-3 font-cormorant text-base tracking-[0.3em]"
             style={{ color: t.sub }}
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}. {p.wkEn}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1385,7 +1389,7 @@ function CinemaLayout({
             }}
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
-            {String(p.day).padStart(2, "0")} {data.weddingTime}
+            {String(p.day).padStart(2, "0")} {time24(data.weddingTime)}
           </p>
         )}
         {/* 필름 카메라 날짜 스탬프 */}
