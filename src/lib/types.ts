@@ -122,9 +122,9 @@ export const INTROS = [
   { id: "none", label: "사용 안 함", desc: "인트로 없이 바로 열림" },
   { id: "blur", label: "글씨 번짐", desc: "문구가 번지듯 또렷해져요" },
   { id: "line", label: "라인 리빌", desc: "선을 따라 문구가 드러나요" },
-  { id: "photo", label: "사진 페이드", desc: "사진이 밝아지며 문구가" },
+  { id: "photo", label: "사진 페이드", desc: "어두운 사진이 서서히 밝아져요" },
   { id: "star", label: "별빛", desc: "반짝임 속에 문구가 떠올라요" },
-  { id: "petal", label: "꽃잎", desc: "꽃잎이 흩날리고 문구만" },
+  { id: "petal", label: "꽃잎", desc: "꽃잎 사이로 한 글자씩 써져요" },
 ] as const;
 export type IntroStyle = (typeof INTROS)[number]["id"];
 export const isIntroStyle = (v: unknown): v is IntroStyle =>
