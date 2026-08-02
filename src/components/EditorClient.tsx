@@ -929,11 +929,6 @@ export default function EditorClient({
                     onChange={(v) => set("introText", v)}
                     placeholder="We are getting married!"
                   />
-                  <p className="mt-1.5 text-[11px] text-gray-400">
-                    이 문구가 고른 연출로 움직여요. 비우면 두 분 이름이 대신
-                    들어가고, 줄바꿈도 그대로 나와요. 하객이 화면을 누르면
-                    건너뛸 수 있어요.
-                  </p>
                 </div>
               )}
             </div>
@@ -1279,6 +1274,9 @@ export default function EditorClient({
                   onChange={(v) => set("bridePhone", v)}
                 />
               )}
+              <p className="text-xs text-gray-400">
+                연락처를 입력하면 이름 옆에 전화·문자 버튼이 붙어요.
+              </p>
             </div>
           )}
           {labels.showParents && (
@@ -1328,12 +1326,6 @@ export default function EditorClient({
               )}
             </div>
           )}
-          <p className="text-xs text-gray-400">
-            사진을 올리면 프로필 섹션이 생겨요.
-            {labels.showContact &&
-              " 연락처를 입력하면 이름 옆에 전화·문자 버튼이 붙어요."}
-            {labels.showParents && " 부모님 성함은 비우면 표시되지 않아요."}
-          </p>
         </Group>
 
         <Group title={labels.dateSectionTitle} step={4} previewSection="date">
