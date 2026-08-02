@@ -189,6 +189,21 @@ function GreetingInner({
 }
 
 // 예식일까지 남은 일수 (지났으면 null)
+/**
+ * 날짜를 숫자·영문 서체로 쓰는 히어로에서는 시간도 숫자로 맞춘다 ("오후 1시" → "13:00").
+ * 한글로 "2026년 10월 10일" 처럼 쓰는 곳은 "오후 1시" 가 자연스러워 그대로 둔다.
+ */
+function time24(v: string): string {
+  const t = (v ?? "").trim();
+  if (!t) return "";
+  if (/^\d{1,2}:\d{2}$/.test(t)) return t; // 이미 숫자 표기
+  const m = t.match(/(오전|오후)\s*(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?/);
+  if (!m) return t; // 직접 적은 값은 건드리지 않는다
+  const h12 = Number(m[2]) % 12;
+  const h = m[1] === "오전" ? h12 : h12 + 12;
+  return `${String(h).padStart(2, "0")}:${String(Number(m[3] ?? 0)).padStart(2, "0")}`;
+}
+
 function daysUntil(iso: string): number | null {
   const d = parseDate(iso);
   if (!d) return null;
@@ -1584,7 +1599,7 @@ function DolBearLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -1711,7 +1726,7 @@ function DolCloudLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2172,7 +2187,7 @@ function BdayPopLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")} {p.wkEn}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2260,7 +2275,7 @@ function BdayNeonLayout({
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")} {p.wkEn}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2310,7 +2325,7 @@ function BdayMinimalLayout({
           >
             {p.year}.{String(p.month).padStart(2, "0")}.
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
         {/* 알약(캡슐)형 사진 */}
@@ -2457,7 +2472,7 @@ function StarHero({
         >
           {p.year}. {String(p.month).padStart(2, "0")}.{" "}
           {String(p.day).padStart(2, "0")}. {p.wkEn}
-          {data.weddingTime && ` · ${data.weddingTime}`}
+          {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
         </p>
       )}
     </div>
@@ -2590,7 +2605,7 @@ function DolGardenLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2673,7 +2688,7 @@ function DolCrayonLayout({
             style={{ background: t.accentSoft, color: t.accent }}
           >
             {p.year}. {p.month}. {p.day}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -2894,7 +2909,7 @@ function SeniorWarmLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -3012,7 +3027,7 @@ function BdayCakeLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
@@ -3119,7 +3134,7 @@ function BdayBloomLayout({
           >
             {p.year}. {String(p.month).padStart(2, "0")}.{" "}
             {String(p.day).padStart(2, "0")}
-            {data.weddingTime && ` · ${data.weddingTime}`}
+            {time24(data.weddingTime) && ` · ${time24(data.weddingTime)}`}
           </p>
         )}
       </div>
