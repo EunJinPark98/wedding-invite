@@ -494,11 +494,11 @@ export const SAMPLE_INTRO: Record<Category, { person1: string; person2: string }
     person2: "",
   },
   senior: {
-    person1: "평생 가족을 위해 사신\n우리 집 큰어른\n요즘 취미는 텃밭 가꾸기",
+    person1: "1남2녀 장녀\n울산 출생\n아들1 딸1\n취미 텃밭 가꾸기",
     person2: "",
   },
   birthday: {
-    person1: "#ENFP\n#여행 좋아함\n웃음이 많고\n정도 많은 사람",
+    person1: "#INFJ\n#개발자\n#취미 독서\n#아재개그 좋아함",
     person2: "",
   },
 };
