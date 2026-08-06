@@ -63,6 +63,9 @@ export interface CategoryLabels {
   showPerson2: boolean;
   showParents: boolean;
   showContact: boolean; // 프로필에 전화·문자 버튼을 둘지
+  showIntro: boolean; // 프로필에 인물 소개 문구를 둘지 (선택 입력)
+  intro1Label: string;
+  intro2Label: string;
   parent1Label: string;
   parent2Label: string;
   dateSectionTitle: string;
@@ -85,6 +88,7 @@ export interface CategoryLabels {
   dolEvent: string; // 백일잔치/돌잔치 (doljanchi 전용, 그 외 "")
   dolOccasion: string; // 문장 속 표현 — 백일/첫 생일 (doljanchi 전용, 그 외 "")
   dolMilestone: string; // "~을 맞이했습니다" 용 — 백일/첫 돌 (doljanchi 전용, 그 외 "")
+  dolEnglish: string; // 이름 아래 영문 문구 — 구름 위 아기 템플릿 (doljanchi 전용, 그 외 "")
 }
 
 // seniorAge는 senior 카테고리에서만 의미가 있음 (70=칠순, 80=팔순, 90=구순, 100=백수)
@@ -110,9 +114,12 @@ export function getCategoryLabels(
         photo1Label: "아기 사진",
         photo2Label: "",
         showPerson2: false,
-        // 아기는 소개 문구 없이 사진과 이름만 담백하게
+        // 아기 잔치는 혼주·연락처 대신 아기 소개만 담백하게 둔다
         showParents: false,
         showContact: false,
+        showIntro: true,
+        intro1Label: "아기 소개 (선택)",
+        intro2Label: "",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: `${dol.event} 일시 · 장소`,
@@ -135,6 +142,7 @@ export function getCategoryLabels(
         dolEvent: dol.event,
         dolOccasion: dol.occasion,
         dolMilestone: dol.milestone,
+        dolEnglish: dol.english,
       };
     case "senior":
       return {
@@ -150,6 +158,9 @@ export function getCategoryLabels(
         showPerson2: false,
         showParents: false,
         showContact: true,
+        showIntro: true,
+        intro1Label: "주인공 소개 (선택)",
+        intro2Label: "",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: `${age.label} 일시 · 장소`,
@@ -172,6 +183,7 @@ export function getCategoryLabels(
         dolEvent: "",
         dolOccasion: "",
         dolMilestone: "",
+        dolEnglish: "",
       };
     case "birthday":
       return {
@@ -187,6 +199,9 @@ export function getCategoryLabels(
         showPerson2: false,
         showParents: false,
         showContact: true,
+        showIntro: true,
+        intro1Label: "주인공 소개 (선택)",
+        intro2Label: "",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: "파티 일시 · 장소",
@@ -209,6 +224,7 @@ export function getCategoryLabels(
         dolEvent: "",
         dolOccasion: "",
         dolMilestone: "",
+        dolEnglish: "",
       };
     case "wedding":
     default:
@@ -225,6 +241,9 @@ export function getCategoryLabels(
         showPerson2: true,
         showParents: true,
         showContact: true,
+        showIntro: true,
+        intro1Label: "신랑 소개 (선택)",
+        intro2Label: "신부 소개 (선택)",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: "예식 일시 · 장소",
@@ -246,6 +265,7 @@ export function getCategoryLabels(
         dolEvent: "",
         dolOccasion: "",
         dolMilestone: "",
+        dolEnglish: "",
       };
   }
 }

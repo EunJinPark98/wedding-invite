@@ -58,6 +58,7 @@ export const seniorGreetingTitle = (age: number) =>
  *   milestone : "~을 맞이했습니다" 처럼 예스러운 문장에 쓰는 표현
  *   greeting  : 기본 인사말 제목 (종류마다 자연스러운 조사가 달라 통째로 둔다)
  *   kicker    : 히어로 영문 소문구
+ *   english   : 이름 아래 영문 문구 (구름 위 아기 템플릿)
  */
 export const DOL_KINDS = [
   {
@@ -69,6 +70,7 @@ export const DOL_KINDS = [
     greeting: "우리 아이의 백일잔치에 초대합니다",
     kicker: "100 DAYS",
     kicker2: "THE 100TH DAY",
+    english: "HAPPY 100 DAYS",
   },
   {
     id: "dol",
@@ -76,9 +78,10 @@ export const DOL_KINDS = [
     event: "돌잔치",
     occasion: "첫 생일",
     milestone: "첫 돌",
-    greeting: "우리 아이의 첫 생일에 초대합니다",
+    greeting: "우리 아이의 돌잔치에 초대합니다",
     kicker: "FIRST BIRTHDAY",
     kicker2: "THE FIRST BIRTHDAY",
+    english: "HAPPY BIRTH DAY",
   },
 ] as const;
 export type DolKind = (typeof DOL_KINDS)[number]["id"];
@@ -304,6 +307,9 @@ export interface InvitationData {
   // 신랑/신부 개별 프로필 사진 (선택)
   groomPhotoUrl: string;
   bridePhotoUrl: string;
+  // 신랑/신부 한 줄 소개 (선택 — 청첩장 전용, 비우면 아예 표시하지 않음)
+  groomIntro: string;
+  brideIntro: string;
   gallery: string[];
   // 연락처
   groomPhone: string;
@@ -376,6 +382,8 @@ export const normalizeData = (
     : "diamond",
   groomPhotoUrl: d?.groomPhotoUrl ?? "",
   bridePhotoUrl: d?.bridePhotoUrl ?? "",
+  groomIntro: d?.groomIntro ?? "",
+  brideIntro: d?.brideIntro ?? "",
   gallery: Array.isArray(d?.gallery)
     ? d.gallery.filter((g) => typeof g === "string").slice(0, MAX_GALLERY)
     : [],
@@ -473,6 +481,28 @@ const CATEGORY_SAMPLE: Record<
   },
 };
 
+// 인물 소개 예시 (소개 칸을 두는 카테고리만 채운다 — CategoryLabels.showIntro).
+// 프로필 카드가 반쪽 너비라 한 줄이 열 글자를 넘으면 접히므로 짧은 줄로 끊어 두고,
+// 이름은 소개 바로 위에 이미 나오므로 예시에 넣지 않는다.
+export const SAMPLE_INTRO: Record<Category, { person1: string; person2: string }> = {
+  wedding: {
+    person1: "#ISFP\n#개발자\n무뚝뚝해 보이지만\n세상 다정한 F신랑",
+    person2: "#INFJ\n#사업가\n웃음이 많은\n장난꾸러기 신부",
+  },
+  doljanchi: {
+    person1: "웃음이 많은\n세상 순한 아기\n잡아당기기 좋아함",
+    person2: "",
+  },
+  senior: {
+    person1: "1남2녀 장녀\n울산 출생\n아들1 딸1\n취미 텃밭 가꾸기",
+    person2: "",
+  },
+  birthday: {
+    person1: "#INFJ\n#개발자\n#취미 독서\n#아재개그 좋아함",
+    person2: "",
+  },
+};
+
 export const emptyInvitation = (category: Category = "wedding"): InvitationData => {
   const s = CATEGORY_SAMPLE[category];
   return {
@@ -514,6 +544,10 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     dividerStyle: "diamond",
     groomPhotoUrl: "",
     bridePhotoUrl: "",
+    // 소개는 선택 사항이지만, 비어 있으면 어떤 칸인지 알기 어려워 예시를 채워 둔다
+    // (소개 칸이 없는 종류는 예시도 빈 값)
+    groomIntro: SAMPLE_INTRO[category].person1,
+    brideIntro: SAMPLE_INTRO[category].person2,
     // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
     gallery: ["", "", ""],
     // 생일·칠순은 연락처가 선택 사항이라 예시 번호를 넣지 않는다

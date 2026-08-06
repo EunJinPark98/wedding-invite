@@ -373,6 +373,7 @@ function CoupleInner({
           mother: data.groomMother,
           relation: "아들",
           tel: data.groomPhone,
+          intro: data.groomIntro,
         },
         {
           role: "신부",
@@ -382,6 +383,7 @@ function CoupleInner({
           mother: data.brideMother,
           relation: "딸",
           tel: data.bridePhone,
+          intro: data.brideIntro,
         },
       ]
     : [
@@ -393,6 +395,7 @@ function CoupleInner({
           mother: data.groomMother,
           relation: labels.relation,
           tel: data.groomPhone,
+          intro: data.groomIntro,
         },
       ];
   return (
@@ -431,6 +434,15 @@ function CoupleInner({
               {p.name}
             </p>
             <GenderMark data={data} t={t} />
+            {/* 한 줄 소개 (선택) — 안 적으면 이 줄 자체가 나오지 않는다 */}
+            {labels.showIntro && p.intro.trim() && (
+              <p
+                className="inv-fade mt-2.5 whitespace-pre-line text-[calc(12px*var(--inv-fs))] leading-[1.9]"
+                style={{ color: t.sub }}
+              >
+                {p.intro.trim()}
+              </p>
+            )}
             {labels.showContact && p.tel && (
               <div className="inv-fade mt-2.5 flex items-center justify-center gap-2">
                   <a
@@ -1731,10 +1743,10 @@ function DolCloudLayout({
           {data.groomName}
         </h1>
         <p
-          className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
+          className="inv-hero-in-delay mt-2 font-cormorant text-[calc(14px*var(--inv-fs))] tracking-[0.3em]"
           style={{ color: t.sub }}
         >
-          구름 위를 걷는 {labels.dolOccasion}에 초대해요
+          {labels.dolEnglish}
         </p>
         {p && (
           <p
