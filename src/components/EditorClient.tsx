@@ -1295,36 +1295,45 @@ export default function EditorClient({
                 value={data.groomIntro}
                 onChange={(v) => set("groomIntro", v)}
                 placeholder={SAMPLE_INTRO.groom}
+                rows={4}
               />
-              <TextareaField
-                label={labels.intro2Label}
-                value={data.brideIntro}
-                onChange={(v) => set("brideIntro", v)}
-                placeholder={SAMPLE_INTRO.bride}
-              />
-              <p className="text-xs text-gray-400">
-                이름 아래에 들어가요. 비워 두면 나오지 않아요.
-              </p>
+              {/* 안내문은 마지막 칸에 붙여 둔다 (space-y 간격이 끼면 멀어 보인다) */}
+              <div>
+                <TextareaField
+                  label={labels.intro2Label}
+                  value={data.brideIntro}
+                  onChange={(v) => set("brideIntro", v)}
+                  placeholder={SAMPLE_INTRO.bride}
+                  rows={4}
+                />
+                <p className="mt-1.5 text-xs text-gray-400">
+                  이름 아래에 들어가요. 비워 두면 나오지 않아요.
+                </p>
+              </div>
             </div>
           )}
           {/* 연락처는 칸이 세 개라 좁은 화면에서 나란히 두면 눌린다 */}
           {labels.showContact && (
             <div className="space-y-3.5">
-              <PhoneField
-                label={labels.contact1Label}
-                value={data.groomPhone}
-                onChange={(v) => set("groomPhone", v)}
-              />
               {labels.showPerson2 && (
                 <PhoneField
-                  label={labels.contact2Label}
-                  value={data.bridePhone}
-                  onChange={(v) => set("bridePhone", v)}
+                  label={labels.contact1Label}
+                  value={data.groomPhone}
+                  onChange={(v) => set("groomPhone", v)}
                 />
               )}
-              <p className="text-xs text-gray-400">
-                연락처를 입력하면 이름 옆에 전화·문자 버튼이 붙어요.
-              </p>
+              <div>
+                <PhoneField
+                  label={labels.showPerson2 ? labels.contact2Label : labels.contact1Label}
+                  value={labels.showPerson2 ? data.bridePhone : data.groomPhone}
+                  onChange={(v) =>
+                    set(labels.showPerson2 ? "bridePhone" : "groomPhone", v)
+                  }
+                />
+                <p className="mt-1.5 text-xs text-gray-400">
+                  연락처를 입력하면 이름 옆에 전화·문자 버튼이 붙어요.
+                </p>
+              </div>
             </div>
           )}
           {labels.showParents && (
@@ -1551,7 +1560,8 @@ export default function EditorClient({
               )}
             </div>
           </div>
-          <p className="text-xs text-gray-400">
+          {/* 바로 위 사진 목록에 붙여 둔다 (Group 의 space-y 간격을 되돌림) */}
+          <p className="-mt-2 text-xs text-gray-400">
             갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요.
           </p>
         </Group>

@@ -478,11 +478,11 @@ const CATEGORY_SAMPLE: Record<
   },
 };
 
-// 신랑·신부 한 줄 소개 예시 (청첩장 전용). 프로필 카드가 반쪽 너비라 한 줄이
-// 열 글자를 넘으면 접히므로, 예시도 짧은 두 줄로 맞춰 둔다.
+// 신랑·신부 소개 예시 (청첩장 전용). 프로필 카드가 반쪽 너비라 한 줄이 열 글자를
+// 넘으면 접히므로, 예시도 짧은 줄로 끊어 둔다. (이름은 바로 위에 이미 나온다)
 export const SAMPLE_INTRO = {
-  groom: "무뚝뚝하지만\n누구보다 다정한 사람",
-  bride: "웃음이 많고\n마음이 따뜻한 사람",
+  groom: "#ISFP\n#개발자\n무뚝뚝해 보이지만\n세상 다정한 F신랑",
+  bride: "#INFJ\n#사업가\n웃음이 많은\n장난꾸러기 신부",
 } as const;
 
 export const emptyInvitation = (category: Category = "wedding"): InvitationData => {
