@@ -478,12 +478,21 @@ const CATEGORY_SAMPLE: Record<
   },
 };
 
-// 신랑·신부 소개 예시 (청첩장 전용). 프로필 카드가 반쪽 너비라 한 줄이 열 글자를
-// 넘으면 접히므로, 예시도 짧은 줄로 끊어 둔다. (이름은 바로 위에 이미 나온다)
-export const SAMPLE_INTRO = {
-  groom: "#ISFP\n#개발자\n무뚝뚝해 보이지만\n세상 다정한 F신랑",
-  bride: "#INFJ\n#사업가\n웃음이 많은\n장난꾸러기 신부",
-} as const;
+// 인물 소개 예시 (소개 칸을 두는 카테고리만 채운다 — CategoryLabels.showIntro).
+// 프로필 카드가 반쪽 너비라 한 줄이 열 글자를 넘으면 접히므로 짧은 줄로 끊어 두고,
+// 이름은 소개 바로 위에 이미 나오므로 예시에 넣지 않는다.
+export const SAMPLE_INTRO: Record<Category, { person1: string; person2: string }> = {
+  wedding: {
+    person1: "#ISFP\n#개발자\n무뚝뚝해 보이지만\n세상 다정한 F신랑",
+    person2: "#INFJ\n#사업가\n웃음이 많은\n장난꾸러기 신부",
+  },
+  doljanchi: {
+    person1: "웃음이 많은\n세상 순한 아기\n잡아당기기 좋아함",
+    person2: "",
+  },
+  senior: { person1: "", person2: "" },
+  birthday: { person1: "", person2: "" },
+};
 
 export const emptyInvitation = (category: Category = "wedding"): InvitationData => {
   const s = CATEGORY_SAMPLE[category];
@@ -527,9 +536,9 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     groomPhotoUrl: "",
     bridePhotoUrl: "",
     // 소개는 선택 사항이지만, 비어 있으면 어떤 칸인지 알기 어려워 예시를 채워 둔다
-    // (청첩장에서만 쓰는 칸이라 다른 종류는 빈 값)
-    groomIntro: category === "wedding" ? SAMPLE_INTRO.groom : "",
-    brideIntro: category === "wedding" ? SAMPLE_INTRO.bride : "",
+    // (소개 칸이 없는 종류는 예시도 빈 값)
+    groomIntro: SAMPLE_INTRO[category].person1,
+    brideIntro: SAMPLE_INTRO[category].person2,
     // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
     gallery: ["", "", ""],
     // 생일·칠순은 연락처가 선택 사항이라 예시 번호를 넣지 않는다

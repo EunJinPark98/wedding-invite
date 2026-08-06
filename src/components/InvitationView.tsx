@@ -395,7 +395,7 @@ function CoupleInner({
           mother: data.groomMother,
           relation: labels.relation,
           tel: data.groomPhone,
-          intro: "",
+          intro: data.groomIntro,
         },
       ];
   return (

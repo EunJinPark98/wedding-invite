@@ -652,6 +652,7 @@ export default function EditorClient({
   );
   // 칠순 카테고리는 선택한 연세(70/80/90/100)에 따라 문구가 바뀜
   const labels = getCategoryLabels(category, data.seniorAge, data.dolKind);
+  const sampleIntro = SAMPLE_INTRO[category];
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1236,7 +1237,7 @@ export default function EditorClient({
           {category === "doljanchi" && (
             <div>
               <span className="mb-1.5 block text-xs font-medium text-gray-500">
-                성별 (이름 옆에 표시돼요)
+                성별 (이름 아래에 표시돼요)
               </span>
               <div className="grid grid-cols-3 gap-2">
                 {BABY_GENDERS.map((g) => {
@@ -1290,20 +1291,26 @@ export default function EditorClient({
               나란히 두면 글이 눌려서 위아래로 쌓는다 */}
           {labels.showIntro && (
             <div className="space-y-3.5">
-              <TextareaField
-                label={labels.intro1Label}
-                value={data.groomIntro}
-                onChange={(v) => set("groomIntro", v)}
-                placeholder={SAMPLE_INTRO.groom}
-                rows={4}
-              />
+              {labels.showPerson2 && (
+                <TextareaField
+                  label={labels.intro1Label}
+                  value={data.groomIntro}
+                  onChange={(v) => set("groomIntro", v)}
+                  placeholder={sampleIntro.person1}
+                  rows={4}
+                />
+              )}
               {/* 안내문은 마지막 칸에 붙여 둔다 (space-y 간격이 끼면 멀어 보인다) */}
               <div>
                 <TextareaField
-                  label={labels.intro2Label}
-                  value={data.brideIntro}
-                  onChange={(v) => set("brideIntro", v)}
-                  placeholder={SAMPLE_INTRO.bride}
+                  label={labels.showPerson2 ? labels.intro2Label : labels.intro1Label}
+                  value={labels.showPerson2 ? data.brideIntro : data.groomIntro}
+                  onChange={(v) =>
+                    set(labels.showPerson2 ? "brideIntro" : "groomIntro", v)
+                  }
+                  placeholder={
+                    labels.showPerson2 ? sampleIntro.person2 : sampleIntro.person1
+                  }
                   rows={4}
                 />
                 <p className="mt-1.5 text-xs text-gray-400">

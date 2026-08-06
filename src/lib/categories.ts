@@ -113,11 +113,11 @@ export function getCategoryLabels(
         photo1Label: "아기 사진",
         photo2Label: "",
         showPerson2: false,
-        // 아기는 소개 문구 없이 사진과 이름만 담백하게
+        // 아기 잔치는 혼주·연락처 대신 아기 소개만 담백하게 둔다
         showParents: false,
         showContact: false,
-        showIntro: false,
-        intro1Label: "",
+        showIntro: true,
+        intro1Label: "아기 소개 (선택)",
         intro2Label: "",
         parent1Label: "",
         parent2Label: "",
