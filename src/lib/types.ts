@@ -304,6 +304,9 @@ export interface InvitationData {
   // 신랑/신부 개별 프로필 사진 (선택)
   groomPhotoUrl: string;
   bridePhotoUrl: string;
+  // 신랑/신부 한 줄 소개 (선택 — 청첩장 전용, 비우면 아예 표시하지 않음)
+  groomIntro: string;
+  brideIntro: string;
   gallery: string[];
   // 연락처
   groomPhone: string;
@@ -376,6 +379,8 @@ export const normalizeData = (
     : "diamond",
   groomPhotoUrl: d?.groomPhotoUrl ?? "",
   bridePhotoUrl: d?.bridePhotoUrl ?? "",
+  groomIntro: d?.groomIntro ?? "",
+  brideIntro: d?.brideIntro ?? "",
   gallery: Array.isArray(d?.gallery)
     ? d.gallery.filter((g) => typeof g === "string").slice(0, MAX_GALLERY)
     : [],
@@ -473,6 +478,13 @@ const CATEGORY_SAMPLE: Record<
   },
 };
 
+// 신랑·신부 한 줄 소개 예시 (청첩장 전용). 프로필 카드가 반쪽 너비라 한 줄이
+// 열 글자를 넘으면 접히므로, 예시도 짧은 두 줄로 맞춰 둔다.
+export const SAMPLE_INTRO = {
+  groom: "무뚝뚝하지만\n누구보다 다정한 사람",
+  bride: "웃음이 많고\n마음이 따뜻한 사람",
+} as const;
+
 export const emptyInvitation = (category: Category = "wedding"): InvitationData => {
   const s = CATEGORY_SAMPLE[category];
   return {
@@ -514,6 +526,10 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     dividerStyle: "diamond",
     groomPhotoUrl: "",
     bridePhotoUrl: "",
+    // 소개는 선택 사항이지만, 비어 있으면 어떤 칸인지 알기 어려워 예시를 채워 둔다
+    // (청첩장에서만 쓰는 칸이라 다른 종류는 빈 값)
+    groomIntro: category === "wedding" ? SAMPLE_INTRO.groom : "",
+    brideIntro: category === "wedding" ? SAMPLE_INTRO.bride : "",
     // 갤러리: 저작권 문제로 예시 사진 제거 — 빈 슬롯만 두어 사용자가 직접 추가
     gallery: ["", "", ""],
     // 생일·칠순은 연락처가 선택 사항이라 예시 번호를 넣지 않는다

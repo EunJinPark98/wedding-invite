@@ -63,6 +63,9 @@ export interface CategoryLabels {
   showPerson2: boolean;
   showParents: boolean;
   showContact: boolean; // 프로필에 전화·문자 버튼을 둘지
+  showIntro: boolean; // 인물 소개 칸을 둘지 (청첩장 전용, 선택 입력)
+  intro1Label: string;
+  intro2Label: string;
   parent1Label: string;
   parent2Label: string;
   dateSectionTitle: string;
@@ -113,6 +116,9 @@ export function getCategoryLabels(
         // 아기는 소개 문구 없이 사진과 이름만 담백하게
         showParents: false,
         showContact: false,
+        showIntro: false,
+        intro1Label: "",
+        intro2Label: "",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: `${dol.event} 일시 · 장소`,
@@ -150,6 +156,9 @@ export function getCategoryLabels(
         showPerson2: false,
         showParents: false,
         showContact: true,
+        showIntro: false,
+        intro1Label: "",
+        intro2Label: "",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: `${age.label} 일시 · 장소`,
@@ -187,6 +196,9 @@ export function getCategoryLabels(
         showPerson2: false,
         showParents: false,
         showContact: true,
+        showIntro: false,
+        intro1Label: "",
+        intro2Label: "",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: "파티 일시 · 장소",
@@ -225,6 +237,9 @@ export function getCategoryLabels(
         showPerson2: true,
         showParents: true,
         showContact: true,
+        showIntro: true,
+        intro1Label: "신랑 소개 (선택)",
+        intro2Label: "신부 소개 (선택)",
         parent1Label: "",
         parent2Label: "",
         dateSectionTitle: "예식 일시 · 장소",

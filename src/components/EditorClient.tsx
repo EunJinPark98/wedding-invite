@@ -28,6 +28,7 @@ import {
   getIntros,
   introPlaceholder,
   MAX_GALLERY,
+  SAMPLE_INTRO,
   SENIOR_AGES,
   dolGreetingMessage,
   dolGreetingTitle,
@@ -1285,6 +1286,27 @@ export default function EditorClient({
               </div>
             )}
           </div>
+          {/* 한 줄 소개 (선택) — 이름 아래에 들어가는 짧은 문구. 두 사람 칸을
+              나란히 두면 글이 눌려서 위아래로 쌓는다 */}
+          {labels.showIntro && (
+            <div className="space-y-3.5">
+              <TextareaField
+                label={labels.intro1Label}
+                value={data.groomIntro}
+                onChange={(v) => set("groomIntro", v)}
+                placeholder={SAMPLE_INTRO.groom}
+              />
+              <TextareaField
+                label={labels.intro2Label}
+                value={data.brideIntro}
+                onChange={(v) => set("brideIntro", v)}
+                placeholder={SAMPLE_INTRO.bride}
+              />
+              <p className="text-xs text-gray-400">
+                이름 아래에 들어가요. 비워 두면 나오지 않아요.
+              </p>
+            </div>
+          )}
           {/* 연락처는 칸이 세 개라 좁은 화면에서 나란히 두면 눌린다 */}
           {labels.showContact && (
             <div className="space-y-3.5">
