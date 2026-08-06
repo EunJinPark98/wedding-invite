@@ -493,8 +493,14 @@ export const SAMPLE_INTRO: Record<Category, { person1: string; person2: string }
     person1: "웃음이 많은\n세상 순한 아기\n잡아당기기 좋아함",
     person2: "",
   },
-  senior: { person1: "", person2: "" },
-  birthday: { person1: "", person2: "" },
+  senior: {
+    person1: "평생 가족을 위해 사신\n우리 집 큰어른\n요즘 취미는 텃밭 가꾸기",
+    person2: "",
+  },
+  birthday: {
+    person1: "#ENFP\n#여행 좋아함\n웃음이 많고\n정도 많은 사람",
+    person2: "",
+  },
 };
 
 export const emptyInvitation = (category: Category = "wedding"): InvitationData => {

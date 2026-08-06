@@ -63,7 +63,7 @@ export interface CategoryLabels {
   showPerson2: boolean;
   showParents: boolean;
   showContact: boolean; // 프로필에 전화·문자 버튼을 둘지
-  showIntro: boolean; // 인물 소개 칸을 둘지 (청첩장 전용, 선택 입력)
+  showIntro: boolean; // 프로필에 인물 소개 문구를 둘지 (선택 입력)
   intro1Label: string;
   intro2Label: string;
   parent1Label: string;
@@ -158,8 +158,8 @@ export function getCategoryLabels(
         showPerson2: false,
         showParents: false,
         showContact: true,
-        showIntro: false,
-        intro1Label: "",
+        showIntro: true,
+        intro1Label: "주인공 소개 (선택)",
         intro2Label: "",
         parent1Label: "",
         parent2Label: "",
@@ -199,8 +199,8 @@ export function getCategoryLabels(
         showPerson2: false,
         showParents: false,
         showContact: true,
-        showIntro: false,
-        intro1Label: "",
+        showIntro: true,
+        intro1Label: "주인공 소개 (선택)",
         intro2Label: "",
         parent1Label: "",
         parent2Label: "",
