@@ -58,6 +58,7 @@ export const seniorGreetingTitle = (age: number) =>
  *   milestone : "~을 맞이했습니다" 처럼 예스러운 문장에 쓰는 표현
  *   greeting  : 기본 인사말 제목 (종류마다 자연스러운 조사가 달라 통째로 둔다)
  *   kicker    : 히어로 영문 소문구
+ *   english   : 이름 아래 영문 문구 (구름 위 아기 템플릿)
  */
 export const DOL_KINDS = [
   {
@@ -69,6 +70,7 @@ export const DOL_KINDS = [
     greeting: "우리 아이의 백일잔치에 초대합니다",
     kicker: "100 DAYS",
     kicker2: "THE 100TH DAY",
+    english: "HAPPY 100 DAYS",
   },
   {
     id: "dol",
@@ -76,9 +78,10 @@ export const DOL_KINDS = [
     event: "돌잔치",
     occasion: "첫 생일",
     milestone: "첫 돌",
-    greeting: "우리 아이의 첫 생일에 초대합니다",
+    greeting: "우리 아이의 돌잔치에 초대합니다",
     kicker: "FIRST BIRTHDAY",
     kicker2: "THE FIRST BIRTHDAY",
+    english: "HAPPY BIRTH DAY",
   },
 ] as const;
 export type DolKind = (typeof DOL_KINDS)[number]["id"];

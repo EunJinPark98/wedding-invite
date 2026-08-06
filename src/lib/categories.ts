@@ -88,6 +88,7 @@ export interface CategoryLabels {
   dolEvent: string; // 백일잔치/돌잔치 (doljanchi 전용, 그 외 "")
   dolOccasion: string; // 문장 속 표현 — 백일/첫 생일 (doljanchi 전용, 그 외 "")
   dolMilestone: string; // "~을 맞이했습니다" 용 — 백일/첫 돌 (doljanchi 전용, 그 외 "")
+  dolEnglish: string; // 이름 아래 영문 문구 — 구름 위 아기 템플릿 (doljanchi 전용, 그 외 "")
 }
 
 // seniorAge는 senior 카테고리에서만 의미가 있음 (70=칠순, 80=팔순, 90=구순, 100=백수)
@@ -141,6 +142,7 @@ export function getCategoryLabels(
         dolEvent: dol.event,
         dolOccasion: dol.occasion,
         dolMilestone: dol.milestone,
+        dolEnglish: dol.english,
       };
     case "senior":
       return {
@@ -181,6 +183,7 @@ export function getCategoryLabels(
         dolEvent: "",
         dolOccasion: "",
         dolMilestone: "",
+        dolEnglish: "",
       };
     case "birthday":
       return {
@@ -221,6 +224,7 @@ export function getCategoryLabels(
         dolEvent: "",
         dolOccasion: "",
         dolMilestone: "",
+        dolEnglish: "",
       };
     case "wedding":
     default:
@@ -261,6 +265,7 @@ export function getCategoryLabels(
         dolEvent: "",
         dolOccasion: "",
         dolMilestone: "",
+        dolEnglish: "",
       };
   }
 }

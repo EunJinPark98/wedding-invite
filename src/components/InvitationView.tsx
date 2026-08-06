@@ -1743,10 +1743,10 @@ function DolCloudLayout({
           {data.groomName}
         </h1>
         <p
-          className="inv-hero-in-delay mt-1.5 text-[calc(15px*var(--inv-fs))]"
+          className="inv-hero-in-delay mt-2 font-cormorant text-[calc(14px*var(--inv-fs))] tracking-[0.3em]"
           style={{ color: t.sub }}
         >
-          구름 위를 걷는 {labels.dolOccasion}에 초대해요
+          {labels.dolEnglish}
         </p>
         {p && (
           <p
