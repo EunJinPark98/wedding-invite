@@ -2017,18 +2017,28 @@ export default function EditorClient({
           onClick={() => setShowPreview(false)}
           className="fixed inset-0 z-50 flex flex-col bg-black/80 p-4 md:hidden"
         >
-          <button
-            type="button"
-            onClick={() => setShowPreview(false)}
-            aria-label="닫기"
-            className="mb-2 self-end text-3xl leading-none text-white/80"
-          >
-            ×
-          </button>
           <div
             onClick={(e) => e.stopPropagation()}
-            className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-[2rem] border-8 border-gray-800 bg-white shadow-2xl"
+            className="relative mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-[2rem] border-8 border-gray-800 bg-white shadow-2xl"
           >
+            {/* 초대장 안 오른쪽 위에 붙여 둔다. 스크롤되는 건 안쪽 상자라
+                여기 둔 버튼은 내려도 그 자리에 그대로 떠 있는다.
+                밝은 템플릿·어두운 템플릿 어디에 얹혀도 보이도록 반투명 검정. */}
+            <button
+              type="button"
+              onClick={() => setShowPreview(false)}
+              aria-label="미리보기 닫기"
+              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition active:bg-black/50"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden>
+                <path
+                  d="M6 6l12 12M18 6L6 18"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
             <div className="h-full overflow-y-auto">
               <InvitationView template={template} data={data} preview />
             </div>
