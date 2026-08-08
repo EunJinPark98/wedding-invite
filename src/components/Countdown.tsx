@@ -40,10 +40,17 @@ export default function Countdown({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setTime(remain(iso));
+    // 서버가 그린 화면에는 남은 시간이 없다(그릴 때와 볼 때가 다르다).
+    // 첫 값도 타이머와 같은 길로 넣어 화면이 뜬 뒤에 채운다.
+    const first = setTimeout(() => {
+      setMounted(true);
+      setTime(remain(iso));
+    }, 0);
     const id = setInterval(() => setTime(remain(iso)), 1000);
-    return () => clearInterval(id);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
   }, [iso]);
 
   if (!mounted || !time) return null;
