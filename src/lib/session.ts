@@ -68,6 +68,8 @@ export function toSessionCookie<T extends WritableCookieOptions>(
 ): Partial<T> {
   if (!options) return {};
   if (options.maxAge === 0) return options;
-  const { maxAge: _maxAge, expires: _expires, ...rest } = options;
+  const rest = { ...options };
+  delete rest.maxAge;
+  delete rest.expires;
   return rest as Partial<T>;
 }

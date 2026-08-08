@@ -874,14 +874,6 @@ const josaEulReul = (word: string) => {
   return code % 28 === 0 ? "를" : "을";
 };
 
-// 만료일 표시용 (예: 2026년 9월 26일)
-const fmtDate = (iso: string) => {
-  const d = new Date(iso);
-  return isNaN(d.getTime())
-    ? ""
-    : `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
-};
-
 // 공통 입력 스타일
 const INPUT_CLASS =
   "w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 py-2.5 text-sm text-gray-800 transition placeholder:text-gray-300 focus:border-gold-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gold-100";

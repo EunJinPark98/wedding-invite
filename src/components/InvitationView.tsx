@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   getBabyGenderMark,
   normalizeData,
@@ -3262,13 +3263,13 @@ function Footer({
           )}
         </>
       )}
-      <a
+      <Link
         href="/"
         className="mt-6 inline-block text-[calc(10px*var(--inv-fs))] tracking-wider transition"
         style={{ color: subColor }}
       >
         별빛 초대장 ✦ 별마마파파
-      </a>
+      </Link>
     </footer>
   );
 }

@@ -8,13 +8,11 @@ import { authEnabled, supabaseBrowser } from "@/lib/supabase/client";
 export default function AuthStatus() {
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  // 로그인 기능이 꺼진 환경에서는 물어볼 것이 없으니 처음부터 준비된 상태다
+  const [ready, setReady] = useState(!authEnabled);
 
   useEffect(() => {
-    if (!authEnabled) {
-      setReady(true);
-      return;
-    }
+    if (!authEnabled) return;
     const supabase = supabaseBrowser();
     supabase.auth.getUser().then(({ data: { user } }) => {
       setEmail(user?.email ?? null);
