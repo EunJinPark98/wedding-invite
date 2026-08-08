@@ -480,12 +480,19 @@ body {
   animation-fill-mode: both;
 }
 
-/* 먹번짐 — 스미듯 천천히 또렷해진다 (칠순 인트로) */
-@keyframes inv-intro-ink {
+/* 먹번짐 (칠순 인트로) — 붓으로 쓰듯 한 글자씩, 먹이 한지에 스미듯 번져 나온다.
+   "글씨 번짐"(inv-intro-blur)은 문구 전체가 한 번에 또렷해지는 연출이라,
+   여기서는 글자 단위로 시차를 두고 훨씬 크게 번졌다 조여드는 것으로 구분한다. */
+@keyframes inv-intro-ink-letter {
   0% {
     opacity: 0;
-    filter: blur(14px);
-    transform: scale(1.04);
+    filter: blur(11px);
+    transform: scale(1.5);
+  }
+  45% {
+    opacity: 0.8;
+    filter: blur(3px);
+    transform: scale(1.1);
   }
   100% {
     opacity: 1;
@@ -493,14 +500,44 @@ body {
     transform: none;
   }
 }
-.inv-intro-ink {
-  animation: inv-intro-ink 1.8s ease-out both;
+.inv-intro-ink-letter {
+  display: inline-block;
+  animation: inv-intro-ink-letter 0.9s ease-out both;
+}
+
+/* 글씨 뒤로 먹물이 한 번 번졌다 스며든다 (글자 색을 그대로 쓴다) */
+@keyframes inv-intro-ink-wash {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  35% {
+    opacity: 0.14;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+.inv-intro-ink-wash {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  margin: -130px 0 0 -130px;
+  /* 정원이 아니라 살짝 일그러진 먹방울 모양 */
+  border-radius: 46% 54% 58% 42% / 52% 44% 56% 48%;
+  background: radial-gradient(circle at 50% 50%, currentColor 0%, transparent 68%);
+  animation: inv-intro-ink-wash 2.4s ease-out both;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .inv-intro-balloon,
   .inv-intro-confetti,
-  .inv-intro-ink {
+  .inv-intro-ink-letter,
+  .inv-intro-ink-wash {
     animation: none;
   }
 }
