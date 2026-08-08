@@ -177,8 +177,9 @@ export default function PrivacyPage() {
           삭제할 수 있습니다.
         </Clause>
         <Clause n={3}>
-          회원 탈퇴와 계정 정보 삭제는 아래 문의 창구로 요청해 주시면 본인
-          확인 후 지체 없이 처리해 드립니다.
+          회원 탈퇴는 <strong className="text-gray-700">마이페이지 &gt; 내 계정
+          &gt; 회원 탈퇴</strong>에서 직접 하실 수 있습니다. 탈퇴하면 만드신
+          초대장과 올린 사진, 계정 정보가 모두 지워지며 복구할 수 없습니다.
         </Clause>
       </Section>
 
