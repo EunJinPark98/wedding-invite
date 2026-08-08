@@ -4,7 +4,7 @@ import EditorClient from "@/components/EditorClient";
 import { getUsedCategories, getInvitationOwned } from "@/lib/store";
 import { authEnabled, getUser } from "@/lib/supabase/server";
 import { findTheme } from "@/lib/templates";
-import { CATEGORY_IDS, type Category } from "@/lib/types";
+import { CATEGORY_IDS, todayInKorea, type Category } from "@/lib/types";
 
 export const metadata = { title: "초대장 만들기" };
 
@@ -53,6 +53,7 @@ export default async function EditorPage({
           editSlug={inv.slug}
           initialTemplate={inv.template}
           initialData={inv.data}
+          today={todayInKorea()}
         />
       </Suspense>
     );
@@ -72,7 +73,7 @@ export default async function EditorPage({
         <div className="p-10 text-center text-gray-400">불러오는 중...</div>
       }
     >
-      <EditorClient />
+      <EditorClient today={todayInKorea()} />
     </Suspense>
   );
 }
