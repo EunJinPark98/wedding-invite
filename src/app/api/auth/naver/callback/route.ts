@@ -98,6 +98,16 @@ export async function GET(req: Request) {
       prof.email ?? `naver-${prof.id}@users.noreply.starlight-invite.app`;
     const name = prof.name ?? prof.nickname ?? "네이버 사용자";
 
+    // 마이페이지 "내 계정"에서 항목별로 보여주려면 이름과 닉네임을 따로 둬야 한다
+    // (name 은 화면 곳곳에서 쓰는 표시용 이름이라 예전 그대로 둔다)
+    const profileMeta = {
+      name,
+      full_name: prof.name ?? "",
+      nickname: prof.nickname ?? "",
+      provider: "naver",
+      naver_id: prof.id,
+    };
+
     // 3) admin 클라이언트로 유저 확보 + magiclink 토큰 발급
     const admin = createClient(supaUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -112,7 +122,7 @@ export async function GET(req: Request) {
       const created = await admin.auth.admin.createUser({
         email,
         email_confirm: true,
-        user_metadata: { name, provider: "naver", naver_id: prof.id },
+        user_metadata: profileMeta,
       });
       if (created.error) {
         console.error("[naver-login] createUser:", created.error.message);
@@ -125,6 +135,17 @@ export async function GET(req: Request) {
       if (linkRes.error) {
         console.error("[naver-login] generateLink:", linkRes.error.message);
         return fail(url.origin, "link");
+      }
+    } else if (linkRes.data.user?.id) {
+      // 이미 있는 계정 — 네이버에서 이름·닉네임을 바꿨을 수 있으니 갱신한다.
+      // (이 항목이 생기기 전에 가입한 계정도 여기서 채워진다)
+      const updated = await admin.auth.admin.updateUserById(
+        linkRes.data.user.id,
+        { user_metadata: profileMeta }
+      );
+      // 갱신에 실패해도 로그인 자체는 막지 않는다
+      if (updated.error) {
+        console.error("[naver-login] updateUser:", updated.error.message);
       }
     }
 

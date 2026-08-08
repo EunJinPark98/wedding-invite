@@ -27,6 +27,65 @@ export interface MyInvitation {
   expired: boolean;
 }
 
+// 로그인에 쓴 계정에서 받아온 정보
+export interface MyAccount {
+  name: string;
+  nickname: string;
+  email: string;
+  provider: string;
+}
+
+const PROVIDER_LABEL: Record<string, string> = {
+  naver: "네이버",
+  kakao: "카카오",
+};
+
+// 이메일 제공에 동의하지 않으면 계정을 만들려고 우리가 지어낸 주소가 들어간다.
+// 사용자에게는 실제 이메일이 아니므로 보여 주지 않는다.
+const isPlaceholderEmail = (email: string) =>
+  email.endsWith("@users.noreply.starlight-invite.app");
+
+function AccountCard({ account }: { account: MyAccount }) {
+  const provider = PROVIDER_LABEL[account.provider] ?? "";
+  const rows: { label: string; value: string }[] = [
+    { label: "회원이름", value: account.name },
+    { label: "닉네임", value: account.nickname },
+    {
+      label: "이메일 주소",
+      value: isPlaceholderEmail(account.email) ? "" : account.email,
+    },
+  ];
+  return (
+    <section className="mt-6 rounded-2xl border border-gold-100 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+      <div className="mb-3 flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-gray-800">내 계정</h2>
+        {provider && (
+          <span className="rounded-full bg-gold-50 px-2 py-0.5 text-[11px] font-medium text-gold-600">
+            {provider} 로그인
+          </span>
+        )}
+      </div>
+      <dl className="divide-y divide-gray-100">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-center gap-4 py-2.5">
+            <dt className="w-20 shrink-0 text-xs text-gray-400">{r.label}</dt>
+            <dd className="min-w-0 flex-1 truncate text-sm text-gray-700">
+              {r.value || (
+                <span className="text-gray-300">제공받지 않음</span>
+              )}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-2 text-xs text-gray-400">
+        {provider ? `${provider} 계정에서 받아온 정보예요. ` : ""}
+        초대장을 누가 만들었는지 구분하고, 마이페이지에 다시 들어오실 때
+        같은 계정을 알아보는 데에만 씁니다.
+      </p>
+    </section>
+  );
+}
+
 const fmtDate = (iso: string | null) => {
   if (!iso) return "무기한";
   const d = new Date(iso);
@@ -35,7 +94,13 @@ const fmtDate = (iso: string | null) => {
     : `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
 };
 
-export default function MyPageClient({ items }: { items: MyInvitation[] }) {
+export default function MyPageClient({
+  items,
+  account,
+}: {
+  items: MyInvitation[];
+  account?: MyAccount | null;
+}) {
   const router = useRouter();
   const params = useSearchParams();
   const notice = params.get("notice");
@@ -131,6 +196,8 @@ export default function MyPageClient({ items }: { items: MyInvitation[] }) {
           </strong>{" "}
           삭제되면 추가로 만들 수 있습니다.
         </p>
+
+        {account && <AccountCard account={account} />}
 
         {/* 아직 만들지 않은 종류 바로 만들기 */}
         {available.length > 0 && (
