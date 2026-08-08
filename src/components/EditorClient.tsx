@@ -799,12 +799,15 @@ function Field({
   onChange,
   type = "text",
   placeholder,
+  min,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   placeholder?: string;
+  // 날짜 칸에서 고를 수 있는 가장 이른 날 ("2026-08-08")
+  min?: string;
 }) {
   return (
     // min-w-0 이 없으면 날짜 입력처럼 고유 폭이 큰 칸이 grid 칸을 밀어내
@@ -817,6 +820,7 @@ function Field({
         type={type}
         value={value}
         placeholder={placeholder}
+        min={min}
         onChange={(e) => onChange(e.target.value)}
         className={INPUT_CLASS}
       />
@@ -1066,11 +1070,15 @@ export default function EditorClient({
   editSlug,
   initialTemplate,
   initialData,
+  today,
 }: {
   // 수정 모드: 기존 청첩장 slug + 저장된 내용
   editSlug?: string;
   initialTemplate?: TemplateId;
   initialData?: InvitationData;
+  // 날짜 칸에서 고를 수 있는 가장 이른 날 (한국 기준 오늘).
+  // 서버에서 정해 내려보낸다 — 여기서 계산하면 서버(UTC)와 화면(한국)이 어긋난다.
+  today?: string;
 } = {}) {
   const params = useSearchParams();
   const isEdit = Boolean(editSlug);
@@ -1857,6 +1865,7 @@ export default function EditorClient({
           <Field
             label={labels.dateFieldLabel}
             type="date"
+            min={today}
             value={data.weddingDate}
             onChange={(v) => set("weddingDate", v)}
           />

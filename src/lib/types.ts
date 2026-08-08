@@ -215,6 +215,17 @@ export const isSamplePhoto = (url: string | undefined | null) =>
   !!url && SAMPLE_PHOTOS.includes(url);
 
 /**
+ * 한국 기준 오늘 날짜 ("2026-08-08").
+ *
+ * 날짜 칸에서 지난 날을 못 고르게 하는 데 쓴다. 서버는 UTC 로 돌고 보는 사람은
+ * 한국에 있어, 그냥 두면 우리 시간으로 오늘인데 어제로 계산되는 시간대가 생긴다.
+ */
+export function todayInKorea(now: Date = new Date()): string {
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().slice(0, 10);
+}
+
+/**
  * 게시 종료 시각 — 행사 다음 날 0시(한국시간)부터 자동 비공개.
  * 예: 예식일 2026-10-10 → 10월 10일까지 열리고 10월 11일에 사라짐.
  * 잘못된 날짜면 null.
