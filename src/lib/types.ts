@@ -203,7 +203,7 @@ export const MAX_GALLERY = 19;
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
 export const SAMPLE_BABY_PHOTO = "/baby.png";
 export const SAMPLE_BIRTHDAY_PHOTO = "/birthday-party.png";
-export const SAMPLE_SENIOR_PHOTO = "/grandmama.png";
+export const SAMPLE_SENIOR_PHOTO = "/70th.png";
 // 예시 사진 전체 — 제작 시 본인 사진으로 교체했는지 검사할 때 사용
 export const SAMPLE_PHOTOS: readonly string[] = [
   SAMPLE_MAIN_PHOTO,
