@@ -84,13 +84,15 @@ function AccountCard({
           </div>
         ))}
       </dl>
-      <button
-        type="button"
-        onClick={onLeave}
-        className="mt-3 text-xs text-gray-400 underline underline-offset-2 transition hover:text-red-500"
-      >
-        회원 탈퇴
-      </button>
+      <div className="mt-3 text-right">
+        <button
+          type="button"
+          onClick={onLeave}
+          className="text-xs text-gray-400 underline underline-offset-2 transition hover:text-red-500"
+        >
+          회원 탈퇴
+        </button>
+      </div>
     </section>
   );
 }
