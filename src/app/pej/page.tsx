@@ -5,10 +5,13 @@ import { getTheme } from "@/lib/templates";
 import { getCategoryMeta } from "@/lib/categories";
 import { authEnabled, getUser } from "@/lib/supabase/server";
 import { isAdminEmail, listAccounts, type Account } from "@/lib/admin";
+import PejDeleteAccount from "@/components/PejDeleteAccount";
 import { CATEGORIES } from "@/lib/categories";
 import { normalizeData, type Category } from "@/lib/types";
 
 export const metadata = { title: "운영 현황" };
+// 한 쪽에 보여 줄 계정 수
+const PER_PAGE = 10;
 // 목록이 캐시되어 옛 내용이 보이면 안 된다
 export const dynamic = "force-dynamic";
 
@@ -98,16 +101,21 @@ function AccountCard({ account, items }: { account: Account; items: Inv[] }) {
   const title = account.name || account.nickname || account.email || "(정보 없음)";
   return (
     <li className="rounded-2xl border border-gold-100 bg-white p-4">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="text-sm font-semibold text-gray-800">{title}</span>
-        {provider && (
-          <span className="rounded-full bg-gold-50 px-2 py-0.5 text-[11px] font-medium text-gold-600">
-            {provider}
-          </span>
-        )}
-        <span className="text-xs text-gray-400">
-          초대장 {items.length}개
-        </span>
+      <div className="flex items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-sm font-semibold text-gray-800">{title}</span>
+          {provider && (
+            <span className="rounded-full bg-gold-50 px-2 py-0.5 text-[11px] font-medium text-gold-600">
+              {provider}
+            </span>
+          )}
+          <span className="text-xs text-gray-400">초대장 {items.length}개</span>
+        </div>
+        <PejDeleteAccount
+          userId={account.id}
+          label={title}
+          invitations={items.length}
+        />
       </div>
       <p className="mt-1 truncate text-xs text-gray-400">
         {account.email || (
@@ -137,10 +145,17 @@ function AccountCard({ account, items }: { account: Account; items: Inv[] }) {
  * ADMIN_EMAILS 에 적힌 계정으로 로그인했을 때만 열린다. 그 외에는 주소를
  * 알더라도 없는 페이지로 보이게 해서, 이런 화면이 있다는 것 자체를 알리지 않는다.
  */
-export default async function OverviewPage() {
+export default async function OverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; page?: string }>;
+}) {
   if (!authEnabled) notFound();
   const user = await getUser();
   if (!isAdminEmail(user?.email)) notFound();
+
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
 
   const [accounts, invitations] = await Promise.all([
     listAccounts(),
@@ -169,6 +184,22 @@ export default async function OverviewPage() {
   }));
   const madeSomething = accounts.filter((a) => (byUser.get(a.id)?.length ?? 0) > 0)
     .length;
+
+  // 이름으로 찾기 — 닉네임·이메일도 함께 본다 (이름을 안 준 계정이 있다)
+  const needle = q.toLowerCase();
+  const found = needle
+    ? accounts.filter((a) =>
+        [a.name, a.nickname, a.email].some((v) =>
+          v.toLowerCase().includes(needle)
+        )
+      )
+    : accounts;
+
+  const pages = Math.max(1, Math.ceil(found.length / PER_PAGE));
+  const page = Math.min(Math.max(1, Number(sp.page) || 1), pages);
+  const shown = found.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const pageHref = (n: number) =>
+    `/pej?${new URLSearchParams({ ...(q ? { q } : {}), ...(n > 1 ? { page: String(n) } : {}) })}`;
 
   return (
     <main className="min-h-screen bg-cream text-gray-800">
@@ -236,13 +267,65 @@ export default async function OverviewPage() {
         )}
 
         <h2 className="mt-9 text-sm font-semibold text-gray-800">
-          계정 {accounts.length}개
+          계정 {q ? `${found.length}개 (전체 ${accounts.length}개)` : `${accounts.length}개`}
         </h2>
-        <ul className="mt-3 space-y-3">
-          {accounts.map((a) => (
-            <AccountCard key={a.id} account={a} items={byUser.get(a.id) ?? []} />
-          ))}
-        </ul>
+
+        {/* 이름으로 찾기 — 자바스크립트 없이 주소로 넘긴다 */}
+        <form method="get" className="mt-3 flex gap-2">
+          <input
+            type="search"
+            name="q"
+            defaultValue={q}
+            placeholder="이름 · 닉네임 · 이메일로 찾기"
+            className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 placeholder:text-gray-300 focus:border-gold-300 focus:outline-none focus:ring-2 focus:ring-gold-100"
+          />
+          <button
+            type="submit"
+            className="shrink-0 rounded-xl border border-gold-200 px-4 py-2.5 text-sm font-medium text-gold-600 transition hover:bg-gold-50"
+          >
+            찾기
+          </button>
+          {q && (
+            <Link
+              href="/pej"
+              className="shrink-0 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-500 transition hover:bg-gray-50"
+            >
+              전체
+            </Link>
+          )}
+        </form>
+
+        {shown.length === 0 ? (
+          <p className="mt-4 rounded-2xl border border-gold-100 bg-white px-4 py-6 text-center text-sm text-gray-400">
+            {q ? `"${q}"로 찾은 계정이 없어요.` : "아직 가입한 계정이 없어요."}
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {shown.map((a) => (
+              <AccountCard key={a.id} account={a} items={byUser.get(a.id) ?? []} />
+            ))}
+          </ul>
+        )}
+
+        {/* 쪽 번호 — 한 쪽에 열 개씩 */}
+        {pages > 1 && (
+          <nav className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+            {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+              <Link
+                key={n}
+                href={pageHref(n)}
+                aria-current={n === page ? "page" : undefined}
+                className={`min-w-9 rounded-lg border px-3 py-1.5 text-center text-sm transition ${
+                  n === page
+                    ? "border-gold-300 bg-gold-50 font-semibold text-gold-600"
+                    : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {n}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         {/* 로그인 없이 만들어진(또는 계정이 지워진) 초대장 */}
         {orphans.length > 0 && (
