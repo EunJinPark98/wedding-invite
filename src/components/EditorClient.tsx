@@ -664,6 +664,15 @@ function TextareaField({
   );
 }
 
+// 앞 글자에 받침이 있으면 "을", 없으면 "를"
+// ("예식일을 입력하면" / "돌잔치 날짜를 입력하면")
+const josaEulReul = (word: string) => {
+  const code = word.trim().charCodeAt(word.trim().length - 1) - 0xac00;
+  // 한글이 아니면(영문·숫자) 안전하게 "을"
+  if (code < 0 || code > 11171) return "을";
+  return code % 28 === 0 ? "를" : "을";
+};
+
 // 만료일 표시용 (예: 2026년 9월 26일)
 const fmtDate = (iso: string) => {
   const d = new Date(iso);
@@ -2068,18 +2077,24 @@ export default function EditorClient({
             <div className="mt-3.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-center text-xs leading-5 text-gold-600">
               {expiryDate ? (
                 <>
-                  {labels.dateFieldLabel} 당일까지 볼 수 있고,
+                  {labels.noun}은 {labels.dateFieldLabel} 당일까지 볼 수 있고,
                   <br />
-                  <span className="font-semibold">{expiryDate}</span>에 사진까지
-                  완전히 삭제돼요.
+                  <span className="font-semibold">{expiryDate}</span>에 완전히
+                  삭제됩니다.
                 </>
               ) : (
-                <>{labels.dateFieldLabel}을 입력하면 게시 종료일이 정해져요.</>
+                <>
+                  {labels.dateFieldLabel}
+                  {josaEulReul(labels.dateFieldLabel)} 입력하면 게시 종료일이
+                  정해집니다.
+                </>
               )}
+              <br />
+              수정 및 삭제는 마이페이지에서 언제든지 가능합니다.
               {isEdit && (
                 <>
                   <br />
-                  저장하면 바로 반영되고, 링크는 그대로 유지돼요.
+                  저장하면 바로 반영되고, 링크는 그대로 유지됩니다.
                 </>
               )}
             </div>
