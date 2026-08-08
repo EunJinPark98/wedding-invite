@@ -514,7 +514,12 @@ export const SAMPLE_INTRO: Record<Category, { person1: string; person2: string }
   },
 };
 
-export const emptyInvitation = (category: Category = "wedding"): InvitationData => {
+export const emptyInvitation = (
+  category: Category = "wedding",
+  // 예시 행사일 — 기본은 오늘. 지난 날짜는 고를 수 없으므로 예시도 지나면 안 된다.
+  // 화면과 서버가 같은 값을 그리도록 부르는 쪽에서 넘겨준다.
+  eventDate: string = todayInKorea()
+): InvitationData => {
   const s = CATEGORY_SAMPLE[category];
   return {
     category,
@@ -528,7 +533,7 @@ export const emptyInvitation = (category: Category = "wedding"): InvitationData 
     groomMother: s.groomMother,
     brideFather: s.brideFather,
     brideMother: s.brideMother,
-    weddingDate: "2026-10-10",
+    weddingDate: eventDate,
     weddingTime: "오후 1시",
     venueName: s.venueName,
     venueHall: s.venueHall,

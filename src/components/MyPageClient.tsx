@@ -219,38 +219,47 @@ export default function MyPageClient({
         >
           마이페이지
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
-          초대장은 종류마다 1개씩, 최대 {CATEGORIES.length}개까지 만들 수 있습니다.
-          수정 · 삭제는 언제든지 가능하고,{" "}
-          <strong className="text-gray-600">
-            행사 다음 날에는 자동으로 삭제됩니다.
-          </strong>{" "}
-          삭제되면 추가로 만들 수 있습니다.
-        </p>
 
         {account && (
           <AccountCard account={account} onLeave={() => setLeaving(true)} />
         )}
 
-        {/* 아직 만들지 않은 종류 바로 만들기 */}
-        {available.length > 0 && (
-          <div className="mt-5 rounded-2xl border border-gold-100 bg-white p-4">
-            <p className="text-xs font-medium text-gray-500">
-              아직 만들지 않은 초대장
-            </p>
-            <div className="mt-2.5 flex flex-wrap gap-2">
-              {available.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/editor?category=${c.id}`}
-                  className="rounded-full border border-gold-200 px-3.5 py-2 text-sm text-gold-600 transition hover:bg-gold-50"
-                >
-                  {c.emoji} {c.label} 만들기
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* 아직 만들지 않은 종류 바로 만들기.
+            네 종류를 다 만들었더라도, 몇 개까지 만들 수 있고 언제 자리가
+            비는지는 알려 줘야 하므로 상자 자체는 늘 둔다. */}
+        <div className="mt-5 rounded-2xl border border-gold-100 bg-white p-4">
+          {available.length > 0 && (
+            <>
+              <p className="text-xs font-medium text-gray-500">
+                아직 만들지 않은 초대장
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {available.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/editor?category=${c.id}`}
+                    className="rounded-full border border-gold-200 px-3.5 py-2 text-sm text-gold-600 transition hover:bg-gold-50"
+                  >
+                    {c.emoji} {c.label} 만들기
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+          <p
+            className={`text-xs leading-6 text-gray-400 ${
+              available.length > 0 ? "mt-3.5 border-t border-gray-100 pt-3" : ""
+            }`}
+          >
+            초대장은 종류마다 1개씩 만들 수 있고, 수정 · 삭제는 언제든지
+            가능해요.
+            <br />
+            <strong className="text-gray-500">
+              행사 끝난 다음 날에 자동으로 삭제되며,
+            </strong>{" "}
+            삭제된 후 추가로 만들 수 있어요.
+          </p>
+        </div>
         {error && (
           <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
             {error}

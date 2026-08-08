@@ -1101,7 +1101,7 @@ export default function EditorClient({
       : catTemplates[0].id;
   });
   const [data, setData] = useState<InvitationData>(() =>
-    initialData ? normalizeData(initialData) : emptyInvitation(category)
+    initialData ? normalizeData(initialData) : emptyInvitation(category, today)
   );
   // 칠순 카테고리는 선택한 연세(70/80/90/100)에 따라 문구가 바뀜
   const labels = getCategoryLabels(category, data.seniorAge, data.dolKind);
