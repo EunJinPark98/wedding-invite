@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import InvitationView from "./InvitationView";
@@ -129,6 +129,110 @@ function ImageUpload({
           사진 삭제
         </button>
       )}
+    </div>
+  );
+}
+
+/* ───────── 담을 사진 추리기 ───────── */
+// 폰 사진첩은 웹에서 "몇 장까지"를 정할 수 없어 얼마든지 고를 수 있다.
+// 넘게 골랐을 때 처음부터 다시 고르게 하는 대신, 방금 고른 것들 중에서
+// 담을 사진만 추리는 화면. 앞에서부터 담을 수 있는 만큼 미리 골라 둔다.
+function TrimPicker({
+  files,
+  room,
+  onCancel,
+  onConfirm,
+}: {
+  files: File[];
+  room: number;
+  onCancel: () => void;
+  onConfirm: (picked: File[]) => void;
+}) {
+  const urls = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
+  // 미리보기 주소는 이 화면을 닫을 때 돌려준다 (안 그러면 메모리에 남는다).
+  // effect 정리에서 돌려주면 안 된다 — 개발 모드처럼 effect 가 두 번 도는
+  // 환경에서는 첫 정리 때 이미 돌려준 주소를 다시 쓰게 돼 사진이 통째로 깨진다.
+  const close = (done: () => void) => {
+    urls.forEach((u) => URL.revokeObjectURL(u));
+    done();
+  };
+
+  const [chosen, setChosen] = useState<Set<number>>(
+    () => new Set(files.map((_, i) => i).slice(0, room))
+  );
+  const full = chosen.size >= room;
+
+  const toggle = (i: number) =>
+    setChosen((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else if (next.size < room) next.add(i);
+      return next;
+    });
+
+  return (
+    <div className="fixed inset-0 z-[60] flex flex-col bg-black/60 p-3">
+      <div className="mx-auto flex min-h-0 w-full max-w-[460px] flex-1 flex-col rounded-2xl bg-white p-4 shadow-2xl">
+        <h2 className="text-center text-base font-bold text-gray-800">
+          담을 사진을 골라 주세요
+        </h2>
+        <p className="mt-1 text-center text-xs text-gray-500">
+          {files.length}장을 고르셨어요. 갤러리에는 {room}장까지 담을 수 있어요.
+        </p>
+        <div className="mt-3 min-h-0 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-3 gap-2">
+            {urls.map((src, i) => {
+              const on = chosen.has(i);
+              // 더 담을 수 없을 때는 안 고른 사진을 흐리게 해 눌러도 안 되는 걸 보인다
+              const locked = !on && full;
+              return (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => toggle(i)}
+                  aria-pressed={on}
+                  className={`relative aspect-square overflow-hidden rounded-xl border-2 transition ${
+                    on ? "border-gold-400" : "border-transparent"
+                  } ${locked ? "opacity-35" : ""}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" className="h-full w-full object-cover" />
+                  <span
+                    className={`absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                      on
+                        ? "bg-gold-400 text-white"
+                        : "border border-white/80 bg-black/20"
+                    }`}
+                  >
+                    {on ? [...chosen].sort((a, b) => a - b).indexOf(i) + 1 : ""}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={() => close(onCancel)}
+            className="flex-1 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-gray-700"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              close(() =>
+                onConfirm([...chosen].sort((a, b) => a - b).map((i) => files[i]))
+              )
+            }
+            disabled={chosen.size === 0}
+            className="flex-1 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {chosen.size}장 담기
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1002,6 +1106,8 @@ export default function EditorClient({
   const [showPreview, setShowPreview] = useState(false); // 모바일 전체화면 미리보기
   // 갤러리 여러 장 업로드 진행 상황 (null이면 진행 중 아님)
   const [bulk, setBulk] = useState<{ done: number; total: number } | null>(null);
+  // 담을 수 있는 것보다 많이 골랐을 때 뜨는 "사진 추리기" 화면
+  const [trim, setTrim] = useState<{ files: File[]; room: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
   const photoSectionRef = useRef<HTMLDivElement>(null);
@@ -1111,18 +1217,17 @@ export default function EditorClient({
       alert(`갤러리는 최대 ${MAX_GALLERY}장까지 담을 수 있어요.`);
       return;
     }
-    // 폰 사진첩은 웹에서 고를 수 있는 장수를 제한할 방법이 없어, 너무 많이
-    // 고르면 여기서 되돌린다. 앞에서부터 잘라 담으면 정작 넣고 싶던 사진이
-    // 조용히 빠지므로 아예 담지 않고 다시 고르게 한다.
+    // 폰 사진첩에서 고를 수 있는 장수는 웹에서 제한할 방법이 없다.
+    // 넘게 골랐으면 처음부터 다시 고르게 하는 대신, 방금 고른 사진들 중에서
+    // 담을 것만 추리는 화면을 띄운다.
     if (files.length > room) {
-      alert(
-        `${files.length}장을 고르셨어요.\n` +
-          `갤러리는 최대 ${MAX_GALLERY}장까지라 지금은 ${room}장 더 담을 수 있어요.\n` +
-          `${room}장 이하로 다시 골라 주세요.`
-      );
+      setTrim({ files, room });
       return;
     }
+    await uploadIntoGallery(files);
+  }
 
+  async function uploadIntoGallery(files: File[]) {
     setBulk({ done: 0, total: files.length });
     try {
       const urls: string[] = [];
@@ -2210,6 +2315,19 @@ export default function EditorClient({
             </div>
           </div>
         </div>
+      )}
+
+      {/* 담을 수 있는 것보다 많이 골랐을 때 — 담을 사진만 추린다 */}
+      {trim && (
+        <TrimPicker
+          files={trim.files}
+          room={trim.room}
+          onCancel={() => setTrim(null)}
+          onConfirm={(picked) => {
+            setTrim(null);
+            uploadIntoGallery(picked);
+          }}
+        />
       )}
 
       {/* 저장하는 동안 — 확인 창 위를 덮는다 */}
