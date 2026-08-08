@@ -18,7 +18,7 @@ export const INSTAGRAM_URL = "https://instagram.com/byeolmamapapa";
  * 비워 두면 문서에서 이메일 줄이 빠지고 카카오톡·인스타그램만 안내한다.
  * (공개되는 주소이므로 운영자가 직접 정한 값만 넣는다)
  */
-export const CONTACT_EMAIL = "";
+export const CONTACT_EMAIL = "obliviscor29@naver.com";
 
 // 문서 시행일 — 내용을 고칠 때 함께 올린다
 export const EFFECTIVE_DATE = "2026년 8월 8일";

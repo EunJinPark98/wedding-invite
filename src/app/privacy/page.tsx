@@ -225,7 +225,19 @@ export default function PrivacyPage() {
                 @byeolmamapapa
               </a>
             </>,
-            ...(CONTACT_EMAIL ? [<>이메일: {CONTACT_EMAIL}</>] : []),
+            ...(CONTACT_EMAIL
+              ? [
+                  <>
+                    이메일:{" "}
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="text-gold-600 underline underline-offset-2"
+                    >
+                      {CONTACT_EMAIL}
+                    </a>
+                  </>,
+                ]
+              : []),
           ]}
         />
         <p>

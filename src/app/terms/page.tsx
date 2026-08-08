@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LegalLayout, { Clause, List, Section } from "@/components/LegalLayout";
 import {
+  CONTACT_EMAIL,
   INSTAGRAM_URL,
   KAKAO_CHANNEL_URL,
   OPERATOR_NAME,
@@ -217,6 +218,19 @@ export default function TermsPage() {
                 @byeolmamapapa
               </a>
             </>,
+            ...(CONTACT_EMAIL
+              ? [
+                  <>
+                    이메일:{" "}
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="text-gold-600 underline underline-offset-2"
+                    >
+                      {CONTACT_EMAIL}
+                    </a>
+                  </>,
+                ]
+              : []),
           ]}
         />
         <Clause n={2}>
