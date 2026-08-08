@@ -270,6 +270,24 @@ export default async function Home({
           </a>
         </div>
 
+        {/* 소셜 로그인 동의 화면이 "이 서비스의 이용약관·개인정보처리방침에 따라
+            관리된다"고 안내하므로, 두 문서로 가는 길이 늘 열려 있어야 한다 */}
+        <div className="mt-7 flex items-center justify-center gap-3 text-xs">
+          <Link
+            href="/terms"
+            className="text-gray-400 transition hover:text-gold-600"
+          >
+            이용약관
+          </Link>
+          <span className="h-2.5 w-px bg-gray-200" />
+          <Link
+            href="/privacy"
+            className="font-medium text-gray-500 transition hover:text-gold-600"
+          >
+            개인정보처리방침
+          </Link>
+        </div>
+
         <p className="mt-5 text-[11px] text-gray-300">
           © 2026 별마마파파. All rights reserved.
         </p>

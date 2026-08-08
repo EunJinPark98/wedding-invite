@@ -120,6 +120,24 @@ export default function LoginClient() {
           <p className="mt-6 text-[11px] leading-5 text-gray-400">
             모든 기능 무료 · 종류마다 1개씩 · 수정은 언제든지
           </p>
+          {/* 로그인하면 약관에 동의하는 것이므로, 누르기 전에 읽을 수 있어야 한다 */}
+          <p className="mt-3 text-[11px] leading-5 text-gray-400">
+            로그인하면{" "}
+            <Link
+              href="/terms"
+              className="text-gold-600 underline underline-offset-2"
+            >
+              이용약관
+            </Link>
+            과{" "}
+            <Link
+              href="/privacy"
+              className="text-gold-600 underline underline-offset-2"
+            >
+              개인정보처리방침
+            </Link>
+            에 동의하는 것으로 봅니다.
+          </p>
         </div>
 
         <p className="mt-6 text-center">
