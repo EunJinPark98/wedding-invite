@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthStatus from "./AuthStatus";
+import { supabaseBrowser } from "@/lib/supabase/client";
 import KakaoShareButton from "./KakaoShareButton";
 import {
   getCategoryLabels,
@@ -45,7 +46,13 @@ const PROVIDER_LABEL: Record<string, string> = {
 const isPlaceholderEmail = (email: string) =>
   email.endsWith("@users.noreply.starlight-invite.app");
 
-function AccountCard({ account }: { account: MyAccount }) {
+function AccountCard({
+  account,
+  onLeave,
+}: {
+  account: MyAccount;
+  onLeave: () => void;
+}) {
   const provider = PROVIDER_LABEL[account.provider] ?? "";
   const rows: { label: string; value: string }[] = [
     { label: "회원이름", value: account.name },
@@ -77,6 +84,13 @@ function AccountCard({ account }: { account: MyAccount }) {
           </div>
         ))}
       </dl>
+      <button
+        type="button"
+        onClick={onLeave}
+        className="mt-3 text-xs text-gray-400 underline underline-offset-2 transition hover:text-red-500"
+      >
+        회원 탈퇴
+      </button>
     </section>
   );
 }
@@ -111,6 +125,7 @@ export default function MyPageClient({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState(false); // 탈퇴 확인 창
 
   // 종류당 1개 제한에 걸려 넘어온 경우 — 알림창으로 알려 준다.
   // 개발 모드에서 효과가 두 번 실행돼도 한 번만 뜨도록 막는다.
@@ -140,6 +155,25 @@ export default function MyPageClient({
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "삭제에 실패했습니다.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // 회원 탈퇴 — 만든 초대장·사진·계정을 모두 지운다. 되돌릴 수 없다.
+  async function handleLeave() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/account", { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "탈퇴에 실패했습니다.");
+      // 계정이 사라졌으니 남아 있는 세션도 정리하고 첫 화면으로 보낸다
+      await supabaseBrowser().auth.signOut();
+      window.location.href = "/";
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "탈퇴에 실패했습니다.");
+      setLeaving(false);
     } finally {
       setBusy(false);
     }
@@ -192,7 +226,9 @@ export default function MyPageClient({
           삭제되면 추가로 만들 수 있습니다.
         </p>
 
-        {account && <AccountCard account={account} />}
+        {account && (
+          <AccountCard account={account} onLeave={() => setLeaving(true)} />
+        )}
 
         {/* 아직 만들지 않은 종류 바로 만들기 */}
         {available.length > 0 && (
@@ -370,6 +406,43 @@ export default function MyPageClient({
                 className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
               >
                 {busy ? "삭제 중..." : "삭제할게요"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 회원 탈퇴 확인 */}
+      {leaving && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl">
+            <p className="text-3xl">👋</p>
+            <h2 className="mt-3 text-lg font-bold text-gray-800">
+              정말 탈퇴할까요?
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-gray-500">
+              만드신 초대장 {items.length}개와 올린 사진, 계정 정보가{" "}
+              <strong className="text-red-500">모두 지워지고 복원할 수 없어요.</strong>
+              <br />
+              공유한 링크도 더 이상 열리지 않아요.
+            </p>
+            {error && <p className="mt-3 text-xs text-red-500">{error}</p>}
+            <div className="mt-6 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setLeaving(false)}
+                disabled={busy}
+                className="flex-1 rounded-xl border border-gray-200 py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-60"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleLeave}
+                disabled={busy}
+                className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
+              >
+                {busy ? "처리 중..." : "탈퇴할게요"}
               </button>
             </div>
           </div>

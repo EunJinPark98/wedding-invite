@@ -302,6 +302,29 @@ export async function deleteInvitation(
 }
 
 /**
+ * 한 계정이 만든 초대장을 전부 지운다 (DB 행 + 업로드된 사진). 회원 탈퇴용.
+ * auth.users 를 지우려면 이 표에 남은 행이 먼저 없어져야 한다
+ * (invitations.user_id 가 auth.users 를 참조한다).
+ */
+export async function deleteInvitationsOfUser(userId: string): Promise<number> {
+  if (useSupabase) {
+    const { data, error } = await supabase()
+      .from("invitations")
+      .delete()
+      .eq("user_id", userId)
+      .select("slug, data");
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    await deleteImages(
+      rows.flatMap((r) => photoUrlsOf(r.data as InvitationData | null))
+    );
+    return rows.length;
+  }
+  // 로컬 폴백은 계정 개념이 없어 지울 것이 없다 (개발용)
+  return 0;
+}
+
+/**
  * 게시 기간이 끝난 초대장을 완전히 지운다 (DB 행 + 업로드된 사진).
  * 하루 한 번 /api/cron/purge 에서 호출된다. 복구 불가.
  */
