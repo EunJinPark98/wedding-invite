@@ -7,6 +7,14 @@
  */
 
 export const SERVICE_NAME = "별빛 초대장";
+
+/**
+ * 서비스 기준 주소. 공유 카드·robots·sitemap 이 함께 쓴다.
+ * 주소가 바뀌면 Vercel 환경변수 NEXT_PUBLIC_SITE_URL 만 바꾸면 된다.
+ */
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://starinvite.vercel.app";
+
 export const OPERATOR_NAME = "별마마파파";
 
 // 문의 창구 — 푸터에 있는 것과 같은 곳

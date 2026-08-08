@@ -28,6 +28,9 @@ export async function generateMetadata({
   return {
     title,
     description,
+    // 남의 초대장이 검색에 뜨면 안 된다. 링크를 받은 사람만 보는 것이 맞다.
+    // (막는 것은 검색 등재뿐이라, 카톡 미리보기 수집기는 그대로 읽어 간다)
+    robots: { index: false, follow: false },
     openGraph: {
       title,
       description,

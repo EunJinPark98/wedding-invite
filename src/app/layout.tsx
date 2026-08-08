@@ -101,9 +101,7 @@ const SHARE_DESCRIPTION =
  * 이미지 경로를 절대 주소로 바꾸는 데 필요하다 — 없으면 미리보기에 그림이 안 뜬다.
  * 주소가 바뀌면 Vercel 환경변수 NEXT_PUBLIC_SITE_URL 만 바꾸면 된다.
  */
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
-  "https://starinvite.vercel.app";
+import { SITE_URL } from "@/lib/legal";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
