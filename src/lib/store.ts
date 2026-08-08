@@ -2,7 +2,7 @@ import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
-import { deleteImages } from "./storage";
+import { deleteImages, purgeOrphanImages, storagePathFromUrl } from "./storage";
 import { normalizeData, CATEGORY_IDS } from "./types";
 import type {
   Category,
@@ -322,6 +322,26 @@ export async function deleteInvitationsOfUser(userId: string): Promise<number> {
   }
   // 로컬 폴백은 계정 개념이 없어 지울 것이 없다 (개발용)
   return 0;
+}
+
+/**
+ * 어느 초대장에도 딸리지 않은 사진을 지운다.
+ *
+ * 저장소를 훑기 전에 "쓰이고 있는 경로"를 모두 모아 둬야 한다. 하나라도
+ * 빠뜨리면 멀쩡한 초대장의 사진이 지워진다.
+ */
+export async function purgeUnusedImages(minAgeHours = 24): Promise<number> {
+  if (!useSupabase) return 0;
+  const { data, error } = await supabase().from("invitations").select("data");
+  if (error) throw new Error(error.message);
+  const keep = new Set<string>();
+  for (const row of data ?? []) {
+    for (const url of photoUrlsOf(row.data as InvitationData | null)) {
+      const p = storagePathFromUrl(url);
+      if (p) keep.add(p);
+    }
+  }
+  return purgeOrphanImages(keep, minAgeHours);
 }
 
 /**
