@@ -74,8 +74,17 @@ const CONFETTI = [
  * 글자마다 span 을 만들어 시작 시각만 조금씩 늦춘다. 단어는 통째로 감싸
  * 줄바꿈이 단어 중간에서 일어나지 않게 하고, 문구가 길어도 인트로가 끝나기
  * 전에 다 써지도록 글자 간격을 줄인다.
+ *
+ * 글자에 걸리는 연출은 letterClass 로 갈아 끼운다 (꽃잎=획이 그어지듯,
+ * 먹번짐=먹이 크게 번졌다 조여들듯).
  */
-function WrittenPhrase({ text }: { text: string }) {
+function WrittenPhrase({
+  text,
+  letterClass,
+}: {
+  text: string;
+  letterClass: string;
+}) {
   const total = [...text.replace(/\s/g, "")].length || 1;
   const step = Math.min(0.06, 1.25 / total);
   let n = 0;
@@ -90,7 +99,7 @@ function WrittenPhrase({ text }: { text: string }) {
                 {[...word].map((ch, ci) => (
                   <span
                     key={ci}
-                    className="inv-intro-letter"
+                    className={letterClass}
                     style={{ animationDelay: `${(n++ * step).toFixed(3)}s` }}
                   >
                     {ch}
@@ -152,15 +161,14 @@ export default function InvitationIntro({
   // 어느 것도 자간을 건드리지 않는다. 자간이 변하면 글자 폭이 달라져
   // 재생 도중에 줄바꿈이 다시 계산되고, 두 줄이던 문구가 한 줄로 튄다.
   const phraseClass =
-    style === "ink"
-      ? "inv-intro-ink"
+    // 먹번짐은 글자마다 따로 번져 나오므로 문단에는 연출을 걸지 않는다
+    style === "ink" || style === "petal"
+      ? ""
       : style === "blur"
         ? "inv-intro-blur"
       : style === "line"
         ? "inv-intro-wipe"
-        : style === "petal"
-          ? "" // 글자마다 따로 나타나므로 문단에는 연출을 걸지 않는다
-          : "inv-intro-phrase-in";
+        : "inv-intro-phrase-in";
 
   return (
     <div
@@ -263,6 +271,11 @@ export default function InvitationIntro({
         )}
 
         <div className="relative px-8 text-center">
+          {/* 먹번짐 — 글씨 뒤로 먹물이 한 번 번졌다 스며든다 */}
+          {style === "ink" && (
+            <span className="inv-intro-ink-wash" style={{ color: inkColor }} />
+          )}
+
           {/* 라인 리빌 — 위아래 선이 그어지고 그 사이로 문구가 드러난다 */}
           {style === "line" && (
             <span
@@ -273,10 +286,16 @@ export default function InvitationIntro({
 
           {/* 문구 글꼴은 템플릿을 따르지 않고 흘림체로 고정한다 (inv-intro-phrase) */}
           <p
-            className={`${phraseClass} inv-intro-phrase whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
+            className={`${phraseClass} inv-intro-phrase relative whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
             style={{ color: inkColor }}
           >
-            {style === "petal" ? <WrittenPhrase text={phrase} /> : phrase}
+            {style === "petal" ? (
+              <WrittenPhrase text={phrase} letterClass="inv-intro-letter" />
+            ) : style === "ink" ? (
+              <WrittenPhrase text={phrase} letterClass="inv-intro-ink-letter" />
+            ) : (
+              phrase
+            )}
           </p>
 
           {sub && (
