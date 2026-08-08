@@ -6,6 +6,7 @@ import { getCategoryMeta } from "@/lib/categories";
 import { authEnabled, getUser } from "@/lib/supabase/server";
 import { isAdminEmail, listAccounts, type Account } from "@/lib/admin";
 import PejDeleteAccount from "@/components/PejDeleteAccount";
+import PejCleanImages from "@/components/PejCleanImages";
 import { CATEGORIES } from "@/lib/categories";
 import { normalizeData, type Category } from "@/lib/types";
 
@@ -258,6 +259,8 @@ export default async function OverviewPage({
             </span>
           ))}
         </div>
+
+        <PejCleanImages />
 
         {accounts.length === 0 && (
           <p className="mt-6 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs text-gray-400">

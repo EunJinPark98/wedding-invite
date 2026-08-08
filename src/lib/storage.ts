@@ -115,3 +115,51 @@ export async function deleteImages(
 }
 
 export const uploadMode = useSupabase ? "supabase" : "local";
+
+/**
+ * 어느 초대장에도 딸리지 않은 사진을 지운다.
+ *
+ * 사진은 "사진 추가"를 누른 순간 올라가지만, 초대장은 "제작하기"를 눌러야
+ * 저장된다. 그래서 만들다 그만두거나 올린 뒤 다른 사진으로 바꾸면, 아무 데도
+ * 쓰이지 않는 파일이 저장소에 남는다.
+ *
+ * 지금 편집 중인 사람의 사진까지 지우면 안 되므로, 올라온 지 minAgeHours 가
+ * 지난 것만 지운다. keep 에는 초대장이 실제로 쓰고 있는 경로를 넘긴다.
+ */
+export async function purgeOrphanImages(
+  keep: Set<string>,
+  minAgeHours = 24
+): Promise<number> {
+  if (!useSupabase) return 0;
+  const cutoff = Date.now() - minAgeHours * 60 * 60 * 1000;
+  const doomed: string[] = [];
+
+  // 한 번에 다 오지 않으므로 더 없을 때까지 이어서 받는다
+  const pageSize = 1000;
+  for (let offset = 0; offset < 100_000; offset += pageSize) {
+    const { data, error } = await supabase()
+      .storage.from(BUCKET)
+      .list("", { limit: pageSize, offset });
+    if (error) throw new Error(error.message);
+    const files = data ?? [];
+    for (const f of files) {
+      if (keep.has(f.name)) continue;
+      // 만들어진 시각을 모르면 건드리지 않는다 (지우고 나면 되돌릴 수 없다)
+      const at = Date.parse(f.created_at ?? "");
+      if (!Number.isFinite(at) || at > cutoff) continue;
+      doomed.push(f.name);
+    }
+    if (files.length < pageSize) break;
+  }
+
+  if (doomed.length === 0) return 0;
+  // 한 번에 너무 많이 보내지 않도록 나눠서 지운다
+  let n = 0;
+  for (let i = 0; i < doomed.length; i += 100) {
+    const slice = doomed.slice(i, i + 100);
+    const { error } = await supabase().storage.from(BUCKET).remove(slice);
+    if (error) throw new Error(error.message);
+    n += slice.length;
+  }
+  return n;
+}

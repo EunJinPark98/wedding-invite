@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { purgeExpiredInvitations } from "@/lib/store";
+import { purgeExpiredInvitations, purgeUnusedImages } from "@/lib/store";
 
 /**
  * 게시 기간이 끝난 초대장을 완전히 삭제하는 정기 작업 (DB 행 + 업로드 사진).
+ * 어느 초대장에도 딸리지 않은 사진(만들다 그만둔 것)도 함께 정리한다.
  * Vercel Cron이 하루 한 번(00:30 KST) 호출한다 — vercel.json 참고.
  *
  * 보호: CRON_SECRET 환경변수를 설정하면 Vercel이 Authorization 헤더에 실어 보낸다.
@@ -24,10 +25,12 @@ export async function GET(req: Request) {
 
   try {
     const result = await purgeExpiredInvitations();
+    // 만든 지 하루가 지났는데 아무 초대장에도 안 딸린 사진 (편집 중인 것은 남긴다)
+    const orphans = await purgeUnusedImages(24);
     console.log(
-      `[purge] 초대장 ${result.deleted}건, 사진 ${result.images}장 삭제`
+      `[purge] 초대장 ${result.deleted}건, 사진 ${result.images}장, 안 쓰는 사진 ${orphans}장 삭제`
     );
-    return NextResponse.json({ ok: true, ...result });
+    return NextResponse.json({ ok: true, ...result, orphans });
   } catch (e) {
     const message = e instanceof Error ? e.message : "삭제 중 오류가 발생했습니다.";
     console.error("[purge] 실패:", message);
