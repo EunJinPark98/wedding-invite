@@ -15,6 +15,13 @@ import {
   type FontOption,
 } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
+import {
+  clearDraft,
+  readDraft,
+  saveDraft,
+  savedAgo,
+  type Draft,
+} from "@/lib/draft";
 import { fileToCompressedBlob } from "@/lib/image";
 import {
   emptyInvitation,
@@ -1118,7 +1125,24 @@ export default function EditorClient({
   const [trim, setTrim] = useState<{ files: File[]; room: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
+  // 만들다 만 것이 남아 있을 때 띄우는 "이어서 작성" 안내
+  const [draft, setDraft] = useState<Draft | null>(null);
   const photoSectionRef = useRef<HTMLDivElement>(null);
+
+  // 만들다 만 것이 있는지 본다. 저장된 초안은 브라우저에만 있으므로, 서버가
+  // 그려 보낸 화면과 어긋나지 않도록 화면이 뜬 다음에 확인한다.
+  useEffect(() => {
+    if (isEdit) return; // 수정 모드는 서버에 저장된 내용이 우선이다
+    const id = setTimeout(() => setDraft(readDraft(category)), 0);
+    return () => clearTimeout(id);
+  }, [isEdit, category]);
+
+  // 적는 동안 계속 담아 둔다. 글자마다 저장하면 낭비라 잠깐 멈췄을 때만 쓴다.
+  useEffect(() => {
+    if (isEdit) return;
+    const id = setTimeout(() => saveDraft({ category, template, data }), 800);
+    return () => clearTimeout(id);
+  }, [isEdit, category, template, data]);
 
   // 폼을 내리면 미리보기도 같은 대목으로 따라온다
   const deskPreviewRef = useRef<HTMLDivElement>(null);
@@ -1289,6 +1313,7 @@ export default function EditorClient({
       }
       if (!res.ok) throw new Error(json.error || "저장에 실패했습니다.");
       const url = `${window.location.origin}/v/${json.slug}`;
+      clearDraft(); // 만들었으니 임시로 담아 둔 것은 지운다
       setConfirming(false);
       setResultExpires(json.expiresAt ?? null);
       setResult(url);
@@ -1355,6 +1380,43 @@ export default function EditorClient({
               : "입력한 내용이 미리보기에 실시간으로 반영돼요."}
           </p>
         </div>
+
+        {/* 만들다 만 것이 남아 있을 때. 되돌릴지는 본인이 고르게 한다 —
+            지금 화면에 적고 있던 것을 말없이 덮어쓰면 그게 더 나쁘다. */}
+        {draft && (
+          <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4">
+            <p className="text-sm font-semibold text-gray-800">
+              작성하시던 내용이 있어요
+            </p>
+            <p className="mt-1 text-xs leading-5 text-gray-500">
+              {savedAgo(draft.savedAt)}까지 적으신 내용이 남아 있어요. 이어서
+              쓰시겠어요?
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setTemplate(draft.template);
+                  setData(normalizeData(draft.data));
+                  setDraft(null);
+                }}
+                className="flex-1 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white transition hover:from-gold-500 hover:to-gold-600"
+              >
+                이어서 작성
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  clearDraft();
+                  setDraft(null);
+                }}
+                className="flex-1 rounded-xl border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              >
+                새로 시작
+              </button>
+            </div>
+          </div>
+        )}
 
         <Group title="메인" step={1} previewSection="top">
           <div className="grid grid-cols-2 gap-3">
