@@ -77,11 +77,6 @@ function AccountCard({ account }: { account: MyAccount }) {
           </div>
         ))}
       </dl>
-      <p className="mt-2 text-xs text-gray-400">
-        {provider ? `${provider} 계정에서 받아온 정보예요. ` : ""}
-        초대장을 누가 만들었는지 구분하고, 마이페이지에 다시 들어오실 때
-        같은 계정을 알아보는 데에만 씁니다.
-      </p>
     </section>
   );
 }
