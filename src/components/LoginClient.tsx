@@ -120,7 +120,8 @@ export default function LoginClient() {
           <p className="mt-6 text-[11px] leading-5 text-gray-400">
             모든 기능 무료 · 종류마다 1개씩 · 수정은 언제든지
           </p>
-          {/* 로그인하면 약관에 동의하는 것이므로, 누르기 전에 읽을 수 있어야 한다 */}
+          {/* 로그인하면 약관에 동의하는 것이므로, 누르기 전에 읽을 수 있어야 한다.
+              다만 로그인 화면이라 문서 말투가 아니라 서비스 말투로 적는다 */}
           <p className="mt-3 text-[11px] leading-5 text-gray-400">
             로그인하면{" "}
             <Link
@@ -136,7 +137,7 @@ export default function LoginClient() {
             >
               개인정보처리방침
             </Link>
-            에 동의하는 것으로 봅니다.
+            에 동의하게 돼요.
           </p>
         </div>
 
