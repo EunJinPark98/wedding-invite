@@ -133,6 +133,252 @@ function ImageUpload({
   );
 }
 
+/* ───────── 갤러리 사진 순서 바꾸기 ───────── */
+// HTML5 draggable 은 터치에서 아예 동작하지 않아, 폰에서도 되도록 포인터
+// 이벤트로 직접 만든다. 사진을 잠깐 누르고 있으면 집히고(그 전에 움직이면
+// 페이지 스크롤로 본다), 옮길 자리 위에 올려 놓으면 그 칸이 표시된다.
+const HOLD_MS = 200; // 이만큼 누르고 있어야 집힌다
+const HOLD_TOL = 8; // 집히기 전에 이만큼(px) 움직이면 스크롤로 본다
+const EDGE = 72; // 화면 위아래 이만큼 안으로 들어오면 자동으로 스크롤
+const EDGE_SPEED = 12;
+
+type SlotRect = { left: number; top: number; right: number; bottom: number };
+type DragState = {
+  from: number;
+  to: number;
+  // 집을 때 재어 둔 각 칸의 자리 (문서 좌표 — 스크롤해도 어긋나지 않는다)
+  slots: SlotRect[];
+  // 손가락을 따라다니는 사진 (화면 좌표)
+  box: { left: number; top: number; width: number; height: number };
+};
+
+function SortablePhotos({
+  photos,
+  onMove,
+  onChangeAt,
+  onRemoveAt,
+  children,
+}: {
+  photos: string[];
+  onMove: (from: number, to: number) => void;
+  onChangeAt: (i: number, url: string) => void;
+  onRemoveAt: (i: number) => void;
+  // "사진 추가" 타일 — 같은 격자 안에 두되 순서 바꾸기 대상은 아니다
+  children?: React.ReactNode;
+}) {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [drag, setDrag] = useState<DragState | null>(null);
+  // rAF 루프와 이벤트 핸들러가 최신 값을 봐야 해서 ref 로도 들고 있는다
+  const dragRef = useRef<DragState | null>(null);
+  const holdRef = useRef<{
+    i: number;
+    x: number;
+    y: number;
+    timer: number;
+    el: HTMLElement;
+    pointerId: number;
+  } | null>(null);
+  const grabRef = useRef({ x: 0, y: 0 });
+  const ptrRef = useRef({ x: 0, y: 0 });
+  // 끌고 나서 손을 떼면 click 이 뒤따라 일어나 사진첩이 열린다 — 그걸 막는다
+  const draggedRef = useRef(false);
+
+  const apply = (d: DragState | null) => {
+    dragRef.current = d;
+    setDrag(d);
+  };
+
+  const cancelHold = () => {
+    if (holdRef.current) {
+      clearTimeout(holdRef.current.timer);
+      holdRef.current = null;
+    }
+  };
+
+  // 옮길 자리 고르기 — 칸 밖으로 나가면 마지막으로 고른 자리를 그대로 둔다
+  const pickTarget = (d: DragState) => {
+    const x = ptrRef.current.x + window.scrollX;
+    const y = ptrRef.current.y + window.scrollY;
+    const hit = d.slots.findIndex(
+      (s) => x >= s.left && x <= s.right && y >= s.top && y <= s.bottom
+    );
+    return hit === -1 ? d.to : hit;
+  };
+
+  // 드래그 중에는 페이지가 따라 스크롤되지 않게 막고, 화면 가장자리에서는
+  // 반대로 자동으로 스크롤해 준다 (사진이 많으면 한 화면에 다 안 들어온다)
+  const dragging = !!drag;
+  useEffect(() => {
+    if (!dragging) return;
+    const block = (e: TouchEvent) => e.preventDefault();
+    document.addEventListener("touchmove", block, { passive: false });
+    let raf = 0;
+    const tick = () => {
+      const d = dragRef.current;
+      if (d) {
+        const y = ptrRef.current.y;
+        const dy =
+          y < EDGE ? -EDGE_SPEED : y > window.innerHeight - EDGE ? EDGE_SPEED : 0;
+        if (dy) {
+          window.scrollBy(0, dy);
+          const to = pickTarget(d);
+          if (to !== d.to) apply({ ...d, to });
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      document.removeEventListener("touchmove", block);
+      cancelAnimationFrame(raf);
+    };
+    // pickTarget 은 ref 만 읽으므로 매 렌더 새로 만들어져도 상관없다
+  }, [dragging]);
+
+  const begin = (i: number, el: HTMLElement, pointerId: number) => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    // 집힌 뒤에야 포인터를 붙잡는다. 누르자마자 붙잡으면 뒤따르는 click 도 이
+    // 칸으로 끌려와, 그냥 한 번 누른 것뿐인데 사진첩이 열리지 않는다.
+    try {
+      el.setPointerCapture(pointerId);
+    } catch {
+      // 이미 손을 뗐으면 무시
+    }
+    const nodes = [...grid.querySelectorAll<HTMLElement>("[data-slot]")];
+    const slots = nodes.map((n) => {
+      const r = n.getBoundingClientRect();
+      return {
+        left: r.left + window.scrollX,
+        top: r.top + window.scrollY,
+        right: r.right + window.scrollX,
+        bottom: r.bottom + window.scrollY,
+      };
+    });
+    // 따라다니는 사진은 사진 부분(라벨)만 — 아래 "사진 삭제" 글씨는 뺀다
+    const img = nodes[i]?.querySelector("label") ?? nodes[i];
+    const r = img.getBoundingClientRect();
+    grabRef.current = { x: ptrRef.current.x - r.left, y: ptrRef.current.y - r.top };
+    draggedRef.current = true;
+    apply({
+      from: i,
+      to: i,
+      slots,
+      box: { left: r.left, top: r.top, width: r.width, height: r.height },
+    });
+  };
+
+  const onPointerDown = (i: number) => (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    draggedRef.current = false;
+    ptrRef.current = { x: e.clientX, y: e.clientY };
+    const el = e.currentTarget as HTMLElement;
+    const pointerId = e.pointerId;
+    cancelHold();
+    holdRef.current = {
+      i,
+      x: e.clientX,
+      y: e.clientY,
+      el,
+      pointerId,
+      timer: window.setTimeout(() => {
+        holdRef.current = null;
+        begin(i, el, pointerId);
+      }, HOLD_MS),
+    };
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    ptrRef.current = { x: e.clientX, y: e.clientY };
+    const hold = holdRef.current;
+    if (hold) {
+      // 아직 집히기 전 — 많이 움직였으면 스크롤하려던 것으로 보고 놓아 준다
+      if (Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > HOLD_TOL) cancelHold();
+      return;
+    }
+    const d = dragRef.current;
+    if (!d) return;
+    apply({
+      ...d,
+      to: pickTarget(d),
+      box: {
+        ...d.box,
+        left: e.clientX - grabRef.current.x,
+        top: e.clientY - grabRef.current.y,
+      },
+    });
+  };
+
+  const onPointerUp = () => {
+    cancelHold();
+    const d = dragRef.current;
+    apply(null);
+    if (d && d.to !== d.from) onMove(d.from, d.to);
+  };
+
+  return (
+    <>
+      <div
+        ref={gridRef}
+        // select-none: 마우스로 끌 때 글자가 blue 로 잡히지 않게 한다
+        className="grid select-none grid-cols-3 gap-2"
+        // 끌고 난 직후의 click 은 삼킨다 (사진첩이 열리면 안 된다)
+        onClickCapture={(e) => {
+          if (!draggedRef.current) return;
+          draggedRef.current = false;
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        {photos.map((g, i) => (
+          <div
+            key={i}
+            data-slot=""
+            // 집혀 있는 동안에는 이 칸의 터치가 스크롤로 넘어가지 않게 한다
+            style={{ touchAction: drag ? "none" : undefined }}
+            className={`relative rounded-xl transition ${
+              drag?.from === i ? "opacity-30" : ""
+            } ${
+              drag && drag.to === i && drag.from !== i
+                ? "ring-2 ring-gold-400 ring-offset-2"
+                : ""
+            }`}
+            onPointerDown={onPointerDown(i)}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+          >
+            <ImageUpload
+              value={g}
+              onChange={(url) => (url ? onChangeAt(i, url) : onRemoveAt(i))}
+              label="사진 추가"
+              className="h-24"
+            />
+          </div>
+        ))}
+        {children}
+      </div>
+      {/* 손가락을 따라다니는 사진 */}
+      {drag && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={photos[drag.from]}
+          alt=""
+          // 살짝 비쳐 보이게 두어야 밑에 있는 "여기로 갑니다" 표시가 가려지지 않는다
+          className="pointer-events-none fixed z-50 rounded-xl object-cover opacity-90 shadow-2xl"
+          style={{
+            left: drag.box.left,
+            top: drag.box.top,
+            width: drag.box.width,
+            height: drag.box.height,
+            transform: "scale(1.06)",
+          }}
+        />
+      )}
+    </>
+  );
+}
+
 /* ───────── 은행 선택 ───────── */
 // 많이 쓰는 은행만 추린 목록 — 여기 없으면 직접 입력으로 넣는다
 const BANKS = [
@@ -741,13 +987,22 @@ export default function EditorClient({
       accounts: d.accounts.filter((_, idx) => idx !== i),
     }));
 
+  // 갤러리는 담긴 사진만 추려서 다룬다 — 빈 슬롯이 섞여 있으면 화면에 보이는
+  // 순서와 배열 인덱스가 어긋나 순서 바꾸기가 엉뚱한 사진을 옮긴다.
+  const photos = data.gallery.filter(Boolean);
+  const setPhotos = (next: (list: string[]) => string[]) =>
+    setData((d) => ({ ...d, gallery: next(d.gallery.filter(Boolean)) }));
   const setGallery = (i: number, url: string) =>
-    setData((d) => ({
-      ...d,
-      gallery: d.gallery.map((g, idx) => (idx === i ? url : g)),
-    }));
+    setPhotos((list) => list.map((g, idx) => (idx === i ? url : g)));
   const removeGallery = (i: number) =>
-    setData((d) => ({ ...d, gallery: d.gallery.filter((_, idx) => idx !== i) }));
+    setPhotos((list) => list.filter((_, idx) => idx !== i));
+  const moveGallery = (from: number, to: number) =>
+    setPhotos((list) => {
+      const next = [...list];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
 
   // 갤러리 여러 장 한 번에 담기 — 폰 사진첩에서 여러 장을 골라 올릴 수 있게.
   // 한 장씩 순서대로 올려 진행 상황을 보여 준다.
@@ -1513,27 +1768,18 @@ export default function EditorClient({
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               갤러리 사진{" "}
               <span className="text-gray-400">
-                ({data.gallery.filter(Boolean).length}/{MAX_GALLERY})
+                ({photos.length}/{MAX_GALLERY})
               </span>
             </span>
-            <div className="grid grid-cols-3 gap-2">
-              {/* 빈 슬롯은 두지 않는다. 예전에는 빈 슬롯이 한 장짜리 업로드라,
-                  여러 장 담기 타일보다 먼저 눈에 띄어 한 장씩만 올리게 됐다. */}
-              {data.gallery.map((g, i) =>
-                g ? (
-                  <ImageUpload
-                    key={i}
-                    value={g}
-                    onChange={(url) => {
-                      if (url) setGallery(i, url);
-                      else removeGallery(i);
-                    }}
-                    label="사진 추가"
-                    className="h-24"
-                  />
-                ) : null
-              )}
-              {data.gallery.filter(Boolean).length < MAX_GALLERY && (
+            {/* 빈 슬롯은 두지 않는다. 예전에는 빈 슬롯이 한 장짜리 업로드라,
+                여러 장 담기 타일보다 먼저 눈에 띄어 한 장씩만 올리게 됐다. */}
+            <SortablePhotos
+              photos={photos}
+              onMove={moveGallery}
+              onChangeAt={setGallery}
+              onRemoveAt={removeGallery}
+            >
+              {photos.length < MAX_GALLERY && (
                 // 폰 사진첩에서 여러 장을 한 번에 고를 수 있다
                 <label className="relative flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-gray-300 transition hover:border-gold-300 hover:text-gold-400">
                   {bulk ? (
@@ -1565,11 +1811,12 @@ export default function EditorClient({
                   />
                 </label>
               )}
-            </div>
+            </SortablePhotos>
           </div>
           {/* 바로 위 사진 목록에 붙여 둔다 (Group 의 space-y 간격을 되돌림) */}
           <p className="-mt-2 text-xs text-gray-400">
             갤러리는 최대 {MAX_GALLERY}장까지 추가할 수 있어요.
+            {photos.length > 1 && " 사진을 꾹 눌러 끌면 순서를 바꿀 수 있어요."}
           </p>
         </Group>
 
