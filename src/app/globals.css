@@ -1045,3 +1045,61 @@ body {
     animation: none;
   }
 }
+
+/* ───────── 제작 중 편지 애니메이션 (에디터) ───────── */
+/* 봉투가 둥실 떠 있고, 그 안에서 편지지가 올라왔다 다시 들어간다 */
+@keyframes ed-envelope-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+.ed-envelope {
+  animation: ed-envelope-bob 2.2s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes ed-letter-slip {
+  0%,
+  8% {
+    transform: translateY(11px);
+  }
+  38%,
+  62% {
+    transform: translateY(-15px);
+  }
+  92%,
+  100% {
+    transform: translateY(11px);
+  }
+}
+.ed-letter {
+  animation: ed-letter-slip 2.6s ease-in-out infinite;
+}
+/* 봉투 위로 하나씩 피어오르는 하트 */
+@keyframes ed-heart-rise {
+  0% {
+    transform: translate(0, 4px) scale(0.5);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(var(--ed-dx, 0), -34px) scale(1);
+    opacity: 0;
+  }
+}
+.ed-heart {
+  animation: ed-heart-rise 2.4s ease-out infinite;
+  animation-delay: var(--ed-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ed-envelope,
+  .ed-letter,
+  .ed-heart {
+    animation: none;
+  }
+}

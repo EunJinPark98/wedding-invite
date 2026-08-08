@@ -133,6 +133,92 @@ function ImageUpload({
   );
 }
 
+/* ───────── 제작 중 화면 ───────── */
+// 저장은 사진 수에 따라 몇 초씩 걸려서, 그동안 멈춘 것처럼 보이지 않게
+// 편지가 오가는 그림을 띄운다. (모양은 globals.css 의 ed-* 애니메이션)
+function SendingOverlay({ label }: { label: string }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-6 bg-white/95 backdrop-blur-sm"
+    >
+      <div className="relative">
+        {/* 봉투 위로 피어오르는 하트 */}
+        <div className="pointer-events-none absolute inset-x-0 -top-2 flex justify-center">
+          {[
+            { dx: "-16px", delay: "0s" },
+            { dx: "4px", delay: "0.8s" },
+            { dx: "18px", delay: "1.6s" },
+          ].map((h) => (
+            <span
+              key={h.delay}
+              className="ed-heart absolute text-sm text-gold-300"
+              style={
+                { "--ed-dx": h.dx, "--ed-delay": h.delay } as React.CSSProperties
+              }
+              aria-hidden
+            >
+              ♥
+            </span>
+          ))}
+        </div>
+        <svg width="132" height="112" viewBox="0 0 64 54" aria-hidden>
+          <g className="ed-envelope">
+            {/* 봉투 뒷면 */}
+            <rect
+              x="5"
+              y="16"
+              width="54"
+              height="33"
+              rx="4"
+              fill="#faf4e4"
+              stroke="#d9bf70"
+              strokeWidth="1.4"
+            />
+            {/* 봉투 안에서 오르내리는 편지지 */}
+            <g className="ed-letter">
+              <rect
+                x="13"
+                y="15"
+                width="38"
+                height="28"
+                rx="2.5"
+                fill="#fff"
+                stroke="#e8d5a2"
+                strokeWidth="1.2"
+              />
+              <path
+                d="M19 23h26M19 28h26M19 33h17"
+                stroke="#d9bf70"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </g>
+            {/* 봉투 앞면 — 편지지가 이 뒤로 들어간다 */}
+            <path
+              d="M5 24 32 42 59 24 V45a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4Z"
+              fill="#f3e8c8"
+              stroke="#c6a23f"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+            />
+          </g>
+        </svg>
+      </div>
+      <p className="text-base font-semibold text-gray-700">
+        {label}
+        <span className="ml-0.5 inline-block w-5 text-left text-gold-400">
+          ···
+        </span>
+      </p>
+      <p className="-mt-4 text-xs text-gray-400">
+        곧 링크가 만들어져요. 창을 닫지 말아 주세요.
+      </p>
+    </div>
+  );
+}
+
 /* ───────── 갤러리 사진 순서 바꾸기 ───────── */
 // HTML5 draggable 은 터치에서 아예 동작하지 않아, 폰에서도 되도록 포인터
 // 이벤트로 직접 만든다. 사진을 잠깐 누르고 있으면 집히고(그 전에 움직이면
@@ -663,6 +749,15 @@ function TextareaField({
     </label>
   );
 }
+
+// 앞 글자에 받침이 있으면 "을", 없으면 "를"
+// ("예식일을 입력하면" / "돌잔치 날짜를 입력하면")
+const josaEulReul = (word: string) => {
+  const code = word.trim().charCodeAt(word.trim().length - 1) - 0xac00;
+  // 한글이 아니면(영문·숫자) 안전하게 "을"
+  if (code < 0 || code > 11171) return "을";
+  return code % 28 === 0 ? "를" : "을";
+};
 
 // 만료일 표시용 (예: 2026년 9월 26일)
 const fmtDate = (iso: string) => {
@@ -2068,18 +2163,24 @@ export default function EditorClient({
             <div className="mt-3.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-center text-xs leading-5 text-gold-600">
               {expiryDate ? (
                 <>
-                  {labels.dateFieldLabel} 당일까지 볼 수 있고,
+                  {labels.noun}은 {labels.dateFieldLabel} 당일까지 볼 수 있고,
                   <br />
-                  <span className="font-semibold">{expiryDate}</span>에 사진까지
-                  완전히 삭제돼요.
+                  <span className="font-semibold">{expiryDate}</span>에 완전히
+                  삭제됩니다.
                 </>
               ) : (
-                <>{labels.dateFieldLabel}을 입력하면 게시 종료일이 정해져요.</>
+                <>
+                  {labels.dateFieldLabel}
+                  {josaEulReul(labels.dateFieldLabel)} 입력하면 게시 종료일이
+                  정해집니다.
+                </>
               )}
+              <br />
+              수정 및 삭제는 마이페이지에서 언제든지 가능합니다.
               {isEdit && (
                 <>
                   <br />
-                  저장하면 바로 반영되고, 링크는 그대로 유지돼요.
+                  저장하면 바로 반영되고, 링크는 그대로 유지됩니다.
                 </>
               )}
             </div>
@@ -2101,7 +2202,7 @@ export default function EditorClient({
                 className="flex-1 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:from-gold-500 hover:to-gold-600 disabled:opacity-50"
               >
                 {submitting
-                  ? "저장 중..."
+                  ? "잠시만요..."
                   : isEdit
                     ? "네, 수정할게요"
                     : "네, 제작할게요"}
@@ -2109,6 +2210,15 @@ export default function EditorClient({
             </div>
           </div>
         </div>
+      )}
+
+      {/* 저장하는 동안 — 확인 창 위를 덮는다 */}
+      {submitting && (
+        <SendingOverlay
+          label={
+            isEdit ? `${labels.noun} 수정 중` : `${labels.noun} 제작 중`
+          }
+        />
       )}
     </div>
     </div>
