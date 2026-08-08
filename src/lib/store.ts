@@ -136,6 +136,31 @@ export async function listInvitationsByUser(
   );
 }
 
+/** 운영자가 만들어진 초대장을 훑어보기 위한 전체 목록 (관리자 화면 전용). */
+export async function listAllInvitations(): Promise<
+  (Invitation & { userId: string | null })[]
+> {
+  if (useSupabase) {
+    const { data, error } = await supabase()
+      .from("invitations")
+      .select("slug, template, data, created_at, expires_at, user_id")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((r) => ({
+      slug: r.slug,
+      template: r.template,
+      data: r.data,
+      createdAt: r.created_at,
+      expiresAt: r.expires_at ?? null,
+      userId: r.user_id ?? null,
+    }));
+  }
+  const db = await readLocal();
+  return Object.values(db)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map((inv) => ({ ...inv, userId: null }));
+}
+
 /**
  * 계정이 지금 쓰고 있는 초대장의 종류 목록 (종류당 1개 제한 검사용).
  * 게시 기간이 끝난 초대장은 자리를 비워주므로 제외한다.
