@@ -771,12 +771,12 @@ function NamesAmp({
   );
 }
 
-// 대표 사진 모션 id → CSS 클래스 (부모에 overflow-hidden 필요)
+// 대표 사진 모션 id → CSS 클래스 (부모에 overflow-hidden 필요).
+// "none"은 여기에 없다 — 아무 클래스도 붙이지 않으면 그대로 멈춰 있는다.
 const MOTION_CLASS: Record<string, string> = {
   zoomin: "inv-kenburns",
   zoomout: "inv-motion-zoomout",
   focus: "inv-motion-focus",
-  mono: "inv-motion-mono",
 };
 
 function Photo({
@@ -791,9 +791,8 @@ function Photo({
   // true면 선택된 대표 사진 모션 적용 (부모에 overflow-hidden 필요)
   kenburns?: boolean;
 }) {
-  const motion = kenburns
-    ? (MOTION_CLASS[data.heroMotion] ?? MOTION_CLASS.zoomin)
-    : "";
+  // 고른 모션에 클래스가 없으면(=없음) 붙이지 않는다
+  const motion = kenburns ? (MOTION_CLASS[data.heroMotion] ?? "") : "";
   if (data.mainPhotoUrl)
     return (
       // eslint-disable-next-line @next/next/no-img-element

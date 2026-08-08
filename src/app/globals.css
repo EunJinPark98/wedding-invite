@@ -649,28 +649,10 @@ body {
 .inv-motion-focus {
   animation: inv-motion-focus 2.6s ease-out both;
 }
-/* 4. 흑백 → 컬러: 흑백으로 잠시 머물다 색이 물드는 연출 */
-@keyframes inv-motion-mono {
-  0% {
-    filter: grayscale(1);
-    transform: scale(1.04);
-  }
-  35% {
-    filter: grayscale(1);
-  }
-  100% {
-    filter: grayscale(0);
-    transform: scale(1);
-  }
-}
-.inv-motion-mono {
-  animation: inv-motion-mono 5s ease-in-out both;
-}
 @media (prefers-reduced-motion: reduce) {
   .inv-kenburns,
   .inv-motion-zoomout,
-  .inv-motion-focus,
-  .inv-motion-mono {
+  .inv-motion-focus {
     animation: none;
   }
 }

@@ -107,12 +107,12 @@ export type BabyGender = (typeof BABY_GENDERS)[number]["id"];
 export const getBabyGenderMark = (id: string | undefined) =>
   BABY_GENDERS.find((g) => g.id === id)?.mark ?? "";
 
-// 대표 사진 모션 (청첩장 업체에서 많이 쓰는 연출 4종)
+// 대표 사진 모션. "none"이면 움직이지 않는다.
 export const HERO_MOTIONS = [
+  { id: "none", label: "없음", desc: "움직임 없이 그대로" },
   { id: "zoomin", label: "줌 인", desc: "천천히 확대" },
   { id: "zoomout", label: "줌 아웃", desc: "천천히 축소" },
   { id: "focus", label: "아웃포커스", desc: "흐림 → 선명" },
-  { id: "mono", label: "흑백 → 컬러", desc: "흑백에서 물들듯" },
 ] as const;
 export type HeroMotion = (typeof HERO_MOTIONS)[number]["id"];
 
