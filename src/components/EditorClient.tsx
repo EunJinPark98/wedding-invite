@@ -1016,24 +1016,29 @@ export default function EditorClient({
       alert(`갤러리는 최대 ${MAX_GALLERY}장까지 담을 수 있어요.`);
       return;
     }
-    const picked = files.slice(0, room);
+    // 폰 사진첩은 웹에서 고를 수 있는 장수를 제한할 방법이 없어, 너무 많이
+    // 고르면 여기서 되돌린다. 앞에서부터 잘라 담으면 정작 넣고 싶던 사진이
+    // 조용히 빠지므로 아예 담지 않고 다시 고르게 한다.
+    if (files.length > room) {
+      alert(
+        `${files.length}장을 고르셨어요.\n` +
+          `갤러리는 최대 ${MAX_GALLERY}장까지라 지금은 ${room}장 더 담을 수 있어요.\n` +
+          `${room}장 이하로 다시 골라 주세요.`
+      );
+      return;
+    }
 
-    setBulk({ done: 0, total: picked.length });
+    setBulk({ done: 0, total: files.length });
     try {
       const urls: string[] = [];
-      for (const f of picked) {
+      for (const f of files) {
         urls.push(await uploadPhoto(f));
-        setBulk({ done: urls.length, total: picked.length });
+        setBulk({ done: urls.length, total: files.length });
       }
       setData((d) => ({
         ...d,
         gallery: [...d.gallery.filter(Boolean), ...urls].slice(0, MAX_GALLERY),
       }));
-      if (files.length > picked.length) {
-        alert(
-          `갤러리는 최대 ${MAX_GALLERY}장이라 ${picked.length}장만 담았어요.`
-        );
-      }
     } catch (e) {
       alert(
         e instanceof Error
@@ -1793,7 +1798,10 @@ export default function EditorClient({
                   ) : (
                     <>
                       <span className="text-2xl leading-none">+</span>
-                      <span className="mt-1 text-[11px]">사진 추가</span>
+                      {/* 사진첩을 열기 전에 몇 장까지 고르면 되는지 알려 준다 */}
+                      <span className="mt-1 text-[11px]">
+                        {photos.length ? `${MAX_GALLERY - photos.length}장 더` : "사진 추가"}
+                      </span>
                     </>
                   )}
                   {/* display:none 으로 숨기면 아이폰에서 사진첩이 열리지 않는다.
