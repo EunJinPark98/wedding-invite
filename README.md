@@ -59,6 +59,8 @@
 
 <div align="center">
 <img src="docs/img/categories.png" alt="결혼 · 돌잔치 · 칠순 · 생일 초대장 미리보기" width="900"/>
+<br/>
+<sub>왼쪽부터 <b>클래식</b>(결혼) · <b>색동</b>(돌잔치) · <b>한지</b>(칠순) · <b>네온 나이트</b>(생일)</sub>
 </div>
 
 | | 종류 | 입력 형태 | 특징 |
