@@ -73,6 +73,12 @@ export default async function InvitationPage({
 
   return (
     <main className="min-h-screen bg-gray-100">
+      {/* 대표 사진은 열자마자 맨 위에 나오고 인트로(사진 페이드)도 이 사진을
+          쓴다. HTML 과 함께 받아 두어야 하객이 흰 화면·검은 화면을 덜 본다.
+          (React 가 head 로 올려 준다) */}
+      {inv.data.mainPhotoUrl && (
+        <link rel="preload" as="image" href={inv.data.mainPhotoUrl} />
+      )}
       <InvitationView template={inv.template} data={inv.data} />
     </main>
   );
