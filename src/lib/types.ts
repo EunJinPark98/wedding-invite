@@ -226,6 +226,20 @@ export function todayInKorea(now: Date = new Date()): string {
 }
 
 /**
+ * 이미 지나간 행사일인가 (한국 기준).
+ *
+ * 지난 날로 만들면 게시 기간이 시작하자마자 끝나 있어, 만들자마자 "게시 기간이
+ * 종료됐다"는 화면을 보게 된다. 날짜 칸의 min 은 달력에서 고르는 것만 막으므로
+ * (직접 적거나 임시 저장을 되살리면 지나간 날이 그대로 들어온다) 화면과 서버
+ * 양쪽에서 한 번 더 본다.
+ */
+export function isPastEventDate(eventDate: string | undefined): boolean {
+  const d = (eventDate ?? "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false; // 형식 검사는 다른 곳에서
+  return d < todayInKorea();
+}
+
+/**
  * 게시 종료 시각 — 행사 다음 날 0시(한국시간)부터 자동 비공개.
  * 예: 예식일 2026-10-10 → 10월 10일까지 열리고 10월 11일에 사라짐.
  * 잘못된 날짜면 null.

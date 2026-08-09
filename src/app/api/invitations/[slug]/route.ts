@@ -10,6 +10,7 @@ import { getCategoryLabels } from "@/lib/categories";
 import {
   MAX_GALLERY,
   expiryFromEventDate,
+  isPastEventDate,
   isSamplePhoto,
   TEMPLATE_IDS,
 } from "@/lib/types";
@@ -99,6 +100,14 @@ export async function PATCH(
   if (!expiresAt) {
     return NextResponse.json(
       { error: `${labels.dateFieldLabel}을 정확히 입력해 주세요.` },
+      { status: 400 }
+    );
+  }
+  // 지난 날로 만들면 게시가 시작하자마자 끝나 있다. 화면에서도 막지만,
+  // 화면을 거치지 않고 들어오는 요청이 있을 수 있어 여기서도 본다.
+  if (isPastEventDate(data.weddingDate)) {
+    return NextResponse.json(
+      { error: `${labels.dateFieldLabel}은 오늘 이후로 정해 주세요.` },
       { status: 400 }
     );
   }
