@@ -1123,10 +1123,13 @@ export default function EditorClient({
   const [trim, setTrim] = useState<{ files: File[]; room: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
-  const [dateWarn, setDateWarn] = useState(false); // 지난 행사일 경고
   // 임시저장 버튼을 누른 직후에만 잠깐 뜨는 확인 문구
   const [savedNote, setSavedNote] = useState(false);
   const dateSectionRef = useRef<HTMLDivElement>(null);
+  // 지난 행사일인지는 상태로 들고 있지 않고 값에서 바로 본다.
+  // 브라우저마다 날짜 칸의 min 을 지키지 않는 경우가 있어(아이폰에서 지난 날이
+  // 그대로 눌린다), 고른 순간 바로 보이게 하려면 이 편이 확실하다.
+  const datePast = isPastEventDate(data.weddingDate);
   // 만들다 만 것이 남아 있을 때 띄우는 "이어서 작성" 안내
   const [draft, setDraft] = useState<Draft | null>(null);
   const photoSectionRef = useRef<HTMLDivElement>(null);
@@ -1167,8 +1170,7 @@ export default function EditorClient({
   function openConfirm() {
     // 달력의 min 은 고르는 것만 막는다. 직접 적거나 임시 저장을 되살리면
     // 지나간 날이 그대로 들어오므로 여기서 한 번 더 본다.
-    if (isPastEventDate(data.weddingDate)) {
-      setDateWarn(true);
+    if (datePast) {
       dateSectionRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
@@ -1948,14 +1950,11 @@ export default function EditorClient({
             label={labels.dateFieldLabel}
             type="date"
             min={today}
-            invalid={dateWarn}
+            invalid={datePast}
             value={data.weddingDate}
-            onChange={(v) => {
-              setDateWarn(false);
-              set("weddingDate", v);
-            }}
+            onChange={(v) => set("weddingDate", v)}
           />
-          {dateWarn && (
+          {datePast && (
             <p className="-mt-2 text-xs text-red-500">
               지난 날짜예요. 오늘 이후로 골라 주세요.
             </p>
@@ -2213,7 +2212,11 @@ export default function EditorClient({
         >
           {isEdit ? "수정 내용 저장하기" : `${labels.noun} 제작하기`}
         </button>
-        {photoWarn && needMainPhoto ? (
+        {datePast ? (
+          <p className="text-center text-sm font-medium text-red-500">
+            {labels.dateFieldLabel}이 지난 날짜예요. 오늘 이후로 골라 주세요.
+          </p>
+        ) : photoWarn && needMainPhoto ? (
           <p className="text-center text-sm font-medium text-red-500">
             대표 사진을 등록해 주세요. 지금 보이는 사진은 예시용이에요.
           </p>
