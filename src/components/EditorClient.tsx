@@ -2204,14 +2204,11 @@ export default function EditorClient({
             {isEdit ? "수정 내용 저장하기" : `${labels.noun} 제작하기`}
           </button>
         </div>
-        {/* 버튼 아래 한자리에서 상황을 알린다 (저장 확인 · 막힌 이유 · 기본 안내) */}
+        {/* 버튼 아래 안내. 지난 날짜는 여기 적지 않는다 — 날짜 칸이 이미
+            빨갛게 알리고 있고, 눌러도 그 칸으로 데려간다. */}
         {savedNote ? (
           <p className="text-center text-sm font-medium text-gold-500">
             저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요.
-          </p>
-        ) : datePast ? (
-          <p className="text-center text-sm font-medium text-red-500">
-            {labels.dateFieldLabel}이 지난 날짜예요. 오늘 이후로 골라 주세요.
           </p>
         ) : photoWarn && needMainPhoto ? (
           <p className="text-center text-sm font-medium text-red-500">
