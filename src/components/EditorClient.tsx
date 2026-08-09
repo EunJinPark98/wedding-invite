@@ -1124,6 +1124,8 @@ export default function EditorClient({
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
   const [dateWarn, setDateWarn] = useState(false); // 지난 행사일 경고
+  // 임시저장 버튼을 누른 직후에만 잠깐 뜨는 확인 문구
+  const [savedNote, setSavedNote] = useState(false);
   const dateSectionRef = useRef<HTMLDivElement>(null);
   // 만들다 만 것이 남아 있을 때 띄우는 "이어서 작성" 안내
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -1154,6 +1156,13 @@ export default function EditorClient({
 
   // 게시 종료일 — 고르는 게 아니라 행사 다음 날로 자동 결정
   const expiryDate = expiryDateLabel(data.weddingDate);
+
+  // 적는 동안 알아서 담기지만, 눌러서 확인하고 싶은 사람을 위해 버튼도 둔다.
+  function handleSaveDraft() {
+    saveDraft({ category, template, data });
+    setSavedNote(true);
+    setTimeout(() => setSavedNote(false), 3000);
+  }
 
   function openConfirm() {
     // 달력의 min 은 고르는 것만 막는다. 직접 적거나 임시 저장을 되살리면
@@ -2174,6 +2183,28 @@ export default function EditorClient({
             + 계좌 추가
           </button>
         </Group>
+        )}
+
+        {/* 임시저장 — 수정 모드는 이미 서버에 있는 것을 고치는 중이라 두지 않는다 */}
+        {!isEdit && (
+          <div>
+            <button
+              type="button"
+              onClick={handleSaveDraft}
+              className="w-full rounded-2xl border border-gold-200 bg-white py-3.5 text-sm font-semibold text-gold-600 transition hover:bg-gold-50"
+            >
+              임시저장
+            </button>
+            <p
+              className={`mt-2 text-center text-xs ${
+                savedNote ? "text-gold-500" : "text-gray-400"
+              }`}
+            >
+              {savedNote
+                ? "저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요."
+                : "지금 브라우저에만 담아 둬요. 다른 기기에서는 이어 쓸 수 없어요."}
+            </p>
+          </div>
         )}
 
         <button
