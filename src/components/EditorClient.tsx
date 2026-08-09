@@ -2194,14 +2194,9 @@ export default function EditorClient({
             >
               임시저장
             </button>
-            <p
-              className={`mt-2 text-center text-xs ${
-                savedNote ? "text-gold-500" : "text-gray-400"
-              }`}
-            >
-              {savedNote
-                ? "저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요."
-                : "지금 브라우저에만 담아 둬요. 다른 기기에서는 이어 쓸 수 없어요."}
+            {/* 눌렀을 때만 잠깐 뜬다. 자리를 비워 두어 버튼이 튀지 않게 한다. */}
+            <p className="mt-2 min-h-5 text-center text-xs text-gold-500">
+              {savedNote ? "저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요." : ""}
             </p>
           </div>
         )}
