@@ -40,6 +40,7 @@ import {
   dolGreetingMessage,
   dolGreetingTitle,
   expiryDateLabel,
+  isPastEventDate,
   isSamplePhoto,
   seniorGreetingTitle,
   type Account,
@@ -807,6 +808,7 @@ function Field({
   type = "text",
   placeholder,
   min,
+  invalid = false,
 }: {
   label: string;
   value: string;
@@ -815,6 +817,8 @@ function Field({
   placeholder?: string;
   // 날짜 칸에서 고를 수 있는 가장 이른 날 ("2026-08-08")
   min?: string;
+  // 고쳐야 하는 칸임을 눈에 띄게 한다
+  invalid?: boolean;
 }) {
   return (
     // min-w-0 이 없으면 날짜 입력처럼 고유 폭이 큰 칸이 grid 칸을 밀어내
@@ -829,7 +833,9 @@ function Field({
         placeholder={placeholder}
         min={min}
         onChange={(e) => onChange(e.target.value)}
-        className={INPUT_CLASS}
+        className={`${INPUT_CLASS} ${
+          invalid ? "border-red-300 bg-red-50 focus:border-red-400" : ""
+        }`}
       />
     </label>
   );
@@ -1117,6 +1123,8 @@ export default function EditorClient({
   const [trim, setTrim] = useState<{ files: File[]; room: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
+  const [dateWarn, setDateWarn] = useState(false); // 지난 행사일 경고
+  const dateSectionRef = useRef<HTMLDivElement>(null);
   // 만들다 만 것이 남아 있을 때 띄우는 "이어서 작성" 안내
   const [draft, setDraft] = useState<Draft | null>(null);
   const photoSectionRef = useRef<HTMLDivElement>(null);
@@ -1148,6 +1156,16 @@ export default function EditorClient({
   const expiryDate = expiryDateLabel(data.weddingDate);
 
   function openConfirm() {
+    // 달력의 min 은 고르는 것만 막는다. 직접 적거나 임시 저장을 되살리면
+    // 지나간 날이 그대로 들어오므로 여기서 한 번 더 본다.
+    if (isPastEventDate(data.weddingDate)) {
+      setDateWarn(true);
+      dateSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
     if (needMainPhoto) {
       setPhotoWarn(true);
       photoSectionRef.current?.scrollIntoView({
@@ -1916,13 +1934,23 @@ export default function EditorClient({
 
         <Group title={labels.dateSectionTitle} step={4} previewSection="date">
           {/* 좁은 화면에서 날짜 칸이 눌리지 않도록 한 줄씩 둔다 */}
+          <div ref={dateSectionRef} />
           <Field
             label={labels.dateFieldLabel}
             type="date"
             min={today}
+            invalid={dateWarn}
             value={data.weddingDate}
-            onChange={(v) => set("weddingDate", v)}
+            onChange={(v) => {
+              setDateWarn(false);
+              set("weddingDate", v);
+            }}
           />
+          {dateWarn && (
+            <p className="-mt-2 text-xs text-red-500">
+              지난 날짜예요. 오늘 이후로 골라 주세요.
+            </p>
+          )}
           <TimePicker
             value={data.weddingTime}
             onChange={(v) => set("weddingTime", v)}
