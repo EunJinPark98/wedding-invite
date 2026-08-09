@@ -576,16 +576,11 @@ function GalleryInner({
   if (gallery.length === 0) {
     if (!preview) return null;
     return (
-      <>
-        <GalleryPlaceholder
-          count={Math.max(data.gallery.length, 3)}
-          t={t}
-          rounded={rounded}
-        />
-        <p className="mt-4 text-xs" style={{ color: t.sub }}>
-          갤러리 사진을 추가하면 여기에 표시돼요
-        </p>
-      </>
+      <GalleryPlaceholder
+        count={Math.max(data.gallery.length, 3)}
+        t={t}
+        rounded={rounded}
+      />
     );
   }
   return (
