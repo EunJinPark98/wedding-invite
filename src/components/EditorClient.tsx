@@ -2184,9 +2184,11 @@ export default function EditorClient({
         </Group>
         )}
 
-        {/* 임시저장 — 수정 모드는 이미 서버에 있는 것을 고치는 중이라 두지 않는다 */}
-        {!isEdit && (
-          <div>
+        {/* 두 버튼은 한 묶음이라 바깥 간격이 끼지 않게 함께 감싼다.
+            임시저장은 수정 모드에 두지 않는다 — 이미 서버에 있는 것을 고치는
+            중이라 임시로 담아 둘 것이 없다. */}
+        <div className="space-y-2">
+          {!isEdit && (
             <button
               type="button"
               onClick={handleSaveDraft}
@@ -2194,20 +2196,20 @@ export default function EditorClient({
             >
               임시저장
             </button>
-            {/* 눌렀을 때만 잠깐 뜬다. 자리를 비워 두어 버튼이 튀지 않게 한다. */}
-            <p className="mt-2 min-h-5 text-center text-xs text-gold-500">
-              {savedNote ? "저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요." : ""}
-            </p>
-          </div>
-        )}
-
-        <button
-          onClick={openConfirm}
-          className="w-full rounded-2xl bg-gradient-to-r from-gold-400 to-gold-500 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
-        >
-          {isEdit ? "수정 내용 저장하기" : `${labels.noun} 제작하기`}
-        </button>
-        {datePast ? (
+          )}
+          <button
+            onClick={openConfirm}
+            className="w-full rounded-2xl bg-gradient-to-r from-gold-400 to-gold-500 py-4 text-base font-semibold text-white shadow-lg shadow-gold-300/50 transition hover:from-gold-500 hover:to-gold-600"
+          >
+            {isEdit ? "수정 내용 저장하기" : `${labels.noun} 제작하기`}
+          </button>
+        </div>
+        {/* 버튼 아래 한자리에서 상황을 알린다 (저장 확인 · 막힌 이유 · 기본 안내) */}
+        {savedNote ? (
+          <p className="text-center text-sm font-medium text-gold-500">
+            저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요.
+          </p>
+        ) : datePast ? (
           <p className="text-center text-sm font-medium text-red-500">
             {labels.dateFieldLabel}이 지난 날짜예요. 오늘 이후로 골라 주세요.
           </p>
