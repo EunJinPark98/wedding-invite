@@ -21,16 +21,19 @@ import type { TemplateTheme } from "@/lib/templates";
 const DURATION = 2900;
 
 /**
- * 사진 페이드는 사진이 도착해야 시작한다.
+ * 사진 페이드(밝아지는 연출)의 길이.
  *
- * 에디터 미리보기에서는 사진이 이미 브라우저에 있어 곧바로 밝아지지만, 링크를
- * 받은 사람은 그때부터 사진을 내려받는다. 그대로 두면 연출은 페이지가 열리는
- * 순간 흘러가 버려서, 사진이 도착했을 땐 이미 끝나 있고 하객은 캄캄한 화면만
- * 보게 된다. 그래서 사진이 올 때까지 기다렸다가 시작한다 — 미리보기 그대로.
+ * 인트로가 언제 끝나는지는 사진과 무관하게 위 DURATION 하나로 정해진다.
+ * 사진을 기다렸다가 인트로를 시작하면 느린 통신에서 열리는 시간이 그만큼
+ * 늦어져, 하객은 캄캄한 화면을 더 오래 보게 된다.
  *
- * 다만 하염없이 기다리면 그게 더 답답하므로 여기까지만 기다린다.
+ * 대신 사진이 도착한 시점에 남은 시간에 맞춰 연출 길이를 줄여서 건다.
+ * 사진이 곧바로 오면 원래 길이대로, 늦게 오면 짧고 빠르게 밝아진다.
  */
-const PHOTO_WAIT_MAX = 2500;
+const PHOTO_FADE_MAX = 2600;
+const PHOTO_FADE_MIN = 600;
+// 연출이 끝나기 전에 인트로가 사라지지 않도록 남겨 두는 여유
+const PHOTO_FADE_TAIL = 400;
 
 // 별빛 연출용 — 열 때마다 자리가 달라지지 않도록 고정해 둔다
 const SPARKS = [
@@ -161,22 +164,29 @@ export default function InvitationIntro({
   style: string;
 }) {
   const [done, setDone] = useState(false);
-  // 사진 페이드일 때만 사진을 기다린다. 나머지 연출은 기다릴 것이 없다.
-  const waitsForPhoto = style === "photo" && !!data.mainPhotoUrl;
-  const [started, setStarted] = useState(!waitsForPhoto);
 
-  // 사진이 끝내 안 오더라도 여기까지만 붙잡는다
-  useEffect(() => {
-    if (!waitsForPhoto) return;
-    const id = setTimeout(() => setStarted(true), PHOTO_WAIT_MAX);
-    return () => clearTimeout(id);
-  }, [waitsForPhoto]);
+  // 인트로가 열린 시각 — 사진이 늦게 왔을 때 남은 시간을 재는 기준
+  const openedAt = useRef<number | null>(null);
+  // 사진이 다 그려지면 그때 남은 시간에 맞춘 연출 길이가 들어간다
+  const [fadeMs, setFadeMs] = useState<number | null>(null);
+  const startFade = useCallback(() => {
+    setFadeMs((prev) => {
+      if (prev !== null) return prev;
+      // 아직 시각을 못 잡았으면 = 열리자마자 사진이 이미 있던 경우
+      if (openedAt.current === null) return PHOTO_FADE_MAX;
+      const left = DURATION - PHOTO_FADE_TAIL - (Date.now() - openedAt.current);
+      return Math.max(PHOTO_FADE_MIN, Math.min(PHOTO_FADE_MAX, left));
+    });
+  }, []);
 
   // 이미 받아 둔 사진이면 onLoad 가 하이드레이션 전에 지나가 버린다 —
   // 붙는 순간 다 그려져 있는지 직접 확인한다.
-  const photoRef = useCallback((el: HTMLImageElement | null) => {
-    if (el?.complete) setStarted(true);
-  }, []);
+  const photoRef = useCallback(
+    (el: HTMLImageElement | null) => {
+      if (el?.complete) startFade();
+    },
+    [startFade]
+  );
 
   // 덮을 화면의 높이 (창 크기가 바뀌면 다시 잰다)
   const [screenH, setScreenH] = useState<number>();
@@ -195,14 +205,14 @@ export default function InvitationIntro({
   }, []);
 
   useEffect(() => {
-    if (!started) return;
+    openedAt.current = Date.now();
     // 모션을 줄이도록 설정한 기기에서는 연출 없이 곧바로 넘긴다.
     // (서버에서 이미 그려 보낸 화면이라 첫 렌더에서 지우면 안 되고,
     //  한 박자 뒤에 지워야 하이드레이션이 어긋나지 않는다)
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const id = setTimeout(() => setDone(true), reduce ? 0 : DURATION);
     return () => clearTimeout(id);
-  }, [started]);
+  }, []);
 
   if (done) return null;
 
@@ -236,9 +246,7 @@ export default function InvitationIntro({
 
   return (
     <div
-      // 사진이 오기 전에는 inv-intro 를 붙이지 않는다 — 붙는 순간부터 시간이
-      // 흘러 2.1초 뒤 사라지기 시작하므로, 사진이 늦으면 캄캄한 화면만 지나간다.
-      className={`absolute inset-0 z-30 overflow-hidden${started ? " inv-intro" : ""}`}
+      className="inv-intro absolute inset-0 z-30 overflow-hidden"
       style={{ background }}
       onClick={() => setDone(true)}
       aria-hidden
@@ -257,19 +265,20 @@ export default function InvitationIntro({
             : undefined
         }
       >
-        {/* 사진은 기다리는 동안에도 걸어 두어야 그때 내려받기 시작한다.
-            다 받은 뒤에야(onLoad) 밝아지는 연출을 붙인다. */}
+        {/* 다 그려진 뒤에(onLoad) 밝아지는 연출을 건다. 그전에는 감춰 둔다 —
+            반쯤 내려온 사진이 툭 나타나는 것보다 낫다. */}
         {style === "photo" && data.mainPhotoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             ref={photoRef}
             src={data.mainPhotoUrl}
             alt=""
-            onLoad={() => setStarted(true)}
-            onError={() => setStarted(true)}
+            onLoad={startFade}
+            onError={startFade}
             className={`absolute inset-0 h-full w-full object-cover ${
-              started ? "inv-intro-photo" : "opacity-0"
+              fadeMs ? "inv-intro-photo" : "opacity-0"
             }`}
+            style={fadeMs ? { animationDuration: `${fadeMs}ms` } : undefined}
           />
         )}
 
@@ -358,62 +367,58 @@ export default function InvitationIntro({
           </div>
         )}
 
-        {/* 문구도 사진과 함께 나와야 한다. 먼저 나오면 사진이 도착했을 땐
-            이미 다 써진 뒤라 미리보기에서 본 것과 어긋난다. */}
-        {started && (
-          <div className="relative px-8 text-center">
-            {/* 먹번짐 — 글씨 뒤로 먹물이 한 번 번졌다 스며든다 */}
-            {style === "ink" && (
-              <span className="inv-intro-ink-wash" style={{ color: inkColor }} />
-            )}
+        <div className="relative px-8 text-center">
+          {/* 먹번짐 — 글씨 뒤로 먹물이 한 번 번졌다 스며든다 */}
+          {style === "ink" && (
+            <span className="inv-intro-ink-wash" style={{ color: inkColor }} />
+          )}
 
-            {/* 라인 리빌 — 위아래 선이 그어지고 그 사이로 문구가 드러난다 */}
-            {style === "line" && (
-              <span
-                className="inv-intro-line mx-auto mb-5 block h-px"
-                style={{ background: accentColor }}
-              />
-            )}
+          {/* 라인 리빌 — 위아래 선이 그어지고 그 사이로 문구가 드러난다 */}
+          {style === "line" && (
+            <span
+              className="inv-intro-line mx-auto mb-5 block h-px"
+              style={{ background: accentColor }}
+            />
+          )}
 
-            {/* 문구 글꼴은 템플릿을 따르지 않고 흘림체로 고정한다 (inv-intro-phrase) */}
+          {/* 문구 글꼴은 템플릿을 따르지 않고 흘림체로 고정한다 (inv-intro-phrase) */}
+          <p
+            className={`${phraseClass} inv-intro-phrase relative whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
+            style={{ color: inkColor }}
+          >
+            {style === "petal" ? (
+              <WrittenPhrase text={phrase} letterClass="inv-intro-letter" />
+            ) : style === "ink" ? (
+              <WrittenPhrase text={phrase} letterClass="inv-intro-ink-letter" />
+            ) : (
+              phrase
+            )}
+          </p>
+
+          {sub && (
             <p
-              className={`${phraseClass} inv-intro-phrase relative whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
-              style={{ color: inkColor }}
+              className="inv-intro-rise-2 mt-5 text-[calc(14px*var(--inv-fs))] tracking-[0.12em]"
+              style={{ color: accentColor, fontFamily: t.headingFont }}
             >
-              {style === "petal" ? (
-                <WrittenPhrase text={phrase} letterClass="inv-intro-letter" />
-              ) : style === "ink" ? (
-                <WrittenPhrase text={phrase} letterClass="inv-intro-ink-letter" />
-              ) : (
-                phrase
-              )}
+              {sub}
             </p>
+          )}
+          {date && (
+            <p
+              className="inv-intro-rise-2 mt-2 text-[calc(12.5px*var(--inv-fs))] tracking-[0.25em]"
+              style={{ color: subColor }}
+            >
+              {date}
+            </p>
+          )}
 
-            {sub && (
-              <p
-                className="inv-intro-rise-2 mt-5 text-[calc(14px*var(--inv-fs))] tracking-[0.12em]"
-                style={{ color: accentColor, fontFamily: t.headingFont }}
-              >
-                {sub}
-              </p>
-            )}
-            {date && (
-              <p
-                className="inv-intro-rise-2 mt-2 text-[calc(12.5px*var(--inv-fs))] tracking-[0.25em]"
-                style={{ color: subColor }}
-              >
-                {date}
-              </p>
-            )}
-
-            {style === "line" && (
-              <span
-                className="inv-intro-line mx-auto mt-5 block h-px"
-                style={{ background: accentColor }}
-              />
-            )}
-          </div>
-        )}
+          {style === "line" && (
+            <span
+              className="inv-intro-line mx-auto mt-5 block h-px"
+              style={{ background: accentColor }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
