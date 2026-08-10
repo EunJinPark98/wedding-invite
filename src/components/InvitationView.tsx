@@ -1,4 +1,5 @@
 import Link from "next/link";
+import HeroPhoto from "./HeroPhoto";
 import {
   getBabyGenderMark,
   normalizeData,
@@ -791,11 +792,10 @@ function Photo({
   const motion = kenburns ? (MOTION_CLASS[data.heroMotion] ?? "") : "";
   if (data.mainPhotoUrl)
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <HeroPhoto
         src={data.mainPhotoUrl}
-        alt="대표 사진"
-        className={`object-cover ${motion} ${className}`}
+        motion={motion}
+        className={className}
       />
     );
   return (
