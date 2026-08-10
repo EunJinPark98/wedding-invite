@@ -2224,7 +2224,10 @@ export default function EditorClient({
       </div>
 
       {/* 실시간 미리보기 — 데스크톱(사이드 고정) */}
-      <div className="hidden md:sticky md:top-8 md:block md:h-[calc(100vh-4rem)]">
+      {/* 높이를 폰 비율(안쪽 364 × 790 ≈ 9:19.5)에서 멈춘다. 창 높이만 따라가면
+          모니터가 클수록 프레임이 길쭉해지고, 화면을 가득 덮는 인트로에서만
+          사진이 좌우로 더 잘려 실제 초대장과 다른 그림이 나온다. */}
+      <div className="hidden md:sticky md:top-8 md:block md:h-[min(calc(100vh-4rem),806px)]">
         <p className="mb-3 text-center font-cormorant text-xs tracking-[0.35em] text-gray-400">
           LIVE PREVIEW
         </p>
