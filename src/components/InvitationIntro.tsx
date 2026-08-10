@@ -246,8 +246,16 @@ export default function InvitationIntro({
       <div
         ref={screenRef}
         className="sticky top-0 flex h-screen items-center justify-center overflow-hidden"
-        // 재기 전(서버에서 그려 보낸 첫 화면)에는 h-screen 을 그대로 쓴다
-        style={screenH ? { height: screenH } : undefined}
+        // 재기 전(서버에서 그려 보낸 첫 화면)에는 h-screen 을 그대로 쓴다.
+        // --inv-screen 은 꽃잎·풍선·컨페티가 날아가는 거리의 기준이 된다.
+        style={
+          screenH
+            ? ({
+                height: screenH,
+                "--inv-screen": `${screenH}px`,
+              } as React.CSSProperties)
+            : undefined
+        }
       >
         {/* 사진은 기다리는 동안에도 걸어 두어야 그때 내려받기 시작한다.
             다 받은 뒤에야(onLoad) 밝아지는 연출을 붙인다. */}

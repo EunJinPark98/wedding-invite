@@ -377,17 +377,25 @@ body {
   animation: inv-intro-sway 2.2s ease-out both;
 }
 
+/* 인트로 입자(꽃잎·풍선·컨페티)가 오르내리는 거리의 기준.
+   창 높이(vh)로 잡으면 에디터 미리보기에서 프레임보다 훨씬 멀리 날아가
+   대부분 밖으로 지나가 버린다. InvitationIntro 가 실제로 덮은 높이를 재서
+   --inv-screen 으로 내려 준다 (재기 전에는 아래 기본값). */
+:root {
+  --inv-screen: 100vh;
+}
+
 /* 흩날리는 꽃잎 한 장 */
 @keyframes inv-intro-petal {
   0% {
     opacity: 0;
-    transform: translate3d(0, -18vh, 0) rotate(0deg);
+    transform: translate3d(0, calc(var(--inv-screen) * -0.18), 0) rotate(0deg);
   }
   12% {
     opacity: 0.85;
   }
   50% {
-    transform: translate3d(var(--petal-sway), 34vh, 0)
+    transform: translate3d(var(--petal-sway), calc(var(--inv-screen) * 0.34), 0)
       rotate(calc(var(--petal-tilt) * 4));
   }
   90% {
@@ -395,7 +403,7 @@ body {
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 86vh, 0) rotate(calc(var(--petal-tilt) * 9));
+    transform: translate3d(0, calc(var(--inv-screen) * 0.86), 0) rotate(calc(var(--petal-tilt) * 9));
   }
 }
 .inv-intro-petal {
@@ -413,20 +421,20 @@ body {
 @keyframes inv-intro-balloon {
   0% {
     opacity: 0;
-    transform: translate3d(0, 30vh, 0);
+    transform: translate3d(0, calc(var(--inv-screen) * 0.3), 0);
   }
   15% {
     opacity: 0.9;
   }
   50% {
-    transform: translate3d(var(--sway), -18vh, 0);
+    transform: translate3d(var(--sway), calc(var(--inv-screen) * -0.18), 0);
   }
   90% {
     opacity: 0.9;
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, -60vh, 0);
+    transform: translate3d(0, calc(var(--inv-screen) * -0.6), 0);
   }
 }
 .inv-intro-balloon {
@@ -455,7 +463,7 @@ body {
 @keyframes inv-intro-confetti {
   0% {
     opacity: 0;
-    transform: translate3d(0, -16vh, 0) rotate(0deg);
+    transform: translate3d(0, calc(var(--inv-screen) * -0.16), 0) rotate(0deg);
   }
   12% {
     opacity: 0.95;
@@ -465,7 +473,7 @@ body {
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 92vh, 0) rotate(calc(var(--tilt) * 12));
+    transform: translate3d(0, calc(var(--inv-screen) * 0.92), 0) rotate(calc(var(--tilt) * 12));
   }
 }
 .inv-intro-confetti {
