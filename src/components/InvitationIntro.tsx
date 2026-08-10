@@ -20,21 +20,6 @@ import type { TemplateTheme } from "@/lib/templates";
  */
 const DURATION = 2900;
 
-/**
- * 사진 페이드(밝아지는 연출)의 길이.
- *
- * 인트로가 언제 끝나는지는 사진과 무관하게 위 DURATION 하나로 정해진다.
- * 사진을 기다렸다가 인트로를 시작하면 느린 통신에서 열리는 시간이 그만큼
- * 늦어져, 하객은 캄캄한 화면을 더 오래 보게 된다.
- *
- * 대신 사진이 도착한 시점에 남은 시간에 맞춰 연출 길이를 줄여서 건다.
- * 사진이 곧바로 오면 원래 길이대로, 늦게 오면 짧고 빠르게 밝아진다.
- */
-const PHOTO_FADE_MAX = 2600;
-const PHOTO_FADE_MIN = 600;
-// 연출이 끝나기 전에 인트로가 사라지지 않도록 남겨 두는 여유
-const PHOTO_FADE_TAIL = 400;
-
 // 별빛 연출용 — 열 때마다 자리가 달라지지 않도록 고정해 둔다
 const SPARKS = [
   { left: "12%", top: "22%", size: 3, delay: 0 },
@@ -165,29 +150,6 @@ export default function InvitationIntro({
 }) {
   const [done, setDone] = useState(false);
 
-  // 인트로가 열린 시각 — 사진이 늦게 왔을 때 남은 시간을 재는 기준
-  const openedAt = useRef<number | null>(null);
-  // 사진이 다 그려지면 그때 남은 시간에 맞춘 연출 길이가 들어간다
-  const [fadeMs, setFadeMs] = useState<number | null>(null);
-  const startFade = useCallback(() => {
-    setFadeMs((prev) => {
-      if (prev !== null) return prev;
-      // 아직 시각을 못 잡았으면 = 열리자마자 사진이 이미 있던 경우
-      if (openedAt.current === null) return PHOTO_FADE_MAX;
-      const left = DURATION - PHOTO_FADE_TAIL - (Date.now() - openedAt.current);
-      return Math.max(PHOTO_FADE_MIN, Math.min(PHOTO_FADE_MAX, left));
-    });
-  }, []);
-
-  // 이미 받아 둔 사진이면 onLoad 가 하이드레이션 전에 지나가 버린다 —
-  // 붙는 순간 다 그려져 있는지 직접 확인한다.
-  const photoRef = useCallback(
-    (el: HTMLImageElement | null) => {
-      if (el?.complete) startFade();
-    },
-    [startFade]
-  );
-
   // 덮을 화면의 높이 (창 크기가 바뀌면 다시 잰다)
   const [screenH, setScreenH] = useState<number>();
   const screenEl = useRef<HTMLDivElement>(null);
@@ -205,7 +167,6 @@ export default function InvitationIntro({
   }, []);
 
   useEffect(() => {
-    openedAt.current = Date.now();
     // 모션을 줄이도록 설정한 기기에서는 연출 없이 곧바로 넘긴다.
     // (서버에서 이미 그려 보낸 화면이라 첫 렌더에서 지우면 안 되고,
     //  한 박자 뒤에 지워야 하이드레이션이 어긋나지 않는다)
@@ -265,20 +226,10 @@ export default function InvitationIntro({
             : undefined
         }
       >
-        {/* 다 그려진 뒤에(onLoad) 밝아지는 연출을 건다. 그전에는 감춰 둔다 —
-            반쯤 내려온 사진이 툭 나타나는 것보다 낫다. */}
         {style === "photo" && data.mainPhotoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            ref={photoRef}
-            src={data.mainPhotoUrl}
-            alt=""
-            onLoad={startFade}
-            onError={startFade}
-            className={`absolute inset-0 h-full w-full object-cover ${
-              fadeMs ? "inv-intro-photo" : "opacity-0"
-            }`}
-            style={fadeMs ? { animationDuration: `${fadeMs}ms` } : undefined}
+          <div
+            className="inv-intro-photo absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${data.mainPhotoUrl})` }}
           />
         )}
 
