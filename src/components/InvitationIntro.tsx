@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { InvitationData } from "@/lib/types";
 import type { TemplateTheme } from "@/lib/templates";
 
@@ -127,6 +127,25 @@ function WrittenPhrase({
   );
 }
 
+/**
+ * 이 초대장이 놓인 "화면 한 장"의 높이.
+ *
+ * 인트로는 화면을 가득 덮는 연출이라 높이가 곧 사진이 잘리는 정도를 정한다.
+ * 100vh(=창 높이)를 그대로 쓰면 에디터 미리보기에서 폰 프레임보다 훨씬 길어져
+ * 사진이 양옆으로 더 잘리고, 하객이 보는 것과 다른 그림이 나온다.
+ * 그래서 초대장을 담고 있는 스크롤 상자(=미리보기의 폰 프레임)를 기준으로 삼고,
+ * 그런 상자가 없으면(링크로 연 화면) 브라우저 창을 쓴다.
+ */
+function screenHeightOf(el: HTMLElement): number {
+  let p = el.parentElement;
+  while (p) {
+    const oy = getComputedStyle(p).overflowY;
+    if (oy === "auto" || oy === "scroll") return p.clientHeight;
+    p = p.parentElement;
+  }
+  return window.innerHeight;
+}
+
 const dateText = (weddingDate: string) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(weddingDate.trim());
   return m ? `${m[1]}. ${m[2]}. ${m[3]}` : "";
@@ -157,6 +176,22 @@ export default function InvitationIntro({
   // 붙는 순간 다 그려져 있는지 직접 확인한다.
   const photoRef = useCallback((el: HTMLImageElement | null) => {
     if (el?.complete) setStarted(true);
+  }, []);
+
+  // 덮을 화면의 높이 (창 크기가 바뀌면 다시 잰다)
+  const [screenH, setScreenH] = useState<number>();
+  const screenEl = useRef<HTMLDivElement>(null);
+  const screenRef = useCallback((el: HTMLDivElement | null) => {
+    screenEl.current = el;
+    if (el) setScreenH(screenHeightOf(el));
+  }, []);
+  useEffect(() => {
+    const remeasure = () => {
+      const el = screenEl.current;
+      if (el) setScreenH(screenHeightOf(el));
+    };
+    window.addEventListener("resize", remeasure);
+    return () => window.removeEventListener("resize", remeasure);
   }, []);
 
   useEffect(() => {
@@ -208,7 +243,12 @@ export default function InvitationIntro({
       onClick={() => setDone(true)}
       aria-hidden
     >
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
+      <div
+        ref={screenRef}
+        className="sticky top-0 flex h-screen items-center justify-center overflow-hidden"
+        // 재기 전(서버에서 그려 보낸 첫 화면)에는 h-screen 을 그대로 쓴다
+        style={screenH ? { height: screenH } : undefined}
+      >
         {/* 사진은 기다리는 동안에도 걸어 두어야 그때 내려받기 시작한다.
             다 받은 뒤에야(onLoad) 밝아지는 연출을 붙인다. */}
         {style === "photo" && data.mainPhotoUrl && (
