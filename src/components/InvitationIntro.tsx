@@ -20,6 +20,9 @@ import type { TemplateTheme } from "@/lib/templates";
  */
 const DURATION = 2900;
 
+// 인트로 글자 크기 배율 — 본문 설정(FONT_SCALES)과 무관하게 "아주 크게"로 고정
+const INTRO_FONT_SCALE = 1.2;
+
 // 별빛 연출용 — 열 때마다 자리가 달라지지 않도록 고정해 둔다
 const SPARKS = [
   { left: "12%", top: "22%", size: 3, delay: 0 },
@@ -196,8 +199,8 @@ export default function InvitationIntro({
   // 어느 것도 자간을 건드리지 않는다. 자간이 변하면 글자 폭이 달라져
   // 재생 도중에 줄바꿈이 다시 계산되고, 두 줄이던 문구가 한 줄로 튄다.
   const phraseClass =
-    // 먹번짐은 글자마다 따로 번져 나오므로 문단에는 연출을 걸지 않는다
-    style === "ink" || style === "petal"
+    // 글자마다 따로 나오는 연출(꽃잎·먹번짐·사진 페이드)은 문단에 걸지 않는다
+    style === "ink" || style === "petal" || style === "photo"
       ? ""
       : style === "blur"
         ? "inv-intro-blur"
@@ -208,7 +211,9 @@ export default function InvitationIntro({
   return (
     <div
       className="inv-intro absolute inset-0 z-30 overflow-hidden"
-      style={{ background }}
+      // 인트로 글자는 본문 글꼴 크기 설정을 따르지 않고 "아주 크게"로 고정한다.
+      // 첫 화면 한 장뿐이라 큼직해야 눈에 들어온다.
+      style={{ background, "--inv-fs": INTRO_FONT_SCALE } as React.CSSProperties}
       onClick={() => setDone(true)}
       aria-hidden
     >
@@ -337,7 +342,7 @@ export default function InvitationIntro({
             className={`${phraseClass} inv-intro-phrase relative whitespace-pre-line text-[calc(2.3rem*var(--inv-fs))] tracking-[0.01em]`}
             style={{ color: inkColor }}
           >
-            {style === "petal" ? (
+            {style === "petal" || style === "photo" ? (
               <WrittenPhrase text={phrase} letterClass="inv-intro-letter" />
             ) : style === "ink" ? (
               <WrittenPhrase text={phrase} letterClass="inv-intro-ink-letter" />
