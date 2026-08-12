@@ -1,6 +1,20 @@
 // 클라이언트에서 이미지를 리사이즈·압축한다.
 // 업로드 전송량을 줄이기 위해 캔버스에서 재인코딩한다.
 
+/**
+ * 기본 압축 설정.
+ *
+ * 초대장은 열자마자 대표 사진이 화면을 채우는데, 사진이 늦게 오면 그동안
+ * 빈 화면(사진 페이드 인트로에서는 어두운 화면)을 보게 된다. 그래서 화질이
+ * 눈에 띄게 나빠지지 않는 선까지만 줄인다.
+ *
+ * 긴 변 1400px 은 요즘 폰(가로 390~430pt · DPR 3 → 1170~1290px)을 채우고도
+ * 남는 크기다. 더 줄이면 세로 사진의 가로가 1000px 아래로 내려가 큰 화면에서
+ * 티가 나기 시작한다.
+ */
+const MAX_DIM = 1400;
+const QUALITY = 0.78;
+
 // SVG/GIF 등은 캔버스 재인코딩이 부적절 → 원본 그대로 사용
 const RECODABLE = /^image\/(jpeg|png|webp)$/;
 
@@ -51,8 +65,8 @@ async function toResizedCanvas(
 // 압축된 data URL (미리보기 등 인라인 용도)
 export async function fileToCompressedDataUrl(
   file: File,
-  maxDim = 1600,
-  quality = 0.82
+  maxDim = MAX_DIM,
+  quality = QUALITY
 ): Promise<string> {
   const canvas = await toResizedCanvas(file, maxDim);
   if (!canvas) return readDataUrl(file);
@@ -62,8 +76,8 @@ export async function fileToCompressedDataUrl(
 // 업로드용 압축 Blob. 재인코딩 불가 타입이면 원본 파일을 그대로 반환.
 export async function fileToCompressedBlob(
   file: File,
-  maxDim = 1600,
-  quality = 0.82
+  maxDim = MAX_DIM,
+  quality = QUALITY
 ): Promise<Blob> {
   const canvas = await toResizedCanvas(file, maxDim);
   if (!canvas) return file;
