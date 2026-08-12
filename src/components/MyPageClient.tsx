@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AuthStatus from "./AuthStatus";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import KakaoShareButton from "./KakaoShareButton";
+import ThemePickerButton from "./ThemePickerButton";
 import {
   getCategoryLabels,
   getCategoryMeta,
@@ -270,12 +271,9 @@ export default function MyPageClient({
           <div className="mt-10 rounded-3xl border border-gold-100 bg-white p-12 text-center shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <p className="text-4xl">💌</p>
             <p className="mt-4 text-gray-500">아직 만든 초대장이 없어요.</p>
-            <Link
-              href="/"
-              className="mt-6 inline-block rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-7 py-3 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600"
-            >
-              무료로 제작하기
-            </Link>
+            {/* 메인 화면과 똑같이, 여기서 바로 종류를 고르고 시작한다
+                (홈으로 되돌아갔다 다시 누르게 하지 않는다) */}
+            <ThemePickerButton className="mt-6 inline-block rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-7 py-3 text-sm font-semibold text-white shadow-md shadow-gold-300/40 transition hover:from-gold-500 hover:to-gold-600" />
           </div>
         ) : (
           <div className="mt-8 space-y-5">
