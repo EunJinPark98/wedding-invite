@@ -1123,8 +1123,6 @@ export default function EditorClient({
   const [trim, setTrim] = useState<{ files: File[]; room: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
-  // 갤러리 사진이 올라가는 중에 제작하기를 눌렀을 때 뜨는 안내
-  const [bulkWarn, setBulkWarn] = useState(false);
   // 임시저장 버튼을 누른 직후에만 잠깐 뜨는 확인 문구
   const [savedNote, setSavedNote] = useState(false);
   const dateSectionRef = useRef<HTMLDivElement>(null);
@@ -1172,9 +1170,8 @@ export default function EditorClient({
   function openConfirm() {
     // 갤러리 사진이 아직 올라가는 중이면 기다려야 한다. 지금 제작하면
     // 덜 올라간 사진은 초대장에 빠진 채로 저장된다.
-    // (화면은 옮기지 않는다 — 안내가 버튼 바로 아래에 뜬다)
     if (bulk) {
-      setBulkWarn(true);
+      window.alert("갤러리 사진을 올리고 있어요.\n잠시만 기다려 주세요.");
       return;
     }
     // 달력의 min 은 고르는 것만 막는다. 직접 적거나 임시 저장을 되살리면
@@ -2215,13 +2212,7 @@ export default function EditorClient({
         </div>
         {/* 버튼 아래 안내. 지난 날짜는 여기 적지 않는다 — 날짜 칸이 이미
             빨갛게 알리고 있고, 눌러도 그 칸으로 데려간다. */}
-        {bulkWarn && bulk ? (
-          <p className="text-center text-sm font-medium text-gold-500">
-            갤러리 사진을 올리고 있어요 ({bulk.done}/{bulk.total}).
-            <br />
-            잠시만 기다려 주세요.
-          </p>
-        ) : savedNote ? (
+        {savedNote ? (
           <p className="text-center text-sm font-medium text-gold-500">
             저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요.
           </p>
