@@ -37,7 +37,7 @@ export default async function Home({
               className="h-8 w-8 rounded-full shadow-sm"
             />
             <span
-              className="text-sm text-ink sm:text-lg"
+              className="text-base text-ink sm:text-xl"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장

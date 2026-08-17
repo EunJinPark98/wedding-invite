@@ -1375,7 +1375,7 @@ export default function EditorClient({
               className="h-6 w-6 rounded-full shadow-sm"
             />
             <span
-              className="text-ink"
+              className="text-base text-ink sm:text-lg"
               style={{ fontFamily: "var(--font-song)" }}
             >
               별빛 초대장
