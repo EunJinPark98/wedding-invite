@@ -244,7 +244,7 @@ export default async function Home({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="" className="h-5 w-5 rounded-full shadow-sm" />
-          <span className="text-xs font-medium text-gold-500">별마마파파</span>
+          <span className="text-sm font-medium text-gold-1">별마마파파</span>
         </a>
         <p className="mt-1.5 text-xs text-gray-400">
           결혼 · 육아 · 가족을 위한 웹서비스
