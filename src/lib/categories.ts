@@ -71,9 +71,9 @@ export interface CategoryLabels {
   dateSectionTitle: string;
   dateFieldLabel: string;
   venueLabel: string;
-  accountsGroupTitle: string; // 에디터 계좌 단계 제목 (뒤에 "(선택)"이 붙는다)
+  accountsGroupTitle: string;
   accountsLabel: string; // 뷰에서 계좌 섹션 소제목 "마음 전하실 곳"
-  showAccounts: boolean; // 계좌 섹션을 둘지 (모든 종류에 둔다)
+  showAccounts: boolean; // 계좌 섹션을 둘지 (결혼 청첩장에만 둔다)
   // 뷰(청첩장 화면)
   sectionCoupleLabel: string; // "GROOM & BRIDE" 대응 섹션 제목
   personTitle: string; // 단일 인물 카드 위 타이틀 (showPerson2=false 전용)
@@ -125,9 +125,10 @@ export function getCategoryLabels(
         dateSectionTitle: `${dol.event} 일시 · 장소`,
         dateFieldLabel: `${dol.event} 날짜`,
         venueLabel: `${dol.event} 장소`,
-        accountsGroupTitle: "마음 전하실 곳",
-        accountsLabel: "마음 전하실 곳",
-        showAccounts: true,
+        accountsGroupTitle: "",
+        accountsLabel: "",
+        // 아기 잔치는 축하금 계좌 섹션을 두지 않는다
+        showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         personPhotoRole: "아기",
@@ -165,9 +166,10 @@ export function getCategoryLabels(
         dateSectionTitle: `${age.label} 일시 · 장소`,
         dateFieldLabel: `${age.label} 날짜`,
         venueLabel: "잔치 장소",
-        accountsGroupTitle: "마음 전하실 곳",
-        accountsLabel: "마음 전하실 곳",
-        showAccounts: true,
+        accountsGroupTitle: "",
+        accountsLabel: "",
+        // 수연도 축하금 계좌 섹션을 두지 않는다
+        showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         personPhotoRole: "주인공",
@@ -205,9 +207,10 @@ export function getCategoryLabels(
         dateSectionTitle: "파티 일시 · 장소",
         dateFieldLabel: "생일 파티 날짜",
         venueLabel: "파티 장소",
-        accountsGroupTitle: "마음 전하실 곳",
-        accountsLabel: "마음 전하실 곳",
-        showAccounts: true,
+        accountsGroupTitle: "",
+        accountsLabel: "",
+        // 생일은 축하금을 받는 자리가 아니라 계좌 섹션을 두지 않는다
+        showAccounts: false,
         sectionCoupleLabel: "주인공",
         personTitle: "",
         personPhotoRole: "주인공",
@@ -246,7 +249,7 @@ export function getCategoryLabels(
         dateSectionTitle: "예식 일시 · 장소",
         dateFieldLabel: "예식일",
         venueLabel: "예식장 이름",
-        accountsGroupTitle: "마음 전하실 곳",
+        accountsGroupTitle: "마음 전하실 곳 (계좌)",
         accountsLabel: "마음 전하실 곳",
         showAccounts: true,
         sectionCoupleLabel: "신랑 신부",
