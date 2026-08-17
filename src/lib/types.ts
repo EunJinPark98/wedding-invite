@@ -585,15 +585,14 @@ export const emptyInvitation = (
       category === "birthday" || category === "senior" ? "" : "010-1234-5678",
     bridePhone: category === "wedding" ? "010-8765-4321" : "",
     accounts:
-      // 생일은 축하금 섹션 자체를 두지 않는다
-      category === "birthday"
-        ? []
-        : category === "wedding"
+      category === "wedding"
         ? [
             { side: "신랑측", name: "김신랑", bank: "국민은행", number: "123-456-7890" },
             { side: "신부측", name: "박신부", bank: "신한은행", number: "987-654-3210" },
           ]
-        : [{ side: "신랑측", name: s.groomName, bank: "국민은행", number: "123-456-7890" }],
+        : // 신랑·신부 구분이 없는 종류는 계좌 한 칸만 예시로 둔다 (side는 화면에
+          // 나오지 않지만 타입상 값이 필요해 "신랑측"을 그대로 쓴다)
+          [{ side: "신랑측", name: s.groomName, bank: "국민은행", number: "123-456-7890" }],
     footerMessage: "",
   };
 };
