@@ -596,7 +596,7 @@ function showGallery(data: InvitationData, preview: boolean) {
   return preview || data.gallery.filter(Boolean).length > 0;
 }
 
-// 계좌 섹션 노출 여부 — 입력한 계좌가 하나도 없으면 숨긴다
+// 계좌 섹션 노출 여부 — 축의금을 받지 않는 종류(생일)는 아예 숨긴다
 function showAccounts(data: InvitationData) {
   return (
     labelsOf(data).showAccounts &&
