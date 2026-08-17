@@ -420,6 +420,9 @@ export const normalizeData = (
   footerMessage: d?.footerMessage ?? "",
 });
 
+// 결혼 청첩장 계좌 칸에 미리 넣어 두는 예시 계좌번호
+const SAMPLE_ACCOUNT_NUMBER = "123-456-7890";
+
 // 카테고리별 인물/문구 샘플값 (에디터 초기 상태 + 템플릿 카드 미리보기용)
 const CATEGORY_SAMPLE: Record<
   Category,
@@ -585,15 +588,57 @@ export const emptyInvitation = (
       category === "birthday" || category === "senior" ? "" : "010-1234-5678",
     bridePhone: category === "wedding" ? "010-8765-4321" : "",
     accounts:
-      // 생일은 축하금 섹션 자체를 두지 않는다
-      category === "birthday"
-        ? []
-        : category === "wedding"
+      category === "wedding"
         ? [
-            { side: "신랑측", name: "김신랑", bank: "국민은행", number: "123-456-7890" },
+            { side: "신랑측", name: "김신랑", bank: "국민은행", number: SAMPLE_ACCOUNT_NUMBER },
             { side: "신부측", name: "박신부", bank: "신한은행", number: "987-654-3210" },
           ]
-        : [{ side: "신랑측", name: s.groomName, bank: "국민은행", number: "123-456-7890" }],
+        : // 결혼 외에는 예시 계좌를 넣지 않는다. 예시를 미리 넣어 두면 그대로
+          // 두고 만든 초대장에 남의 계좌처럼 찍혀 나온다.
+          // ("+ 계좌 추가"를 눌러야 첫 칸이 생긴다)
+          [],
     footerMessage: "",
   };
 };
+
+/**
+ * 예전에 저장된 "예시 계좌"를 걸러 낸다.
+ *
+ * 백일·돌잔치와 칠순·팔순은 계좌 단계가 화면에 없던 시절에도 초기값에 예시
+ * 계좌가 들어 있어, 만든 사람이 보지도 지우지도 못한 채 그대로 저장됐다.
+ * 계좌 단계를 열면 이 예시가 이미 만들어 둔 남의 초대장에 갑자기 나타나므로,
+ * 읽어 올 때 걸러 내 그런 초대장의 화면이 예전 그대로 유지되도록 한다.
+ *
+ * 안전 장치:
+ * - 결혼 청첩장은 절대 건드리지 않는다. 종류를 알 수 없는 옛 데이터도
+ *   결혼으로 보아 그대로 둔다.
+ * - 예금주 · 은행 · 계좌번호가 예시와 모두 같을 때만 지운다. 그래서 계좌
+ *   단계가 열린 뒤 직접 넣은 계좌는 사라지지 않는다.
+ */
+export function stripSampleAccounts<
+  T extends { category?: Category; accounts?: Account[] }
+>(data: T): T {
+  const category = data?.category;
+  if (
+    category !== "doljanchi" &&
+    category !== "senior" &&
+    category !== "birthday"
+  ) {
+    return data;
+  }
+  const accounts = data.accounts;
+  if (!Array.isArray(accounts) || accounts.length === 0) return data;
+
+  const sampleName = CATEGORY_SAMPLE[category].groomName;
+  const kept = accounts.filter(
+    (a) =>
+      !(
+        a &&
+        a.side === "신랑측" &&
+        a.bank === "국민은행" &&
+        a.number === SAMPLE_ACCOUNT_NUMBER &&
+        a.name === sampleName
+      )
+  );
+  return kept.length === accounts.length ? data : { ...data, accounts: kept };
+}
