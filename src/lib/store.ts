@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import { deleteImages, purgeOrphanImages, storagePathFromUrl } from "./storage";
-import { normalizeData, CATEGORY_IDS } from "./types";
+import { normalizeData, stripSampleAccounts, CATEGORY_IDS } from "./types";
 import type {
   Category,
   Invitation,
@@ -88,7 +88,8 @@ export async function getInvitation(slug: string): Promise<Invitation | null> {
     return {
       slug: data.slug,
       template: data.template,
-      data: data.data,
+      // 계좌 단계가 없던 시절 저장된 예시 계좌는 걸러 낸다 (stripSampleAccounts 주석 참고)
+      data: stripSampleAccounts(data.data),
       createdAt: data.created_at,
       expiresAt: data.expires_at ?? null,
     };
@@ -97,7 +98,11 @@ export async function getInvitation(slug: string): Promise<Invitation | null> {
   const db = await readLocal();
   const inv = db[slug];
   if (!inv) return null;
-  return { ...inv, expiresAt: inv.expiresAt ?? null };
+  return {
+    ...inv,
+    data: stripSampleAccounts(inv.data),
+    expiresAt: inv.expiresAt ?? null,
+  };
 }
 
 // 만료 여부 (expiresAt이 없으면 무기한)
@@ -209,13 +214,14 @@ export async function getInvitationOwned(
     return {
       slug: data.slug,
       template: data.template,
-      data: data.data,
+      data: stripSampleAccounts(data.data),
       createdAt: data.created_at,
       expiresAt: data.expires_at ?? null,
     };
   }
   const db = await readLocal();
-  return db[slug] ?? null;
+  const inv = db[slug];
+  return inv ? { ...inv, data: stripSampleAccounts(inv.data) } : null;
 }
 
 // 초대장 수정 (소유자 검증 포함) — 횟수 제한 없음.
