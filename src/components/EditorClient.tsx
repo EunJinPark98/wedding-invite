@@ -1247,6 +1247,23 @@ export default function EditorClient({
       accounts: d.accounts.filter((_, idx) => idx !== i),
     }));
 
+  // 계좌 "안함" — 따로 들고 있지 않고 계좌가 하나도 없는 상태를 그대로 읽는다.
+  // (임시저장을 불러오거나 수정 모드로 들어와도 저절로 맞는다)
+  const accountsOff = data.accounts.length === 0;
+  // 껐다 다시 켤 때 적어 둔 계좌를 잃지 않도록 잠시 담아 둔다
+  const stashedAccounts = useRef<Account[]>([]);
+  const toggleAccountsOff = (off: boolean) => {
+    if (off) {
+      stashedAccounts.current = data.accounts;
+      setData((d) => ({ ...d, accounts: [] }));
+      return;
+    }
+    const back: Account[] = stashedAccounts.current.length
+      ? stashedAccounts.current
+      : [{ side: "신랑측", name: "", bank: "", number: "" }];
+    setData((d) => ({ ...d, accounts: back }));
+  };
+
   // 갤러리는 담긴 사진만 추려서 다룬다 — 빈 슬롯이 섞여 있으면 화면에 보이는
   // 순서와 배열 인덱스가 어긋나 순서 바꾸기가 엉뚱한 사진을 옮긴다.
   const photos = data.gallery.filter(Boolean);
@@ -2134,7 +2151,29 @@ export default function EditorClient({
         </Group>
 
         {labels.showAccounts && (
-        <Group title={labels.accountsGroupTitle} step={7} previewSection="accounts">
+        <Group
+          title={
+            <>
+              {labels.accountsGroupTitle}
+              <span className="font-normal text-gray-400">(선택)</span>
+            </>
+          }
+          step={7}
+          previewSection="accounts"
+        >
+          {/* 축하금을 받지 않는 자리도 있어서, 체크하면 계좌 칸을 접고
+              초대장에서도 이 섹션이 빠진다 */}
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={accountsOff}
+              onChange={(e) => toggleAccountsOff(e.target.checked)}
+              className="h-4 w-4 accent-gold-400"
+            />
+            안함
+          </label>
+          {!accountsOff && (
+          <>
           <div className="space-y-3">
             {data.accounts.map((a, i) => (
               <div
@@ -2186,6 +2225,8 @@ export default function EditorClient({
           >
             + 계좌 추가
           </button>
+          </>
+          )}
         </Group>
         )}
 
