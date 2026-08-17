@@ -212,7 +212,7 @@ export default function PrivacyPage() {
                 rel="noopener noreferrer"
                 className="text-gold-600 underline underline-offset-2"
               >
-                {SERVICE_NAME} 채널
+                {OPERATOR_NAME} 채널
               </a>
             </>,
             <>

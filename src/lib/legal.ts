@@ -16,6 +16,7 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://starinvite.vercel.app";
 
 export const OPERATOR_NAME = "별마마파파";
+export const OPERATOR_URL = "https://byeolmamapapa.com";
 
 // 문의 창구 — 푸터에 있는 것과 같은 곳
 export const KAKAO_CHANNEL_URL = "http://pf.kakao.com/_GxfxbwX";
