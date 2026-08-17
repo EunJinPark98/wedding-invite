@@ -5,6 +5,7 @@ import { emptyInvitation, CATEGORY_IDS, type Category } from "@/lib/types";
 import InvitationView from "@/components/InvitationView";
 import AuthStatus from "@/components/AuthStatus";
 import ThemePickerButton from "@/components/ThemePickerButton";
+import { OPERATOR_URL } from "@/lib/legal";
 
 // 카카오톡 채널 「별마마파파」 문의 링크
 const KAKAO_CHANNEL_URL = "http://pf.kakao.com/_GxfxbwX";
@@ -235,11 +236,16 @@ export default async function Home({
           <span className="text-[10px] text-gold-400">✦</span>
           <span className="h-px w-12 bg-gold-200" />
         </div>
-        <div className="mt-6 flex items-center justify-center gap-1.5">
+        <a
+          href={OPERATOR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 flex items-center justify-center gap-1.5 transition hover:opacity-80"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="" className="h-5 w-5 rounded-full shadow-sm" />
           <span className="text-xs font-medium text-gold-500">별마마파파</span>
-        </div>
+        </a>
         <p className="mt-1.5 text-xs text-gray-400">
           결혼 · 육아 · 가족을 위한 웹서비스
         </p>
