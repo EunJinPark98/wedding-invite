@@ -73,7 +73,7 @@ export interface CategoryLabels {
   venueLabel: string;
   accountsGroupTitle: string;
   accountsLabel: string; // 뷰에서 계좌 섹션 소제목 "마음 전하실 곳"
-  showAccounts: boolean; // 계좌 섹션을 둘지 (결혼 청첩장에만 둔다)
+  showAccounts: boolean; // 계좌 섹션(에디터 7번 항목)을 둘지 — 현재 모든 종류에서 끔
   // 뷰(청첩장 화면)
   sectionCoupleLabel: string; // "GROOM & BRIDE" 대응 섹션 제목
   personTitle: string; // 단일 인물 카드 위 타이틀 (showPerson2=false 전용)
@@ -251,7 +251,7 @@ export function getCategoryLabels(
         venueLabel: "예식장 이름",
         accountsGroupTitle: "마음 전하실 곳 (계좌)",
         accountsLabel: "마음 전하실 곳",
-        showAccounts: true,
+        showAccounts: false,
         sectionCoupleLabel: "신랑 신부",
         personTitle: "",
         personPhotoRole: "",
