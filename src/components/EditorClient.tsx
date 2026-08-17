@@ -2133,7 +2133,6 @@ export default function EditorClient({
           </p>
         </Group>
 
-        {/* 생일은 축하금을 받는 자리가 아니라 계좌 단계를 두지 않는다 */}
         {labels.showAccounts && (
         <Group title={labels.accountsGroupTitle} step={7} previewSection="accounts">
           <div className="space-y-3">
