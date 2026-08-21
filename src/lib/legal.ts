@@ -11,16 +11,20 @@ export const SERVICE_NAME = "별빛 초대장";
 /**
  * 서비스 기준 주소. 공유 카드·robots·sitemap·canonical 이 함께 쓴다.
  * 실제 값은 Vercel 환경변수 NEXT_PUBLIC_SITE_URL 로 정하고, 여기 기본값은
- * 그 변수가 없을 때(로컬 개발 등)만 쓰인다.
+ * 그 변수가 없을 때 쓰인다 — 로컬 개발뿐 아니라, 그 변수를 아직 Vercel에
+ * 설정하지 않은 지금의 운영 배포도 여기에 해당한다.
  *
- * 정식 주소는 letter.byeolmamapapa.com 으로 옮겼다. 예전 주소
- * (starinvite.vercel.app)는 Vercel에서 같은 배포에 도메인을 하나 더 붙이는
- * 방식으로 계속 열어 두어, 그 주소로 받은 초대장 링크도 그대로 동작한다.
- * 다만 검색 결과에는 새 주소만 나오도록 이 값은 새 주소로 고정한다.
+ * 그래서 이 기본값은 반드시 "지금 실제로 열리는 도메인"이어야 한다.
+ * letter.byeolmamapapa.com 으로 옮기는 작업이 진행 중이지만, 그 도메인이
+ * Vercel에 연결되고 NEXT_PUBLIC_SITE_URL 도 그 값으로 설정되기 전까지는
+ * 여기 기본값을 새 주소로 바꾸면 안 된다 — 카카오톡 공유 미리보기 이미지
+ * 등 이 값을 절대주소로 쓰는 곳이 아직 연결 안 된 도메인을 가리키게 되어
+ * 실제 사용자에게 문제가 생긴다.
+ *
+ * → 도메인 연결과 환경변수 설정이 끝난 뒤에 이 기본값도 새 주소로 바꾼다.
  */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
-  "https://letter.byeolmamapapa.com";
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://starinvite.vercel.app";
 
 export const OPERATOR_NAME = "별마마파파";
 export const OPERATOR_URL = "https://byeolmamapapa.com";
