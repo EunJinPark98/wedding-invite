@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { shareOrigin } from "@/lib/legal";
 
 // 카카오 JS SDK (공유 전용) — 전역 window.Kakao 사용
 declare global {
@@ -75,11 +76,14 @@ export default function KakaoShareButton({
 
   function share() {
     if (!window.Kakao) return;
-    // 상대경로는 절대 URL로 변환 (카카오는 절대 URL만 허용)
-    const absUrl = new URL(url, window.location.origin).href;
+    // 상대경로는 절대 URL로 변환 (카카오는 절대 URL만 허용).
+    // 지금 보고 있는 주소가 아니라 대표 주소를 기준으로 삼는다 —
+    // 하객에게 가는 링크가 옛 주소로 만들어지지 않도록.
+    const base = shareOrigin();
+    const absUrl = new URL(url, base).href;
     const absImage = imageUrl
-      ? new URL(imageUrl, window.location.origin).href
-      : `${window.location.origin}/logo.png`;
+      ? new URL(imageUrl, base).href
+      : `${base}/logo.png`;
     window.Kakao.Share.sendDefault({
       objectType: "feed",
       content: {
