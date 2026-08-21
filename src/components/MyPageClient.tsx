@@ -13,6 +13,7 @@ import {
   CATEGORIES,
 } from "@/lib/categories";
 import { expiryDateLabel, type Category } from "@/lib/types";
+import { shareOrigin } from "@/lib/legal";
 
 export interface MyInvitation {
   slug: string;
@@ -184,7 +185,7 @@ export default function MyPageClient({
 
   function copyLink(slug: string) {
     navigator.clipboard
-      .writeText(`${window.location.origin}/v/${slug}`)
+      .writeText(`${shareOrigin()}/v/${slug}`)
       .then(() => {
         setCopied(slug);
         setTimeout(() => setCopied(null), 1500);

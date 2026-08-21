@@ -15,6 +15,7 @@ import {
   type FontOption,
 } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
+import { shareOrigin } from "@/lib/legal";
 import {
   clearDraft,
   readDraft,
@@ -1339,7 +1340,7 @@ export default function EditorClient({
         return;
       }
       if (!res.ok) throw new Error(json.error || "저장에 실패했습니다.");
-      const url = `${window.location.origin}/v/${json.slug}`;
+      const url = `${shareOrigin()}/v/${json.slug}`;
       clearDraft(); // 만들었으니 임시로 담아 둔 것은 지운다
       setConfirming(false);
       setResultExpires(json.expiresAt ?? null);
