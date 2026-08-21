@@ -101,7 +101,7 @@ const SHARE_DESCRIPTION =
  * 이미지 경로를 절대 주소로 바꾸는 데 필요하다 — 없으면 미리보기에 그림이 안 뜬다.
  * 주소가 바뀌면 Vercel 환경변수 NEXT_PUBLIC_SITE_URL 만 바꾸면 된다.
  */
-import { SITE_URL } from "@/lib/legal";
+import { OPERATOR_NAME, OPERATOR_URL, INSTAGRAM_URL, SITE_URL } from "@/lib/legal";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -112,6 +112,9 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: "별빛 초대장",
   authors: [{ name: "별마마파파" }],
+  // 도메인을 옮긴 뒤에도 검색에는 이 주소만 대표로 남도록 명시한다.
+  // (예전 주소도 그대로 열리지만 canonical 은 항상 새 주소를 가리킨다)
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "ko_KR",
@@ -136,6 +139,28 @@ export const metadata: Metadata = {
   },
 };
 
+// 검색엔진이 서비스를 "이름 있는 것"으로 인식하도록 알려 주는 구조화 데이터.
+// 무료라는 점(offers)과 운영자(publisher)까지 함께 밝힌다.
+// (script 태그는 </script> 를 만나면 그 자리서 끊기므로 "/" 는 이스케이프해 넣는다)
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "별빛 초대장",
+  url: SITE_URL,
+  description: DESCRIPTION,
+  applicationCategory: "LifestyleApplication",
+  operatingSystem: "Web",
+  inLanguage: "ko-KR",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
+  publisher: {
+    "@type": "Organization",
+    name: OPERATOR_NAME,
+    url: OPERATOR_URL,
+    logo: `${SITE_URL}/logo.png`,
+    sameAs: [INSTAGRAM_URL],
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -146,7 +171,15 @@ export default function RootLayout({
       lang="ko"
       className={`${myeongjo.variable} ${notoKr.variable} ${serifKr.variable} ${gowun.variable} ${brush.variable} ${song.variable} ${nanumGothic.variable} ${dodum.variable} ${cormorant.variable} ${dancing.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c"),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

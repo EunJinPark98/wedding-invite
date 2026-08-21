@@ -13,6 +13,7 @@ import { CATEGORIES } from "@/lib/categories";
 export const metadata = {
   title: "이용약관",
   description: `${SERVICE_NAME} 서비스 이용에 관한 약관입니다.`,
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {
