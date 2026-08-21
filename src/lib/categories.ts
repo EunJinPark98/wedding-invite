@@ -135,7 +135,11 @@ export function getCategoryLabels(
         heroKicker: dol.kicker,
         heroKicker2: dol.kicker2,
         heroPhrase: `${dol.occasion}을 축하해요`,
-        countdownLabel: dol.occasion,
+        // "OOO의 {countdownLabel}에 초대합니다" (공유 카드·카톡 공유 문구),
+        // "OOO님의 {countdownLabel}까지 D-N" (초대장 속 카운트다운)에 쓰인다.
+        // dol.occasion("첫 생일")이 아니라 dol.event("돌잔치")를 써야
+        // "김아기의 돌잔치에 초대합니다"처럼 자연스럽게 읽힌다.
+        countdownLabel: dol.event,
         seniorLabel: "",
         seniorHanja: "",
         dolEvent: dol.event,
