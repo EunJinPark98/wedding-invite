@@ -9,11 +9,18 @@
 export const SERVICE_NAME = "별빛 초대장";
 
 /**
- * 서비스 기준 주소. 공유 카드·robots·sitemap 이 함께 쓴다.
- * 주소가 바뀌면 Vercel 환경변수 NEXT_PUBLIC_SITE_URL 만 바꾸면 된다.
+ * 서비스 기준 주소. 공유 카드·robots·sitemap·canonical 이 함께 쓴다.
+ * 실제 값은 Vercel 환경변수 NEXT_PUBLIC_SITE_URL 로 정하고, 여기 기본값은
+ * 그 변수가 없을 때(로컬 개발 등)만 쓰인다.
+ *
+ * 정식 주소는 letter.byeolmamapapa.com 으로 옮겼다. 예전 주소
+ * (starinvite.vercel.app)는 Vercel에서 같은 배포에 도메인을 하나 더 붙이는
+ * 방식으로 계속 열어 두어, 그 주소로 받은 초대장 링크도 그대로 동작한다.
+ * 다만 검색 결과에는 새 주소만 나오도록 이 값은 새 주소로 고정한다.
  */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://starinvite.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+  "https://letter.byeolmamapapa.com";
 
 export const OPERATOR_NAME = "별마마파파";
 export const OPERATOR_URL = "https://byeolmamapapa.com";

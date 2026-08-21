@@ -16,6 +16,7 @@ import { MAX_GALLERY } from "@/lib/types";
 export const metadata = {
   title: "개인정보처리방침",
   description: `${SERVICE_NAME}이 어떤 정보를 받아 어떻게 쓰고 언제 지우는지 안내합니다.`,
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {
