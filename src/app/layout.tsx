@@ -103,8 +103,25 @@ const SHARE_DESCRIPTION =
  */
 import { OPERATOR_NAME, OPERATOR_URL, INSTAGRAM_URL, SITE_URL } from "@/lib/legal";
 
+/**
+ * 검색엔진에 "이 사이트 내 것이 맞다"고 알리는 확인 코드.
+ *
+ * 콘솔이 준 <meta name="..." content="여기"> 의 content 만 떼어 Vercel
+ * 환경변수에 넣으면 태그로 붙는다. 값이 없으면 태그도 붙지 않는다.
+ * (구글은 public/ 에 확인용 파일을 두는 방식으로도 되며, 둘 중 하나만
+ *  하면 된다)
+ *
+ * 확인이 끝난 뒤에도 지우면 안 된다 — 검색엔진이 주기적으로 다시 본다.
+ */
+const GOOGLE_VERIFY = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+const NAVER_VERIFY = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  verification: {
+    google: GOOGLE_VERIFY || undefined,
+    other: NAVER_VERIFY ? { "naver-site-verification": NAVER_VERIFY } : {},
+  },
   title: {
     default: "별빛 초대장 — 모바일 청첩장 · 백일 · 돌잔치 · 칠순 · 생일 초대장 만들기",
     template: "%s | 별빛 초대장",
