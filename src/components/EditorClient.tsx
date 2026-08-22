@@ -1678,6 +1678,9 @@ export default function EditorClient({
                 );
               })}
             </div>
+            <p className="mt-1.5 text-xs leading-5 text-gray-400">
+              하객은 초대장에서 음표 버튼을 눌러야 소리가 나요.
+            </p>
           </div>
         </Group>
 
