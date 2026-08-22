@@ -95,6 +95,27 @@ export default function TermsPage() {
           운영자는 서비스의 내용을 개선하기 위해 기능 · 디자인 · 한도를 바꿀 수
           있으며, 이용자의 권리에 중요한 변경이 있는 경우 미리 알립니다.
         </Clause>
+        <Clause n={5}>
+          초대장에 넣을 수 있는 배경음악은 저작권이 만료된 곡을{" "}
+          <a
+            href="https://github.com/gleitz/midi-js-soundfonts"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold-600 underline underline-offset-2"
+          >
+            FluidR3_GM Sound Font
+          </a>
+          의 악기 음원으로 연주해 만든 것입니다. (Sound Font 출처: FluidR3_GM,{" "}
+          <a
+            href="https://creativecommons.org/licenses/by/3.0/us/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold-600 underline underline-offset-2"
+          >
+            CC BY 3.0
+          </a>
+          )
+        </Clause>
       </Section>
 
       <Section n={6} title="게시 기간과 자동 삭제">

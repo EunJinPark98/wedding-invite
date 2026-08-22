@@ -1,5 +1,9 @@
 // 모바일 청첩장 데이터 모델
 
+// 배경음악 곡 목록 검사용. bgm.ts 는 이 파일에서 타입만 가져오므로
+// (import type) 런타임 순환 참조는 생기지 않는다.
+import { BGM_IDS } from "./bgm";
+
 // 초대장 종류 — 결혼 외 인생 이벤트로 확장
 export const CATEGORY_IDS = ["wedding", "doljanchi", "senior", "birthday"] as const;
 export type Category = (typeof CATEGORY_IDS)[number];
@@ -343,6 +347,8 @@ export interface InvitationData {
   accounts: Account[];
   // 맨 아래 푸터에 들어갈 맺음말 (비우면 이름·날짜 표시)
   footerMessage: string;
+  // 배경음악 (src/lib/bgm.ts 의 곡 id, ""이면 사용 안 함)
+  bgm: string;
 }
 
 export interface Invitation {
@@ -418,6 +424,8 @@ export const normalizeData = (
     ? d.accounts.filter((a) => a && typeof a === "object")
     : [],
   footerMessage: d?.footerMessage ?? "",
+  // 목록에 없는 값(과거 데이터·조작된 입력)은 배경음악 없음으로 되돌린다
+  bgm: BGM_IDS.includes(d?.bgm as string) ? (d!.bgm as string) : "",
 });
 
 // 결혼 청첩장 계좌 칸에 미리 넣어 두는 예시 계좌번호
@@ -598,6 +606,8 @@ export const emptyInvitation = (
           // ("+ 계좌 추가"를 눌러야 첫 칸이 생긴다)
           [],
     footerMessage: "",
+    // 배경음악은 기본으로 넣지 않는다 — 직접 고른 사람만 나오게
+    bgm: "",
   };
 };
 

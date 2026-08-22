@@ -6,7 +6,7 @@ import MyPageClient, {
 } from "@/components/MyPageClient";
 import { listInvitationsByUser, isExpired } from "@/lib/store";
 import { getTheme } from "@/lib/templates";
-import { authEnabled, getUser } from "@/lib/supabase/server";
+import { loginRequired, getUser } from "@/lib/supabase/server";
 
 export const metadata = { title: "마이페이지" };
 
@@ -14,7 +14,7 @@ export const metadata = { title: "마이페이지" };
 export default async function MyPage() {
   let userId: string | null = null;
   let account: MyAccount | null = null;
-  if (authEnabled) {
+  if (loginRequired) {
     const user = await getUser();
     if (!user) redirect("/login?next=/my");
     userId = user.id;

@@ -19,6 +19,7 @@ import Countdown from "./Countdown";
 import MapSection from "./MapSection";
 import ScrollReveal from "./ScrollReveal";
 import InvitationIntro from "./InvitationIntro";
+import BgmPlayer from "./BgmPlayer";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -3317,11 +3318,16 @@ export default function InvitationView({
   template,
   data: rawData,
   preview = false,
+  bgmMode = "manual",
 }: {
   template: TemplateId;
   data: InvitationData;
   // true면 갤러리가 비어도 빈 공백 슬롯을 미리 보여줌 (에디터 미리보기 전용)
   preview?: boolean;
+  // 배경음악 재생 방식 — 기본은 하객 화면과 같은 "눌러야 재생"(manual).
+  // 에디터가 같은 데이터로 미리보기를 여러 벌 그릴 때, 소리를 낼 한 벌에만
+  // "auto"(고르는 즉시 재생)를, 나머지에는 "off"를 준다 (BgmPlayer 참고).
+  bgmMode?: "off" | "manual" | "auto";
 }) {
   // 누락 필드가 있어도 안전하게 렌더링 (배열/문자열 기본값 보정)
   const data = normalizeData(rawData);
@@ -3352,6 +3358,9 @@ export default function InvitationView({
     >
       {/* 스크롤에 맞춰 섹션이 나타나게 — 에디터 미리보기도 실제와 똑같이 */}
       <ScrollReveal />
+
+      {/* 배경음악 — 고른 초대장에만 뜬다. 하객이 눌러야 소리가 난다 */}
+      <BgmPlayer bgm={data.bgm} t={t} mode={bgmMode} />
 
       {/* 인트로 — 고른 연출이 바뀌면 key 가 바뀌어 미리보기에서 다시 재생된다 */}
       {intro !== "none" && (

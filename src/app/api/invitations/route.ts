@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { customAlphabet } from "nanoid";
 import { saveInvitation, getUsedCategories } from "@/lib/store";
-import { getUser, authEnabled } from "@/lib/supabase/server";
+import { getUser, loginRequired } from "@/lib/supabase/server";
 import { getTheme } from "@/lib/templates";
 import { getCategoryMeta, getCategoryLabels } from "@/lib/categories";
 import {
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
 
   // 로그인 필수 + 종류당 1개 제한 (Supabase 미설정 로컬 개발 모드는 통과)
   let userId: string | null = null;
-  if (authEnabled) {
+  if (loginRequired) {
     const user = await getUser();
     if (!user) {
       return NextResponse.json(

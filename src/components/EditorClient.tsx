@@ -15,6 +15,7 @@ import {
   type FontOption,
 } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
+import { bgmFor } from "@/lib/bgm";
 import {
   clearDraft,
   readDraft,
@@ -1528,7 +1529,7 @@ export default function EditorClient({
                 placeholder="예) 은진이의 서른 번째 생일"
               />
               <p className="mt-1 text-[11px] text-gray-400">
-                상단 사진 위에 크게 보여요. 비워두면 아무것도 표시되지 않아요.
+                대표 사진 아래에 나와요. 비워두면 아무것도 표시되지 않아요.
               </p>
               <div className="mt-3">
                 <span className="mb-2 block text-xs font-medium text-gray-500">
@@ -1625,30 +1626,61 @@ export default function EditorClient({
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               대표 사진 모션
             </span>
-            <div className="grid grid-cols-2 gap-2">
+            {/* 한 줄에 모두 두느라 설명은 넣지 않는다 (title 로만 남김) */}
+            <div className="grid grid-cols-4 gap-1.5">
               {HERO_MOTIONS.map((m) => {
                 const selected = data.heroMotion === m.id;
                 return (
                   <button
                     key={m.id}
                     type="button"
+                    title={m.desc}
                     onClick={() => set("heroMotion", m.id)}
-                    className={`rounded-xl border-2 px-3 py-2.5 text-left transition ${
+                    className={`min-w-0 rounded-lg border-2 px-1 py-2 text-center transition ${
                       selected
                         ? "border-gold-400 bg-gold-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
-                    <span className="block text-sm font-medium text-gray-800">
+                    <span className="block truncate text-[11px] font-medium text-gray-800">
                       {m.label}
-                    </span>
-                    <span className="mt-0.5 block text-[11px] text-gray-400">
-                      {m.desc}
                     </span>
                   </button>
                 );
               })}
             </div>
+          </div>
+
+          {/* 배경음악 — 저작권 걱정 없는 곡만 골라 둔다 (src/lib/bgm.ts).
+              고르면 미리보기에서 바로 들려준다 (BgmPlayer 의 preview) */}
+          <div>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              배경음악
+            </span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {[{ id: "", name: "사용 안 함" }, ...bgmFor(category)].map((v) => {
+                const selected = data.bgm === v.id;
+                return (
+                  <button
+                    key={v.id || "none"}
+                    type="button"
+                    onClick={() => set("bgm", v.id)}
+                    className={`min-w-0 rounded-lg border-2 px-1.5 py-2 text-center transition ${
+                      selected
+                        ? "border-gold-400 bg-gold-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="block truncate text-[11px] font-medium text-gray-800">
+                      {v.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1.5 text-xs leading-5 text-gray-400">
+              하객은 초대장에서 음표 버튼을 눌러야 소리가 나요.
+            </p>
           </div>
         </Group>
 
@@ -1908,25 +1940,21 @@ export default function EditorClient({
                     label="신랑 아버지"
                     value={data.groomFather}
                     onChange={(v) => set("groomFather", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label="신랑 어머니"
                     value={data.groomMother}
                     onChange={(v) => set("groomMother", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label="신부 아버지"
                     value={data.brideFather}
                     onChange={(v) => set("brideFather", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label="신부 어머니"
                     value={data.brideMother}
                     onChange={(v) => set("brideMother", v)}
-                    placeholder="(선택)"
                   />
                 </>
               ) : (
@@ -1935,13 +1963,11 @@ export default function EditorClient({
                     label={labels.parent1Label}
                     value={data.groomFather}
                     onChange={(v) => set("groomFather", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label={labels.parent2Label}
                     value={data.groomMother}
                     onChange={(v) => set("groomMother", v)}
-                    placeholder="(선택)"
                   />
                 </>
               )}
@@ -2000,7 +2026,7 @@ export default function EditorClient({
             {/* 오시는 길 안내 — 초대장에서는 지도 자리에 펼쳐 볼 수 있다 */}
             <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3.5">
               <span className="block text-xs font-medium text-gray-500">
-                오시는 길 안내 (선택)
+                오시는 길 안내
               </span>
               <p className="mt-1 text-[11px] text-gray-400">
                 적어 두면 초대장 지도 아래에 &lsquo;오시는 길 안내&rsquo; 버튼이
@@ -2049,7 +2075,7 @@ export default function EditorClient({
           </label>
           <label className="block">
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              맺음말 · 맨 아래 문구 (선택)
+              맺음말 · 맨 아래 문구
             </span>
             <textarea
               value={data.footerMessage}
@@ -2068,7 +2094,7 @@ export default function EditorClient({
         <Group
           title={
             <>
-              갤러리<span className="font-normal text-gray-400">(선택)</span>
+              갤러리
             </>
           }
           step={6}
@@ -2239,7 +2265,7 @@ export default function EditorClient({
         </p>
         <div className="mx-auto h-full max-w-[380px] overflow-hidden rounded-[2rem] border-8 border-gray-800 shadow-xl">
           <div ref={deskPreviewRef} className="h-full overflow-y-auto">
-            <InvitationView template={template} data={data} preview />
+            <InvitationView template={template} data={data} preview bgmMode="auto" />
           </div>
         </div>
       </div>
@@ -2261,7 +2287,7 @@ export default function EditorClient({
             transition: "transform 0.4s ease",
           }}
         >
-          <InvitationView template={template} data={data} preview />
+          <InvitationView template={template} data={data} preview bgmMode="off" />
         </div>
         <button
           type="button"
@@ -2368,7 +2394,7 @@ export default function EditorClient({
               </svg>
             </button>
             <div className="h-full overflow-y-auto">
-              <InvitationView template={template} data={data} preview />
+              <InvitationView template={template} data={data} preview bgmMode="off" />
             </div>
           </div>
         </div>
@@ -2388,7 +2414,7 @@ export default function EditorClient({
             </p>
             <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
-                <InvitationView template={template} data={data} />
+                <InvitationView template={template} data={data} bgmMode="off" />
               </div>
             </div>
 
