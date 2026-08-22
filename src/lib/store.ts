@@ -4,6 +4,7 @@ import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import { deleteImages, purgeOrphanImages, storagePathFromUrl } from "./storage";
 import { normalizeData, stripSampleAccounts, CATEGORY_IDS } from "./types";
+import { isPreviewDeploy } from "./supabase/server";
 import type {
   Category,
   Invitation,
@@ -119,12 +120,16 @@ export async function listInvitationsByUser(
   userId: string | null
 ): Promise<Invitation[]> {
   if (useSupabase) {
-    if (!userId) return [];
-    const { data, error } = await supabase()
+    // 미리보기 배포는 로그인이 없어 주인이 비어 있는 것(=미리보기에서 만든 것)을
+    // 모아 보여 준다. 실제 서비스에서는 isPreviewDeploy 가 항상 false 다.
+    if (!userId && !isPreviewDeploy) return [];
+    const q = supabase()
       .from("invitations")
-      .select("slug, template, data, created_at, expires_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .select("slug, template, data, created_at, expires_at");
+    const { data, error } = await (userId
+      ? q.eq("user_id", userId)
+      : q.is("user_id", null)
+    ).order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return (data ?? []).map((r) => ({
       slug: r.slug,
@@ -202,13 +207,15 @@ export async function getInvitationOwned(
   userId: string | null
 ): Promise<Invitation | null> {
   if (useSupabase) {
-    if (!userId) return null;
-    const { data, error } = await supabase()
+    if (!userId && !isPreviewDeploy) return null;
+    const q = supabase()
       .from("invitations")
       .select("slug, template, data, created_at, expires_at")
-      .eq("slug", slug)
-      .eq("user_id", userId)
-      .maybeSingle();
+      .eq("slug", slug);
+    const { data, error } = await (userId
+      ? q.eq("user_id", userId)
+      : q.is("user_id", null)
+    ).maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) return null;
     return {
@@ -238,11 +245,14 @@ export async function updateInvitation(
   if (useSupabase) {
     const existing = await getInvitationOwned(slug, userId);
     if (!existing) return false;
-    const { error } = await supabase()
+    const upd = supabase()
       .from("invitations")
       .update({ template, data, expires_at: expiresAt })
-      .eq("slug", slug)
-      .eq("user_id", userId);
+      .eq("slug", slug);
+    // PostgREST 는 eq(null) 로 NULL 을 못 맞춘다 — is(null) 을 써야 한다
+    const { error } = await (userId
+      ? upd.eq("user_id", userId)
+      : upd.is("user_id", null));
     if (error) throw new Error(error.message);
     await deleteImages(droppedPhotos(existing.data, data));
     return true;
@@ -283,14 +293,16 @@ export async function deleteInvitation(
   userId: string | null
 ): Promise<boolean> {
   if (useSupabase) {
-    if (!userId) return false;
+    if (!userId && !isPreviewDeploy) return false;
     // 사진 URL은 행이 지워지기 전에 확보해 둔다
     const existing = await getInvitationOwned(slug, userId);
-    const { data, error } = await supabase()
+    const del = supabase()
       .from("invitations")
       .delete()
-      .eq("slug", slug)
-      .eq("user_id", userId)
+      .eq("slug", slug);
+    const { data, error } = await (userId
+      ? del.eq("user_id", userId)
+      : del.is("user_id", null))
       .select("slug");
     if (error) throw new Error(error.message);
     if ((data?.length ?? 0) === 0) return false;

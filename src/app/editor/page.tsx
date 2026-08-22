@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import EditorClient from "@/components/EditorClient";
 import { getUsedCategories, getInvitationOwned } from "@/lib/store";
-import { authEnabled, getUser } from "@/lib/supabase/server";
+import { loginRequired, getUser } from "@/lib/supabase/server";
 import { findTheme } from "@/lib/templates";
 import { CATEGORY_IDS, todayInKorea, type Category } from "@/lib/types";
 
@@ -23,8 +23,9 @@ export default async function EditorPage({
       : "wedding");
 
   // 제작/수정은 로그인 필수 — 비로그인이면 로그인 후 "고른 그대로" 복귀
+  // (PR 미리보기 배포는 로그인이 불가능해 그냥 통과시킨다 — loginRequired 참고)
   let userId: string | null = null;
-  if (authEnabled) {
+  if (loginRequired) {
     const user = await getUser();
     if (!user) {
       const params = new URLSearchParams();

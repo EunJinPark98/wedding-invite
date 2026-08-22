@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { authEnabled, supabaseBrowser } from "@/lib/supabase/client";
 
+/**
+ * PR 미리보기 배포인가 (Vercel 이 자동으로 넣어 주는 값).
+ *
+ * 미리보기는 주소가 배포마다 달라 카카오·네이버 로그인이 아예 되지 않으므로
+ * 헤더의 로그인 링크를 감춘다 (눌러도 막히는 버튼을 두지 않기 위해).
+ * 값이 없으면 지금까지와 똑같이 동작한다 — 실제 서비스는 "production" 이다.
+ */
+const isPreviewDeploy = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+
 // 헤더에 로그인 상태 표시: 비로그인 → 로그인 링크 / 로그인 → 닉네임 + 로그아웃
 export default function AuthStatus() {
   const [email, setEmail] = useState<string | null>(null);
@@ -37,6 +46,9 @@ export default function AuthStatus() {
   }, []);
 
   if (!authEnabled || !ready) return null;
+
+  // 미리보기에서는 로그인이 불가능하니 로그인 링크를 두지 않는다
+  if (!email && !name && isPreviewDeploy) return null;
 
   if (!email && !name) {
     return (

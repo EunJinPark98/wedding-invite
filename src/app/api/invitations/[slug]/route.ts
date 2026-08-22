@@ -4,7 +4,7 @@ import {
   updateInvitation,
   getInvitationOwned,
 } from "@/lib/store";
-import { getUser, authEnabled } from "@/lib/supabase/server";
+import { getUser, loginRequired } from "@/lib/supabase/server";
 import { getTheme } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
 import {
@@ -22,7 +22,7 @@ const TEMPLATES: readonly TemplateId[] = TEMPLATE_IDS;
 async function requireUser(): Promise<
   { userId: string | null } | NextResponse
 > {
-  if (!authEnabled) return { userId: null };
+  if (!loginRequired) return { userId: null };
   const user = await getUser();
   if (!user) {
     return NextResponse.json(
