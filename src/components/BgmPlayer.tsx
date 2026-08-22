@@ -16,24 +16,38 @@ import type { TemplateTheme } from "@/lib/templates";
 export default function BgmPlayer({
   bgm,
   t,
+  mode = "manual",
 }: {
   bgm: string;
   t: TemplateTheme;
+  /**
+   * off    — 소리도 버튼도 두지 않는다. 에디터는 미리보기를 여러 벌 그리는데
+   *          모두 소리를 내면 겹쳐 들리므로, 한 벌만 빼고 이 값을 준다.
+   * manual — 하객 화면. 눌러야 소리가 난다 (브라우저가 자동재생을 막는다).
+   * auto   — 에디터에서 곡을 고르는 순간 바로 들려준다. 고르는 클릭 자체가
+   *          사용자 조작이라 이때는 브라우저가 재생을 허용한다.
+   */
+  mode?: "off" | "manual" | "auto";
 }) {
   const track = getBgmTrack(bgm);
   const ref = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
-  // 곡이 바뀌면(에디터 미리보기) 재생을 멈추고 처음으로 되돌린다
+  // 고른 곡이 바뀌면 처음부터 다시 — auto 면 그대로 이어서 들려준다
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.pause();
     el.currentTime = 0;
     setPlaying(false);
-  }, [bgm]);
+    if (mode !== "auto" || !bgm) return;
+    el.play().then(
+      () => setPlaying(true),
+      () => setPlaying(false) // 자동재생이 막히면 버튼으로 넘긴다
+    );
+  }, [bgm, mode]);
 
-  if (!track) return null;
+  if (mode === "off" || !track) return null;
 
   const toggle = () => {
     const el = ref.current;

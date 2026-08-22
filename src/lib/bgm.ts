@@ -28,24 +28,28 @@ export const BGM_TRACKS: BgmTrack[] = [
   { id: "bridal-chorus", name: "신부 입장", origin: "Wagner, Bridal Chorus", category: "wedding" },
   { id: "wedding-march", name: "결혼 행진곡", origin: "Mendelssohn, Wedding March", category: "wedding" },
   { id: "air", name: "G선상의 아리아", origin: "J.S. Bach, Air on the G String", category: "wedding" },
+  { id: "simple-gifts", name: "심플 기프츠", origin: "Simple Gifts (Shaker hymn, traditional)", category: "wedding" },
 
   // 백일 · 돌잔치
   { id: "twinkle", name: "반짝반짝 작은 별", origin: "Ah! vous dirai-je, maman", category: "doljanchi" },
   { id: "lullaby", name: "브람스 자장가", origin: "Brahms, Wiegenlied", category: "doljanchi" },
   { id: "fur-elise", name: "엘리제를 위하여", origin: "Beethoven, Für Elise", category: "doljanchi" },
   { id: "minuet", name: "미뉴에트", origin: "Petzold, Minuet in G", category: "doljanchi" },
+  { id: "rockabye", name: "자장자장 우리 아가", origin: "Rock-a-bye Baby (traditional lullaby)", category: "doljanchi" },
 
   // 칠순 · 팔순
   { id: "ode-to-joy", name: "환희의 송가", origin: "Beethoven, Ode to Joy", category: "senior" },
   { id: "amazing-grace", name: "어메이징 그레이스", origin: "New Britain (traditional)", category: "senior" },
   { id: "greensleeves", name: "그린슬리브스", origin: "Greensleeves (traditional)", category: "senior" },
   { id: "jesu-joy", name: "예수, 인간 소망의 기쁨", origin: "J.S. Bach, Jesu, Joy of Man's Desiring", category: "senior" },
+  { id: "auld-lang-syne", name: "올드 랭 사인", origin: "Auld Lang Syne (Scottish traditional)", category: "senior" },
 
   // 생일
   { id: "happy-birthday", name: "생일 축하합니다", origin: "Good Morning to All", category: "birthday" },
   { id: "turkish-march", name: "터키 행진곡", origin: "Mozart, Rondo alla Turca", category: "birthday" },
   { id: "blue-danube", name: "아름답고 푸른 도나우", origin: "J. Strauss II, Blue Danube", category: "birthday" },
   { id: "entertainer", name: "엔터테이너", origin: "Scott Joplin, The Entertainer", category: "birthday" },
+  { id: "pop-weasel", name: "위즐이 팡!", origin: "Pop! Goes the Weasel (traditional)", category: "birthday" },
 ];
 
 /**
