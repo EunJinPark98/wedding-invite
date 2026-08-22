@@ -15,6 +15,7 @@ import {
   type FontOption,
 } from "@/lib/templates";
 import { getCategoryLabels } from "@/lib/categories";
+import { bgmFor } from "@/lib/bgm";
 import {
   clearDraft,
   readDraft,
@@ -1591,6 +1592,39 @@ export default function EditorClient({
               })}
             </div>
           </div>
+          {/* 배경음악 — 저작권 걱정 없는 곡만 골라 둔다 (src/lib/bgm.ts) */}
+          <div>
+            <span className="mb-1.5 block text-xs font-medium text-gray-500">
+              배경음악{" "}
+              <span className="font-normal text-gray-400">(선택)</span>
+            </span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {[{ id: "", name: "사용 안 함" }, ...bgmFor(category)].map((v) => {
+                const selected = data.bgm === v.id;
+                return (
+                  <button
+                    key={v.id || "none"}
+                    type="button"
+                    onClick={() => set("bgm", v.id)}
+                    className={`min-w-0 rounded-lg border-2 px-1.5 py-2 text-center transition ${
+                      selected
+                        ? "border-gold-400 bg-gold-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="block truncate text-[11px] font-medium text-gray-800">
+                      {v.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1.5 text-xs leading-5 text-gray-400">
+              하객이 초대장에서 음표 버튼을 눌러야 소리가 나요. (휴대폰은 소리가
+              저절로 나지 않도록 막혀 있어요)
+            </p>
+          </div>
+
           <div ref={photoSectionRef}>
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
               대표 사진 <span className="text-gold-400">*필수</span>

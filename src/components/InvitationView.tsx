@@ -19,6 +19,7 @@ import Countdown from "./Countdown";
 import MapSection from "./MapSection";
 import ScrollReveal from "./ScrollReveal";
 import InvitationIntro from "./InvitationIntro";
+import BgmPlayer from "./BgmPlayer";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const WEEKDAYS_EN = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -3352,6 +3353,9 @@ export default function InvitationView({
     >
       {/* 스크롤에 맞춰 섹션이 나타나게 — 에디터 미리보기도 실제와 똑같이 */}
       <ScrollReveal />
+
+      {/* 배경음악 — 고른 초대장에만 뜬다. 하객이 눌러야 소리가 난다 */}
+      <BgmPlayer bgm={data.bgm} t={t} />
 
       {/* 인트로 — 고른 연출이 바뀌면 key 가 바뀌어 미리보기에서 다시 재생된다 */}
       {intro !== "none" && (
