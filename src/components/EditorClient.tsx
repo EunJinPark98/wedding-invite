@@ -2265,7 +2265,13 @@ export default function EditorClient({
         </p>
         <div className="mx-auto h-full max-w-[380px] overflow-hidden rounded-[2rem] border-8 border-gray-800 shadow-xl">
           <div ref={deskPreviewRef} className="h-full overflow-y-auto">
-            <InvitationView template={template} data={data} preview bgmMode="auto" />
+            <InvitationView
+              template={template}
+              data={data}
+              preview
+              // 전체화면·확인 모달이 열리면 그쪽이 소리를 맡는다 (겹쳐 들리지 않게)
+              bgmMode={showPreview || confirming ? "off" : "auto"}
+            />
           </div>
         </div>
       </div>
@@ -2287,7 +2293,7 @@ export default function EditorClient({
             transition: "transform 0.4s ease",
           }}
         >
-          <InvitationView template={template} data={data} preview bgmMode="off" />
+          <InvitationView template={template} data={data} preview bgmMode="manual" />
         </div>
         <button
           type="button"
@@ -2394,7 +2400,7 @@ export default function EditorClient({
               </svg>
             </button>
             <div className="h-full overflow-y-auto">
-              <InvitationView template={template} data={data} preview bgmMode="off" />
+              <InvitationView template={template} data={data} preview bgmMode="auto" />
             </div>
           </div>
         </div>
@@ -2414,7 +2420,7 @@ export default function EditorClient({
             </p>
             <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
-                <InvitationView template={template} data={data} bgmMode="off" />
+                <InvitationView template={template} data={data} bgmMode="manual" />
               </div>
             </div>
 
