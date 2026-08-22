@@ -1940,25 +1940,21 @@ export default function EditorClient({
                     label="신랑 아버지"
                     value={data.groomFather}
                     onChange={(v) => set("groomFather", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label="신랑 어머니"
                     value={data.groomMother}
                     onChange={(v) => set("groomMother", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label="신부 아버지"
                     value={data.brideFather}
                     onChange={(v) => set("brideFather", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label="신부 어머니"
                     value={data.brideMother}
                     onChange={(v) => set("brideMother", v)}
-                    placeholder="(선택)"
                   />
                 </>
               ) : (
@@ -1967,13 +1963,11 @@ export default function EditorClient({
                     label={labels.parent1Label}
                     value={data.groomFather}
                     onChange={(v) => set("groomFather", v)}
-                    placeholder="(선택)"
                   />
                   <Field
                     label={labels.parent2Label}
                     value={data.groomMother}
                     onChange={(v) => set("groomMother", v)}
-                    placeholder="(선택)"
                   />
                 </>
               )}
@@ -2032,7 +2026,7 @@ export default function EditorClient({
             {/* 오시는 길 안내 — 초대장에서는 지도 자리에 펼쳐 볼 수 있다 */}
             <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3.5">
               <span className="block text-xs font-medium text-gray-500">
-                오시는 길 안내 (선택)
+                오시는 길 안내
               </span>
               <p className="mt-1 text-[11px] text-gray-400">
                 적어 두면 초대장 지도 아래에 &lsquo;오시는 길 안내&rsquo; 버튼이
@@ -2081,7 +2075,7 @@ export default function EditorClient({
           </label>
           <label className="block">
             <span className="mb-1.5 block text-xs font-medium text-gray-500">
-              맺음말 · 맨 아래 문구 (선택)
+              맺음말 · 맨 아래 문구
             </span>
             <textarea
               value={data.footerMessage}
@@ -2100,7 +2094,7 @@ export default function EditorClient({
         <Group
           title={
             <>
-              갤러리<span className="font-normal text-gray-400">(선택)</span>
+              갤러리
             </>
           }
           step={6}
