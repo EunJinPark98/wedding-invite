@@ -2265,7 +2265,13 @@ export default function EditorClient({
         </p>
         <div className="mx-auto h-full max-w-[380px] overflow-hidden rounded-[2rem] border-8 border-gray-800 shadow-xl">
           <div ref={deskPreviewRef} className="h-full overflow-y-auto">
-            <InvitationView template={template} data={data} preview bgmMode="auto" />
+            <InvitationView
+              template={template}
+              data={data}
+              preview
+              // 전체화면·확인 모달이 열리면 그쪽이 소리를 맡는다 (겹쳐 들리지 않게)
+              bgmMode={showPreview || confirming ? "off" : "auto"}
+            />
           </div>
         </div>
       </div>
@@ -2287,7 +2293,7 @@ export default function EditorClient({
             transition: "transform 0.4s ease",
           }}
         >
-          <InvitationView template={template} data={data} preview bgmMode="off" />
+          <InvitationView template={template} data={data} preview bgmMode="manual" />
         </div>
         <button
           type="button"
@@ -2375,14 +2381,15 @@ export default function EditorClient({
             onClick={(e) => e.stopPropagation()}
             className="relative mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-[2rem] border-8 border-gray-800 bg-white shadow-2xl"
           >
-            {/* 초대장 안 오른쪽 위에 붙여 둔다. 스크롤되는 건 안쪽 상자라
-                여기 둔 버튼은 내려도 그 자리에 그대로 떠 있는다.
+            {/* 초대장 안 왼쪽 위에 붙여 둔다. 오른쪽 위는 배경음악 음표 버튼
+                자리라, 같이 두면 닫기 버튼이 그 아래에 깔려 눌리지 않는다.
+                스크롤되는 건 안쪽 상자라 여기 둔 버튼은 내려도 그대로 떠 있고,
                 밝은 템플릿·어두운 템플릿 어디에 얹혀도 보이도록 반투명 검정. */}
             <button
               type="button"
               onClick={() => setShowPreview(false)}
               aria-label="미리보기 닫기"
-              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition active:bg-black/50"
+              className="absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition active:bg-black/50"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden>
                 <path
@@ -2394,7 +2401,7 @@ export default function EditorClient({
               </svg>
             </button>
             <div className="h-full overflow-y-auto">
-              <InvitationView template={template} data={data} preview bgmMode="off" />
+              <InvitationView template={template} data={data} preview bgmMode="auto" />
             </div>
           </div>
         </div>
@@ -2414,7 +2421,7 @@ export default function EditorClient({
             </p>
             <div className="mx-auto w-full min-h-0 max-w-[400px] flex-1 overflow-hidden rounded-2xl border-4 border-gray-800">
               <div className="h-full overflow-y-auto">
-                <InvitationView template={template} data={data} bgmMode="off" />
+                <InvitationView template={template} data={data} bgmMode="manual" />
               </div>
             </div>
 
