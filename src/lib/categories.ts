@@ -1,5 +1,21 @@
 import { getDolKindMeta, getSeniorAgeMeta, type Category } from "./types";
 
+// 조사 붙이기 — 카테고리마다 이름이 달라서("예식일" / "돌잔치 날짜")
+// 조사를 박아두면 한쪽이 반드시 틀린다. 받침을 보고 고른다.
+const hasJongseong = (word: string) => {
+  const w = word.trim();
+  const code = w.charCodeAt(w.length - 1) - 0xac00;
+  // 한글이 아니면(영문·숫자) 받침이 있는 쪽으로 본다
+  if (code < 0 || code > 11171) return true;
+  return code % 28 !== 0;
+};
+
+// "팔순을 맞아" / "백수를 맞아", "예식일을 입력하면" / "돌잔치 날짜를 입력하면"
+export const josaEulReul = (word: string) => (hasJongseong(word) ? "을" : "를");
+
+// "예식일은 오늘 이후로" / "돌잔치 날짜는 오늘 이후로"
+export const josaEunNeun = (word: string) => (hasJongseong(word) ? "은" : "는");
+
 // 메인 페이지 카테고리 선택 카드
 export const CATEGORIES: {
   id: Category;

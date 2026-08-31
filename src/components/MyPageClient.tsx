@@ -10,6 +10,7 @@ import ThemePickerButton from "./ThemePickerButton";
 import {
   getCategoryLabels,
   getCategoryMeta,
+  josaEunNeun,
   CATEGORIES,
 } from "@/lib/categories";
 import { expiryDateLabel, type Category } from "@/lib/types";
@@ -137,7 +138,9 @@ export default function MyPageClient({
     if (notice !== "limit" || alerted.current) return;
     alerted.current = true;
     alert(
-      `${limitLabel ? `${limitLabel}은` : "이 종류는"} 이미 만드셨어요.\n새로 만들려면 아래에서 기존 초대장을 삭제해 주세요.`
+      `${
+        limitLabel ? `${limitLabel}${josaEunNeun(limitLabel)}` : "이 종류는"
+      } 이미 만드셨어요.\n새로 만들려면 아래에서 기존 초대장을 삭제해 주세요.`
     );
   }, [notice, limitLabel]);
 
