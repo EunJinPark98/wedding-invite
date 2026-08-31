@@ -1,5 +1,15 @@
 import { getDolKindMeta, getSeniorAgeMeta, type Category } from "./types";
 
+// 앞 글자에 받침이 있으면 "을", 없으면 "를"
+// ("팔순을 맞아" / "백수를 맞아", "예식일을 입력하면" / "돌잔치 날짜를 입력하면")
+export const josaEulReul = (word: string) => {
+  const w = word.trim();
+  const code = w.charCodeAt(w.length - 1) - 0xac00;
+  // 한글이 아니면(영문·숫자) 안전하게 "을"
+  if (code < 0 || code > 11171) return "을";
+  return code % 28 === 0 ? "를" : "을";
+};
+
 // 메인 페이지 카테고리 선택 카드
 export const CATEGORIES: {
   id: Category;

@@ -14,7 +14,7 @@ import {
   TITLE_FONTS,
   type FontOption,
 } from "@/lib/templates";
-import { getCategoryLabels } from "@/lib/categories";
+import { getCategoryLabels, josaEulReul } from "@/lib/categories";
 import { bgmFor } from "@/lib/bgm";
 import {
   clearDraft,
@@ -871,15 +871,6 @@ function TextareaField({
     </label>
   );
 }
-
-// 앞 글자에 받침이 있으면 "을", 없으면 "를"
-// ("예식일을 입력하면" / "돌잔치 날짜를 입력하면")
-const josaEulReul = (word: string) => {
-  const code = word.trim().charCodeAt(word.trim().length - 1) - 0xac00;
-  // 한글이 아니면(영문·숫자) 안전하게 "을"
-  if (code < 0 || code > 11171) return "을";
-  return code % 28 === 0 ? "를" : "을";
-};
 
 // 공통 입력 스타일
 const INPUT_CLASS =

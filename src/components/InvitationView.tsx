@@ -12,7 +12,7 @@ import {
   getTitleFontFamily,
   type TemplateTheme,
 } from "@/lib/templates";
-import { labelsOf } from "@/lib/categories";
+import { josaEulReul, labelsOf } from "@/lib/categories";
 import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
 import Countdown from "./Countdown";
@@ -2796,7 +2796,8 @@ function SeniorInkLayout({
             className="inv-hero-in mt-4 text-[calc(1.5rem*var(--inv-fs))] tracking-[0.3em]"
             style={{ fontFamily: t.headingFont, color: t.ink }}
           >
-            {labels.seniorLabel}을 맞아
+            {labels.seniorLabel}
+            {josaEulReul(labels.seniorLabel)} 맞아
           </h1>
           <p
             className="inv-hero-in mt-2 text-[calc(15px*var(--inv-fs))] tracking-[0.15em]"
