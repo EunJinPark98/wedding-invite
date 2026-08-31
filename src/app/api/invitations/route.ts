@@ -3,7 +3,12 @@ import { customAlphabet } from "nanoid";
 import { saveInvitation, getUsedCategories } from "@/lib/store";
 import { getUser, loginRequired } from "@/lib/supabase/server";
 import { getTheme } from "@/lib/templates";
-import { getCategoryMeta, getCategoryLabels } from "@/lib/categories";
+import {
+  getCategoryMeta,
+  getCategoryLabels,
+  josaEulReul,
+  josaEunNeun,
+} from "@/lib/categories";
 import {
   MAX_GALLERY,
   expiryFromEventDate,
@@ -42,7 +47,11 @@ export async function POST(req: Request) {
   // 이름 필수 검사 (신부 이름은 두 사람이 등장하는 결혼 청첩장에서만)
   if (!data || !data.groomName?.trim()) {
     return NextResponse.json(
-      { error: `${labels.personLabel}은(는) 필수입니다.` },
+      {
+        error: `${labels.personLabel}${josaEunNeun(
+          labels.personLabel
+        )} 필수입니다.`,
+      },
       { status: 400 }
     );
   }
@@ -56,7 +65,11 @@ export async function POST(req: Request) {
   const expiresAt = expiryFromEventDate(data.weddingDate);
   if (!expiresAt) {
     return NextResponse.json(
-      { error: `${labels.dateFieldLabel}을 정확히 입력해 주세요.` },
+      {
+        error: `${labels.dateFieldLabel}${josaEulReul(
+          labels.dateFieldLabel
+        )} 정확히 입력해 주세요.`,
+      },
       { status: 400 }
     );
   }
@@ -64,7 +77,11 @@ export async function POST(req: Request) {
   // 화면을 거치지 않고 들어오는 요청이 있을 수 있어 여기서도 본다.
   if (isPastEventDate(data.weddingDate)) {
     return NextResponse.json(
-      { error: `${labels.dateFieldLabel}은 오늘 이후로 정해 주세요.` },
+      {
+        error: `${labels.dateFieldLabel}${josaEunNeun(
+          labels.dateFieldLabel
+        )} 오늘 이후로 정해 주세요.`,
+      },
       { status: 400 }
     );
   }
@@ -102,7 +119,7 @@ export async function POST(req: Request) {
       const label = getCategoryMeta(category).label;
       return NextResponse.json(
         {
-          error: `${label}은 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 ${label}을 삭제해 주세요.`,
+          error: `${label}${josaEunNeun(label)} 계정당 1개만 만들 수 있어요. 새로 만들려면 마이페이지에서 기존 ${label}${josaEulReul(label)} 삭제해 주세요.`,
           code: "LIMIT_REACHED",
           category,
         },

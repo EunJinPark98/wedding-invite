@@ -6,7 +6,7 @@ import {
 } from "@/lib/store";
 import { getUser, loginRequired } from "@/lib/supabase/server";
 import { getTheme } from "@/lib/templates";
-import { getCategoryLabels } from "@/lib/categories";
+import { getCategoryLabels, josaEulReul, josaEunNeun } from "@/lib/categories";
 import {
   MAX_GALLERY,
   expiryFromEventDate,
@@ -79,7 +79,11 @@ export async function PATCH(
   // 이름 필수 검사 (신부 이름은 두 사람이 등장하는 결혼 청첩장에서만)
   if (!data || !data.groomName?.trim()) {
     return NextResponse.json(
-      { error: `${labels.personLabel}은(는) 필수입니다.` },
+      {
+        error: `${labels.personLabel}${josaEunNeun(
+          labels.personLabel
+        )} 필수입니다.`,
+      },
       { status: 400 }
     );
   }
@@ -99,7 +103,11 @@ export async function PATCH(
   const expiresAt = expiryFromEventDate(data.weddingDate);
   if (!expiresAt) {
     return NextResponse.json(
-      { error: `${labels.dateFieldLabel}을 정확히 입력해 주세요.` },
+      {
+        error: `${labels.dateFieldLabel}${josaEulReul(
+          labels.dateFieldLabel
+        )} 정확히 입력해 주세요.`,
+      },
       { status: 400 }
     );
   }
@@ -107,7 +115,11 @@ export async function PATCH(
   // 화면을 거치지 않고 들어오는 요청이 있을 수 있어 여기서도 본다.
   if (isPastEventDate(data.weddingDate)) {
     return NextResponse.json(
-      { error: `${labels.dateFieldLabel}은 오늘 이후로 정해 주세요.` },
+      {
+        error: `${labels.dateFieldLabel}${josaEunNeun(
+          labels.dateFieldLabel
+        )} 오늘 이후로 정해 주세요.`,
+      },
       { status: 400 }
     );
   }
