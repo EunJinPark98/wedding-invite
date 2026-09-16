@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePhotoFallbackList } from "./usePhotoFallback";
 
 export default function GalleryAlbum({
   images,
@@ -10,26 +11,32 @@ export default function GalleryAlbum({
   rounded?: string;
 }) {
   const [idx, setIdx] = useState<number | null>(null);
+  // 안 열리는 사진은 앨범에서 아예 뺀다. 빈 칸이나 깨진 아이콘을 남기는
+  // 것보다, 원래 그만큼 올린 앨범처럼 보이는 편이 낫다.
+  const { failed, onError, ref } = usePhotoFallbackList();
+  const shown = images.filter((u) => !failed.has(u));
 
   useEffect(() => {
     if (idx === null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIdx(null);
       if (e.key === "ArrowLeft")
-        setIdx((i) => (i === null ? i : (i + images.length - 1) % images.length));
+        setIdx((i) => (i === null ? i : (i + shown.length - 1) % shown.length));
       if (e.key === "ArrowRight")
-        setIdx((i) => (i === null ? i : (i + 1) % images.length));
+        setIdx((i) => (i === null ? i : (i + 1) % shown.length));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [idx, images.length]);
+  }, [idx, shown.length]);
 
-  if (images.length === 0) return null;
-  const [first, ...rest] = images;
+  if (shown.length === 0) return null;
+  const [first, ...rest] = shown;
   const prev = () =>
-    setIdx((i) => (i === null ? i : (i + images.length - 1) % images.length));
+    setIdx((i) => (i === null ? i : (i + shown.length - 1) % shown.length));
   const next = () =>
-    setIdx((i) => (i === null ? i : (i + 1) % images.length));
+    setIdx((i) => (i === null ? i : (i + 1) % shown.length));
+  // 크게 보는 중에 그 사진이 빠지면 번호가 범위를 넘을 수 있다
+  const bigIdx = idx === null ? null : Math.min(idx, shown.length - 1);
 
   return (
     <>
@@ -42,8 +49,10 @@ export default function GalleryAlbum({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            ref={ref(first)}
             src={first}
             alt="gallery-feature"
+            onError={onError(first)}
             className={`aspect-[4/3] w-full cursor-zoom-in object-cover shadow-sm ring-1 ring-black/5 ${rounded}`}
           />
         </button>
@@ -59,8 +68,10 @@ export default function GalleryAlbum({
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
+                  ref={ref(url)}
                   src={url}
                   alt={`gallery-${i}`}
+                  onError={onError(url)}
                   className={`aspect-square w-full cursor-zoom-in object-cover shadow-sm ring-1 ring-black/5 ${rounded}`}
                 />
               </button>
@@ -69,7 +80,7 @@ export default function GalleryAlbum({
         )}
       </div>
 
-      {idx !== null && (
+      {bigIdx !== null && (
         <div
           onClick={() => setIdx(null)}
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
@@ -95,8 +106,10 @@ export default function GalleryAlbum({
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={images[idx]}
-            alt={`gallery-large-${idx}`}
+            ref={ref(shown[bigIdx])}
+            src={shown[bigIdx]}
+            alt={`gallery-large-${bigIdx}`}
+            onError={onError(shown[bigIdx])}
             onClick={(e) => e.stopPropagation()}
             className="max-h-[85vh] max-w-full rounded-lg object-contain"
           />
@@ -112,7 +125,7 @@ export default function GalleryAlbum({
             ›
           </button>
           <span className="absolute bottom-5 left-1/2 -translate-x-1/2 text-sm tracking-widest text-white/70">
-            {idx + 1} / {images.length}
+            {bigIdx + 1} / {shown.length}
           </span>
         </div>
       )}

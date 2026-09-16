@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { usePhotoFallback } from "./usePhotoFallback";
 
 /**
  * 대표 사진 — 고른 모션은 사진이 다 온 뒤에 시작한다.
@@ -25,9 +26,31 @@ export default function HeroPhoto({
   className: string;
 }) {
   const [ready, setReady] = useState(false);
-  const ref = useCallback((el: HTMLImageElement | null) => {
-    if (el?.complete) setReady(true);
-  }, []);
+  const { failed, onError, ref: failRef } = usePhotoFallback(src);
+  const ref = useCallback(
+    (el: HTMLImageElement | null) => {
+      if (el?.complete) setReady(true);
+      // 못 받은 사진인지도 같은 자리에서 본다 (둘 다 하이드레이션 전에 끝난다)
+      failRef(el);
+    },
+    [failRef]
+  );
+
+  /**
+   * 사진이 안 열리면 깨진 아이콘 대신 자리만 남긴다. 하객은 어차피 고칠 수
+   * 없으니 "사진을 못 불러왔다"고 알리는 것보다 조용한 편이 낫다. 자리까지
+   * 없애면 아래 글이 위로 딸려 올라와 짜임새가 흐트러지므로 크기는 지킨다.
+   * 색은 템플릿 글자색을 옅게 깔아 밝은 템플릿과 어두운 템플릿 모두에 맞춘다.
+   */
+  if (failed) {
+    return (
+      <div
+        className={className}
+        style={{ background: "currentColor", opacity: 0.06 }}
+        aria-hidden
+      />
+    );
+  }
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -36,6 +59,7 @@ export default function HeroPhoto({
       src={src}
       alt="대표 사진"
       onLoad={() => setReady(true)}
+      onError={onError}
       className={`object-cover ${ready ? motion : ""} ${className}`}
     />
   );

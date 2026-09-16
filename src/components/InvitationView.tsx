@@ -13,6 +13,7 @@ import {
   type TemplateTheme,
 } from "@/lib/templates";
 import { josaEulReul, labelsOf } from "@/lib/categories";
+import PhotoImg from "./PhotoImg";
 import GalleryAlbum from "./GalleryAlbum";
 import AccountList from "./AccountList";
 import Countdown from "./Countdown";
@@ -312,8 +313,11 @@ function ProfilePhoto({
         className="inv-zoom w-full overflow-hidden"
         style={{ ...shape, aspectRatio: "3/4", boxShadow: `0 14px 30px -14px ${t.accent}55` }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={`${role} 사진`} className="h-full w-full object-cover" />
+        <PhotoImg
+          src={src}
+          alt={`${role} 사진`}
+          className="h-full w-full object-cover"
+        />
       </div>
     );
   // 사진 미등록: 미리보기에서만 빈 슬롯 안내
