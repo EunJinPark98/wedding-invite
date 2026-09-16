@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { purgeExpiredInvitations, purgeUnusedImages } from "@/lib/store";
 
 /**
- * 밤마다 도는 정리 작업. Vercel Cron이 하루 한 번(00:30 KST) 부른다 — vercel.json 참고.
+ * 밤마다 도는 정리 작업. Vercel Cron이 하루 한 번(새벽 3시 KST) 부른다 — vercel.json 참고.
  *
  * 두 가지를 지운다.
  *
