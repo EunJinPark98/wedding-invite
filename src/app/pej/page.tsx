@@ -6,13 +6,14 @@ import { getCategoryMeta } from "@/lib/categories";
 import { authEnabled, getUser } from "@/lib/supabase/server";
 import { isAdminEmail, listAccounts, type Account } from "@/lib/admin";
 import PejDeleteAccount from "@/components/PejDeleteAccount";
-import PejCleanImages from "@/components/PejCleanImages";
 import { CATEGORIES } from "@/lib/categories";
-import { normalizeData, type Category } from "@/lib/types";
+import { isPastEventDate, normalizeData, type Category } from "@/lib/types";
 
 export const metadata = { title: "운영 현황" };
 // 한 쪽에 보여 줄 계정 수
 const PER_PAGE = 10;
+// 아래에 한 번에 내놓을 쪽 번호 개수 (나머지는 화살표로 넘긴다)
+const PAGE_WINDOW = 5;
 // 목록이 캐시되어 옛 내용이 보이면 안 된다
 export const dynamic = "force-dynamic";
 
@@ -50,12 +51,58 @@ function Stat({
 
 type Inv = Awaited<ReturnType<typeof listAllInvitations>>[number];
 
+/**
+ * 행사가 끝났는지.
+ *
+ * 게시 종료 시각(expires_at)만 보면 안 된다. 그 칸이 생기기 전에 만들어진
+ * 초대장은 값이 비어 있어서(무기한) 행사가 아무리 지나도 "게시 중"으로
+ * 남는다. 운영자가 보기에 끝난 것은 행사 날짜가 지난 것이므로 날짜도 본다.
+ */
+function hasEnded(inv: Inv): boolean {
+  return isExpired(inv) || isPastEventDate(normalizeData(inv.data).weddingDate);
+}
+
+/** 쪽 넘기는 화살표. 끝에 닿으면 누를 수 없게 흐리게 둔다. */
+function PageArrow({
+  href,
+  disabled,
+  label,
+  children,
+}: {
+  href: string;
+  disabled: boolean;
+  label: string;
+  children: React.ReactNode;
+}) {
+  const cls = "min-w-9 rounded-lg border px-3 py-1.5 text-center text-sm";
+  if (disabled) {
+    return (
+      <span
+        aria-disabled
+        className={`${cls} border-gray-100 text-gray-300`}
+        aria-label={label}
+      >
+        {children}
+      </span>
+    );
+  }
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className={`${cls} border-gray-200 text-gray-500 transition hover:bg-gray-50`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 /** 초대장 한 줄 — 눌러서 하객이 보는 화면으로 들어간다 */
 function InvitationRow({ inv }: { inv: Inv }) {
   const d = normalizeData(inv.data);
   const meta = getCategoryMeta(d.category);
   const names = [d.groomName, d.brideName].filter(Boolean).join(" · ");
-  const over = isExpired(inv);
+  const over = hasEnded(inv);
   return (
     <Link
       href={`/v/${inv.slug}`}
@@ -149,7 +196,7 @@ function AccountCard({ account, items }: { account: Account; items: Inv[] }) {
 export default async function OverviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; made?: string }>;
 }) {
   if (!authEnabled) notFound();
   const user = await getUser();
@@ -157,6 +204,8 @@ export default async function OverviewPage({
 
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
+  // 초대장을 하나라도 만든 계정만 보기
+  const madeOnly = sp.made === "1";
 
   const [accounts, invitations] = await Promise.all([
     listAccounts(),
@@ -176,7 +225,11 @@ export default async function OverviewPage({
     else byUser.set(inv.userId, [inv]);
   }
 
-  const live = invitations.filter((i) => !isExpired(i)).length;
+  const ended = invitations.filter(hasEnded);
+  const live = invitations.length - ended.length;
+  // 게시 종료일이 아예 없는 것 — 정기 청소가 손대지 못해 계속 남는다
+  const noExpiry = invitations.filter((i) => !i.expiresAt).length;
+  const endedNoExpiry = ended.filter((i) => !i.expiresAt).length;
   const byCategory = CATEGORIES.map((c) => ({
     ...c,
     count: invitations.filter(
@@ -188,19 +241,38 @@ export default async function OverviewPage({
 
   // 이름으로 찾기 — 닉네임·이메일도 함께 본다 (이름을 안 준 계정이 있다)
   const needle = q.toLowerCase();
-  const found = needle
-    ? accounts.filter((a) =>
-        [a.name, a.nickname, a.email].some((v) =>
-          v.toLowerCase().includes(needle)
-        )
-      )
-    : accounts;
+  const found = accounts.filter((a) => {
+    if (madeOnly && (byUser.get(a.id)?.length ?? 0) === 0) return false;
+    if (!needle) return true;
+    return [a.name, a.nickname, a.email].some((v) =>
+      v.toLowerCase().includes(needle)
+    );
+  });
 
   const pages = Math.max(1, Math.ceil(found.length / PER_PAGE));
   const page = Math.min(Math.max(1, Number(sp.page) || 1), pages);
   const shown = found.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   const pageHref = (n: number) =>
-    `/pej?${new URLSearchParams({ ...(q ? { q } : {}), ...(n > 1 ? { page: String(n) } : {}) })}`;
+    `/pej?${new URLSearchParams({
+      ...(q ? { q } : {}),
+      ...(madeOnly ? { made: "1" } : {}),
+      ...(n > 1 ? { page: String(n) } : {}),
+    })}`;
+  // 거르기를 켜고 끌 때는 첫 쪽으로 돌아간다 (걸러진 뒤 쪽 수가 달라진다)
+  const filterHref = (on: boolean) =>
+    `/pej?${new URLSearchParams({
+      ...(q ? { q } : {}),
+      ...(on ? { made: "1" } : {}),
+    })}`;
+
+  // 쪽 번호는 지금 쪽을 가운데 두고 다섯 개만. 나머지는 화살표로 넘긴다.
+  let winStart = Math.max(1, page - Math.floor(PAGE_WINDOW / 2));
+  const winEnd = Math.min(pages, winStart + PAGE_WINDOW - 1);
+  winStart = Math.max(1, winEnd - PAGE_WINDOW + 1);
+  const nums = Array.from(
+    { length: winEnd - winStart + 1 },
+    (_, i) => winStart + i
+  );
 
   return (
     <main className="min-h-screen bg-cream text-gray-800">
@@ -245,10 +317,24 @@ export default async function OverviewPage({
           />
           <Stat
             label="게시 종료"
-            value={invitations.length - live}
-            sub="자동 삭제 대기"
+            value={ended.length}
+            sub={
+              endedNoExpiry > 0
+                ? `무기한 ${endedNoExpiry}개`
+                : "자동 삭제 대기"
+            }
           />
         </div>
+
+        {/* 게시 종료일이 없는 초대장 — 왜 "게시 종료"에 안 잡히는지 알려 준다 */}
+        {noExpiry > 0 && (
+          <p className="mt-2.5 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs leading-5 text-gray-500">
+            게시 종료일이 없는 초대장이{" "}
+            <strong className="text-gray-800">{noExpiry}개</strong> 있어요. 게시
+            종료일 칸이 생기기 전에 만들어진 것이라, 행사가 지나도 자동으로
+            지워지지 않고 계속 남습니다.
+          </p>
+        )}
 
         {/* 종류별 몇 개씩 만들어졌는지 */}
         <div className="mt-2.5 flex flex-wrap gap-2 rounded-2xl border border-gold-100 bg-white px-4 py-3">
@@ -260,8 +346,6 @@ export default async function OverviewPage({
           ))}
         </div>
 
-        <PejCleanImages />
-
         {accounts.length === 0 && (
           <p className="mt-6 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs text-gray-400">
             계정 목록을 읽지 못했습니다. SUPABASE_SERVICE_ROLE_KEY 가 설정돼
@@ -269,12 +353,31 @@ export default async function OverviewPage({
           </p>
         )}
 
-        <h2 className="mt-9 text-sm font-semibold text-gray-800">
-          계정 {q ? `${found.length}개 (전체 ${accounts.length}개)` : `${accounts.length}개`}
-        </h2>
+        <div className="mt-9 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-gray-800">
+            계정{" "}
+            {q || madeOnly
+              ? `${found.length}개 (전체 ${accounts.length}개)`
+              : `${accounts.length}개`}
+          </h2>
+          {/* 초대장을 하나라도 만든 계정만 추려 본다 */}
+          <Link
+            href={filterHref(!madeOnly)}
+            aria-pressed={madeOnly}
+            className={`rounded-xl border px-3 py-1.5 text-xs font-medium transition ${
+              madeOnly
+                ? "border-gold-300 bg-gold-50 text-gold-600"
+                : "border-gray-200 text-gray-500 hover:bg-gray-50"
+            }`}
+          >
+            {madeOnly ? "✓ " : ""}초대장 만든 계정만
+          </Link>
+        </div>
 
         {/* 이름으로 찾기 — 자바스크립트 없이 주소로 넘긴다 */}
         <form method="get" className="mt-3 flex gap-2">
+          {/* 찾기를 눌러도 거르기가 풀리지 않게 함께 넘긴다 */}
+          {madeOnly && <input type="hidden" name="made" value="1" />}
           <input
             type="search"
             name="q"
@@ -290,7 +393,7 @@ export default async function OverviewPage({
           </button>
           {q && (
             <Link
-              href="/pej"
+              href={filterHref(madeOnly)}
               className="shrink-0 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-500 transition hover:bg-gray-50"
             >
               전체
@@ -300,7 +403,11 @@ export default async function OverviewPage({
 
         {shown.length === 0 ? (
           <p className="mt-4 rounded-2xl border border-gold-100 bg-white px-4 py-6 text-center text-sm text-gray-400">
-            {q ? `"${q}"로 찾은 계정이 없어요.` : "아직 가입한 계정이 없어요."}
+            {q
+              ? `"${q}"로 찾은 계정이 없어요.`
+              : madeOnly
+                ? "초대장을 만든 계정이 아직 없어요."
+                : "아직 가입한 계정이 없어요."}
           </p>
         ) : (
           <ul className="mt-3 space-y-3">
@@ -310,10 +417,17 @@ export default async function OverviewPage({
           </ul>
         )}
 
-        {/* 쪽 번호 — 한 쪽에 열 개씩 */}
+        {/* 쪽 번호 — 지금 쪽 둘레로 다섯 개, 나머지는 화살표로 */}
         {pages > 1 && (
           <nav className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
-            {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+            <PageArrow
+              href={pageHref(page - 1)}
+              disabled={page === 1}
+              label="이전 쪽"
+            >
+              ‹
+            </PageArrow>
+            {nums.map((n) => (
               <Link
                 key={n}
                 href={pageHref(n)}
@@ -327,6 +441,16 @@ export default async function OverviewPage({
                 {n}
               </Link>
             ))}
+            <PageArrow
+              href={pageHref(page + 1)}
+              disabled={page === pages}
+              label="다음 쪽"
+            >
+              ›
+            </PageArrow>
+            <span className="ml-1 text-xs text-gray-400">
+              {page} / {pages}
+            </span>
           </nav>
         )}
 

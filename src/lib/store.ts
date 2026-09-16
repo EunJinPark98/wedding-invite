@@ -2,13 +2,8 @@ import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
-import { deleteImages, purgeOrphanImages, storagePathFromUrl } from "./storage";
-import {
-  normalizeData,
-  stripSampleAccounts,
-  CATEGORY_IDS,
-  DRAFT_MAX_AGE_HOURS,
-} from "./types";
+import { deleteImages } from "./storage";
+import { normalizeData, stripSampleAccounts, CATEGORY_IDS } from "./types";
 import { isPreviewDeploy } from "./supabase/server";
 import type {
   Category,
@@ -156,19 +151,31 @@ export async function listAllInvitations(): Promise<
   (Invitation & { userId: string | null })[]
 > {
   if (useSupabase) {
-    const { data, error } = await supabase()
-      .from("invitations")
-      .select("slug, template, data, created_at, expires_at, user_id")
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => ({
-      slug: r.slug,
-      template: r.template,
-      data: r.data,
-      createdAt: r.created_at,
-      expiresAt: r.expires_at ?? null,
-      userId: r.user_id ?? null,
-    }));
+    // 한 번에 다 오지 않는다. 끝까지 받지 않으면 운영 현황의 숫자가
+    // 조용히 모자라게 나온다 — 틀린 줄 모르고 보게 되므로 끝까지 받는다.
+    const rows: (Invitation & { userId: string | null })[] = [];
+    const pageSize = 1000;
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase()
+        .from("invitations")
+        .select("slug, template, data, created_at, expires_at, user_id")
+        .order("created_at", { ascending: false })
+        .range(from, from + pageSize - 1);
+      if (error) throw new Error(error.message);
+      const page = data ?? [];
+      for (const r of page) {
+        rows.push({
+          slug: r.slug,
+          template: r.template,
+          data: r.data,
+          createdAt: r.created_at,
+          expiresAt: r.expires_at ?? null,
+          userId: r.user_id ?? null,
+        });
+      }
+      if (page.length < pageSize) break;
+    }
+    return rows;
   }
   const db = await readLocal();
   return Object.values(db)
@@ -345,40 +352,6 @@ export async function deleteInvitationsOfUser(userId: string): Promise<number> {
   }
   // 로컬 폴백은 계정 개념이 없어 지울 것이 없다 (개발용)
   return 0;
-}
-
-/**
- * 어느 초대장에도 딸리지 않은 사진을 지운다.
- *
- * 저장소를 훑기 전에 "쓰이고 있는 경로"를 모두 모아 둬야 한다. 하나라도
- * 빠뜨리면 멀쩡한 초대장의 사진이 지워진다.
- */
-export async function purgeUnusedImages(
-  minAgeHours = DRAFT_MAX_AGE_HOURS
-): Promise<number> {
-  if (!useSupabase) return 0;
-
-  // 한 번에 다 오지 않는다. 끝까지 받지 않고 지우기 시작하면, 못 받은 행이
-  // 쓰고 있는 사진을 "아무도 안 쓴다"고 보고 지워 버린다.
-  const keep = new Set<string>();
-  const pageSize = 1000;
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await supabase()
-      .from("invitations")
-      .select("data")
-      .range(from, from + pageSize - 1);
-    if (error) throw new Error(error.message);
-    const rows = data ?? [];
-    for (const row of rows) {
-      for (const url of photoUrlsOf(row.data as InvitationData | null)) {
-        const p = storagePathFromUrl(url);
-        if (p) keep.add(p);
-      }
-    }
-    if (rows.length < pageSize) break;
-  }
-
-  return purgeOrphanImages(keep, minAgeHours);
 }
 
 /**
