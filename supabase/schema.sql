@@ -37,3 +37,29 @@ insert into storage.buckets (id, name, public)
 create policy "photos public read"
   on storage.objects for select
   using (bucket_id = 'photos');
+
+-- ───────── 지워진 초대장 수 ─────────
+-- 초대장을 지우면 행이 사라지므로, 나중에 "지금까지 몇 개가 지워졌는지"를
+-- 세어 볼 방법이 없다. 그래서 지울 때마다 여기에 더해 둔다.
+-- 숫자만 남기고 이름·사진 같은 개인정보는 담지 않는다.
+create table if not exists public.app_stats (
+  key text primary key,
+  value bigint not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+-- invitations 와 같은 이유로 서버만 건드린다
+alter table public.app_stats enable row level security;
+
+-- 여러 곳에서 동시에 지워도 수가 어긋나지 않도록 더하기를 DB 안에서 한다.
+-- (읽어서 +1 하고 쓰면 동시에 지울 때 한쪽이 묻힌다)
+create or replace function public.bump_stat(k text, n bigint)
+returns void
+language sql
+as $$
+  insert into public.app_stats (key, value, updated_at)
+  values (k, n, now())
+  on conflict (key) do update
+    set value = app_stats.value + excluded.value,
+        updated_at = now();
+$$;
