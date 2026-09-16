@@ -3,7 +3,12 @@ import { promises as fs } from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import { deleteImages, purgeOrphanImages, storagePathFromUrl } from "./storage";
-import { normalizeData, stripSampleAccounts, CATEGORY_IDS } from "./types";
+import {
+  normalizeData,
+  stripSampleAccounts,
+  CATEGORY_IDS,
+  DRAFT_MAX_AGE_HOURS,
+} from "./types";
 import { isPreviewDeploy } from "./supabase/server";
 import type {
   Category,
@@ -348,7 +353,9 @@ export async function deleteInvitationsOfUser(userId: string): Promise<number> {
  * 저장소를 훑기 전에 "쓰이고 있는 경로"를 모두 모아 둬야 한다. 하나라도
  * 빠뜨리면 멀쩡한 초대장의 사진이 지워진다.
  */
-export async function purgeUnusedImages(minAgeHours = 24): Promise<number> {
+export async function purgeUnusedImages(
+  minAgeHours = DRAFT_MAX_AGE_HOURS
+): Promise<number> {
   if (!useSupabase) return 0;
   const { data, error } = await supabase().from("invitations").select("data");
   if (error) throw new Error(error.message);

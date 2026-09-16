@@ -25,8 +25,9 @@ export async function GET(req: Request) {
 
   try {
     const result = await purgeExpiredInvitations();
-    // 만든 지 하루가 지났는데 아무 초대장에도 안 딸린 사진 (편집 중인 것은 남긴다)
-    const orphans = await purgeUnusedImages(24);
+    // 이어서 쓸 수 있는 기간이 지났는데 아무 초대장에도 안 딸린 사진
+    // (그 전에 지우면 "이어서 작성" 했을 때 사진이 깨진다 — types.ts 참고)
+    const orphans = await purgeUnusedImages();
     console.log(
       `[purge] 초대장 ${result.deleted}건, 사진 ${result.images}장, 안 쓰는 사진 ${orphans}장 삭제`
     );
