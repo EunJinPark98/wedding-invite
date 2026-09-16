@@ -128,7 +128,7 @@ export const uploadMode = useSupabase ? "supabase" : "local";
  */
 export async function purgeOrphanImages(
   keep: Set<string>,
-  minAgeHours = 24
+  minAgeHours: number
 ): Promise<number> {
   if (!useSupabase) return 0;
   const cutoff = Date.now() - minAgeHours * 60 * 60 * 1000;

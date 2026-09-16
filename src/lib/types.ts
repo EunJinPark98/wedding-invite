@@ -203,6 +203,18 @@ export const isFontScale = (v: unknown): v is number =>
 // 갤러리 사진 최대 장수 — 페이지 로딩 속도를 위한 기술적 한도 (요금제 아님)
 export const MAX_GALLERY = 19;
 
+/**
+ * 만들다 만 초대장을 "이어서 작성"으로 되살릴 수 있는 기간.
+ *
+ * 사진 정리 주기이기도 하다. 사진은 "사진 추가"를 누른 순간 올라가지만
+ * 초대장은 "제작하기"를 눌러야 저장되므로, 만들다 만 사람의 사진은 어느
+ * 초대장에도 안 딸린 채로 남는다. 이어서 쓸 수 있는 동안 그 사진을 지워
+ * 버리면 돌아와서 이어서 쓰기를 눌렀을 때 사진 자리가 깨져 보인다.
+ * 두 기간이 따로 놀지 않도록 여기 한 곳에서만 정한다.
+ */
+export const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+export const DRAFT_MAX_AGE_HOURS = DRAFT_MAX_AGE_MS / (60 * 60 * 1000);
+
 // 에디터 미리보기용 예시 대표 사진 — 개인 사진이므로 실제 초대장 제작에는 사용 불가
 export const SAMPLE_MAIN_PHOTO = "/wedding1.jpg";
 export const SAMPLE_BABY_PHOTO = "/baby.png";

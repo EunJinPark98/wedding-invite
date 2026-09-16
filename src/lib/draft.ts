@@ -1,3 +1,4 @@
+import { DRAFT_MAX_AGE_MS } from "./types";
 import type { Category, InvitationData, TemplateId } from "./types";
 
 /**
@@ -11,8 +12,6 @@ import type { Category, InvitationData, TemplateId } from "./types";
  * 올라가 있어 주소만 들어간다.
  */
 const KEY = "starinvite-draft";
-// 이 기간이 지난 것은 없는 셈 친다 (행사 날짜가 지나 버렸을 수 있다)
-const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 export interface Draft {
   category: Category;
@@ -37,7 +36,7 @@ export function readDraft(category: Category): Draft | null {
     const d = JSON.parse(raw) as Draft;
     if (d?.category !== category) return null;
     if (!d.data || typeof d.savedAt !== "number") return null;
-    if (Date.now() - d.savedAt > MAX_AGE_MS) {
+    if (Date.now() - d.savedAt > DRAFT_MAX_AGE_MS) {
       clearDraft();
       return null;
     }
