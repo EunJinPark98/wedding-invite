@@ -357,15 +357,27 @@ export async function purgeUnusedImages(
   minAgeHours = DRAFT_MAX_AGE_HOURS
 ): Promise<number> {
   if (!useSupabase) return 0;
-  const { data, error } = await supabase().from("invitations").select("data");
-  if (error) throw new Error(error.message);
+
+  // 한 번에 다 오지 않는다. 끝까지 받지 않고 지우기 시작하면, 못 받은 행이
+  // 쓰고 있는 사진을 "아무도 안 쓴다"고 보고 지워 버린다.
   const keep = new Set<string>();
-  for (const row of data ?? []) {
-    for (const url of photoUrlsOf(row.data as InvitationData | null)) {
-      const p = storagePathFromUrl(url);
-      if (p) keep.add(p);
+  const pageSize = 1000;
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase()
+      .from("invitations")
+      .select("data")
+      .range(from, from + pageSize - 1);
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    for (const row of rows) {
+      for (const url of photoUrlsOf(row.data as InvitationData | null)) {
+        const p = storagePathFromUrl(url);
+        if (p) keep.add(p);
+      }
     }
+    if (rows.length < pageSize) break;
   }
+
   return purgeOrphanImages(keep, minAgeHours);
 }
 
