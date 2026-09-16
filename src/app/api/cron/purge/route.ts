@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { purgeExpiredInvitations, purgeUnusedImages } from "@/lib/store";
+import {
+  markPurgeRan,
+  purgeExpiredInvitations,
+  purgeUnusedImages,
+} from "@/lib/store";
 
 /**
  * 밤마다 도는 정리 작업. Vercel Cron이 하루 한 번(00:30 KST) 부른다 — vercel.json 참고.
@@ -41,6 +45,8 @@ export async function GET(req: Request) {
     // 기본값이 "이어서 쓸 수 있는 기간"이라 여기서 숫자를 따로 적지 않는다.
     // 적어 두면 draft 기간만 바뀌었을 때 다시 어긋난다 (types.ts 참고).
     const orphans = await purgeUnusedImages();
+    // 돌았다는 사실을 남긴다. 안 남기면 멈춰 있어도 알 수가 없다.
+    await markPurgeRan();
     console.log(
       `[purge] 초대장 ${result.deleted}건, 사진 ${result.images}장, 임시저장 사진 ${orphans}장 삭제`
     );

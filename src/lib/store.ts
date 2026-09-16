@@ -315,6 +315,12 @@ function photoUrlsOf(data: InvitationData | null | undefined): string[] {
  */
 const STAT_DELETED_EXPIRED = "invitations_deleted_expired";
 const STAT_DELETED_BY_USER = "invitations_deleted_by_user";
+const STAT_LAST_PURGE = "last_purge_at";
+/**
+ * 이만큼 소식이 없으면 청소가 멈춘 것으로 본다.
+ * 하루 한 번 도니까 하루는 정상이고, 이틀이면 한 번은 거른 것이다.
+ */
+const PURGE_STALE_HOURS = 48;
 
 async function bumpDeleted(key: string, n: number): Promise<void> {
   if (!useSupabase || n <= 0) return;
@@ -323,6 +329,30 @@ async function bumpDeleted(key: string, n: number): Promise<void> {
     if (error) throw new Error(error.message);
   } catch (e) {
     console.error("[stats] 지워진 수 기록 실패:", e);
+  }
+}
+
+/**
+ * 정기 청소가 방금 돌았다고 남긴다.
+ *
+ * 청소는 아무도 안 보는 새벽에 도는 데다, CRON_SECRET 이 빠져 있거나 스케줄이
+ * 꺼져 있으면 아무 일도 안 일어난 채 조용히 멈춘다. 그러면 "행사 다음 날
+ * 자동 삭제"라는 약속이 지켜지지 않는데도 알 방법이 없다. 그래서 돌 때마다
+ * 시각을 남기고 운영 현황에서 보여 준다.
+ */
+export async function markPurgeRan(): Promise<void> {
+  if (!useSupabase) return;
+  try {
+    const { error } = await supabase()
+      .from("app_stats")
+      .upsert(
+        { key: STAT_LAST_PURGE, value: 0, updated_at: new Date().toISOString() },
+        { onConflict: "key" }
+      );
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    // 기록에 실패해도 청소 자체는 이미 끝났다
+    console.error("[stats] 청소 시각 기록 실패:", e);
   }
 }
 
@@ -336,25 +366,48 @@ async function bumpDeleted(key: string, n: number): Promise<void> {
 export async function readDeletedCounts(): Promise<{
   expired: number;
   byUser: number;
+  lastPurgeAt: string | null;
+  /** 청소가 멈춘 것으로 보이는지 (표가 준비된 경우에만 의미가 있다) */
+  purgeStale: boolean;
   ready: boolean;
 }> {
-  if (!useSupabase) return { expired: 0, byUser: 0, ready: false };
+  if (!useSupabase)
+    return {
+      expired: 0,
+      byUser: 0,
+      lastPurgeAt: null,
+      purgeStale: false,
+      ready: false,
+    };
   try {
     const { data, error } = await supabase()
       .from("app_stats")
-      .select("key, value")
-      .in("key", [STAT_DELETED_EXPIRED, STAT_DELETED_BY_USER]);
+      .select("key, value, updated_at")
+      .in("key", [STAT_DELETED_EXPIRED, STAT_DELETED_BY_USER, STAT_LAST_PURGE]);
     if (error) throw new Error(error.message);
-    const get = (k: string) =>
-      Number((data ?? []).find((r) => r.key === k)?.value ?? 0);
+    const rows = data ?? [];
+    const get = (k: string) => Number(rows.find((r) => r.key === k)?.value ?? 0);
+    const lastPurgeAt =
+      rows.find((r) => r.key === STAT_LAST_PURGE)?.updated_at ?? null;
+    const at = lastPurgeAt ? Date.parse(lastPurgeAt) : NaN;
     return {
       expired: get(STAT_DELETED_EXPIRED),
       byUser: get(STAT_DELETED_BY_USER),
+      lastPurgeAt,
+      purgeStale:
+        !Number.isFinite(at) ||
+        Date.now() - at > PURGE_STALE_HOURS * 60 * 60 * 1000,
       ready: true,
     };
   } catch (e) {
     console.error("[stats] 지워진 수 읽기 실패:", e);
-    return { expired: 0, byUser: 0, ready: false };
+    return {
+      expired: 0,
+      byUser: 0,
+      lastPurgeAt: null,
+      purgeStale: false,
+      ready: false,
+    };
   }
 }
 
