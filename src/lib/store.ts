@@ -156,19 +156,31 @@ export async function listAllInvitations(): Promise<
   (Invitation & { userId: string | null })[]
 > {
   if (useSupabase) {
-    const { data, error } = await supabase()
-      .from("invitations")
-      .select("slug, template, data, created_at, expires_at, user_id")
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => ({
-      slug: r.slug,
-      template: r.template,
-      data: r.data,
-      createdAt: r.created_at,
-      expiresAt: r.expires_at ?? null,
-      userId: r.user_id ?? null,
-    }));
+    // 한 번에 다 오지 않는다. 끝까지 받지 않으면 운영 현황의 숫자가
+    // 조용히 모자라게 나온다 — 틀린 줄 모르고 보게 되므로 끝까지 받는다.
+    const rows: (Invitation & { userId: string | null })[] = [];
+    const pageSize = 1000;
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase()
+        .from("invitations")
+        .select("slug, template, data, created_at, expires_at, user_id")
+        .order("created_at", { ascending: false })
+        .range(from, from + pageSize - 1);
+      if (error) throw new Error(error.message);
+      const page = data ?? [];
+      for (const r of page) {
+        rows.push({
+          slug: r.slug,
+          template: r.template,
+          data: r.data,
+          createdAt: r.created_at,
+          expiresAt: r.expires_at ?? null,
+          userId: r.user_id ?? null,
+        });
+      }
+      if (page.length < pageSize) break;
+    }
+    return rows;
   }
   const db = await readLocal();
   return Object.values(db)

@@ -16,6 +16,7 @@ import {
 } from "@/lib/templates";
 import { getCategoryLabels, josaEulReul } from "@/lib/categories";
 import { bgmFor } from "@/lib/bgm";
+import { usePhotoFallback } from "./usePhotoFallback";
 import {
   clearDraft,
   readDraft,
@@ -86,6 +87,9 @@ function ImageUpload({
   className?: string;
 }) {
   const [busy, setBusy] = useState(false);
+  // 올렸던 사진이 지금은 안 열리는 경우 (주소는 남았는데 파일이 없을 때 등).
+  // 만든 사람은 다시 올리면 되므로, 깨진 아이콘 대신 그렇게 알려 준다.
+  const { failed, onError, ref } = usePhotoFallback(value);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -108,9 +112,21 @@ function ImageUpload({
       <label
         className={`relative flex ${className} w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400 transition hover:border-gold-300`}
       >
-        {value ? (
+        {value && !failed ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={value} alt="" className="h-full w-full object-cover" />
+          <img
+            ref={ref}
+            src={value}
+            alt=""
+            onError={onError}
+            className="h-full w-full object-cover"
+          />
+        ) : value && failed ? (
+          <span className="px-2 text-center text-xs leading-5 text-gray-400">
+            사진을 불러오지 못했어요
+            <br />
+            눌러서 다시 올려 주세요
+          </span>
         ) : (
           <span>{label}</span>
         )}
