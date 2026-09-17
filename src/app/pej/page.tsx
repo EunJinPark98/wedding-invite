@@ -347,13 +347,19 @@ export default async function OverviewPage({
         {/* 청소가 멈춰 있으면 제일 먼저 알려 준다 — 약속한 자동 삭제가 안 된다 */}
         {purgeStale && (
           <p className="mt-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs leading-5 text-red-600">
-            <strong>정기 청소가 돌지 않고 있어요.</strong>{" "}
-            {deleted.lastPurgeAt
-              ? `마지막으로 돈 때가 ${fmt(deleted.lastPurgeAt)} 입니다.`
-              : "아직 한 번도 돈 기록이 없습니다."}{" "}
-            기간이 끝난 초대장이 지워지지 않고 있다는 뜻이라, 개인정보처리방침에
-            적은 자동 삭제가 지켜지지 않습니다. Vercel 에 CRON_SECRET 이 있는지와
-            Cron 이 켜져 있는지 확인해 주세요.
+            <strong>정기 청소가 돌지 않고 있어요.</strong> 마지막으로 돈 때가{" "}
+            {fmt(deleted.lastPurgeAt)} 입니다. 기간이 끝난 초대장이 지워지지
+            않고 있다는 뜻이라, 개인정보처리방침에 적은 자동 삭제가 지켜지지
+            않습니다. Vercel 에 CRON_SECRET 이 있는지와 Cron 이 켜져 있는지
+            확인해 주세요.
+          </p>
+        )}
+
+        {/* 아직 기록이 없는 것은 고장이 아니다 — 표를 막 만든 직후가 그렇다 */}
+        {deleted.ready && !deleted.lastPurgeAt && (
+          <p className="mt-2.5 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs leading-5 text-gray-500">
+            정기 청소가 돈 기록이 아직 없어요. 오늘 밤 청소가 돌고 나면 여기에
+            시각이 표시됩니다.
           </p>
         )}
 

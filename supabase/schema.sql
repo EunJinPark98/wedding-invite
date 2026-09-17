@@ -31,19 +31,6 @@ insert into storage.buckets (id, name, public)
   values ('photos', 'photos', true)
   on conflict (id) do nothing;
 
--- 초대장 화면의 <img> 는 공개 버킷 주소로 사진을 직접 불러온다. 공개 버킷은
--- 그 주소로 바로 받아가므로 storage.objects 에 select 정책을 열어 둘 필요가 없다.
---
--- 예전에는 "photos public read" 라는 select 정책을 열어 두었는데, 그러면 사진이
--- 보이게 되는 것 말고도 목록 조회(/object/list)까지 함께 열린다. 목록을 부를 때
--- 쓰는 anon 키는 브라우저 코드에 들어 있는 공개 값이라, 파일 이름을 몰라도
--- 통째로 훑어 받아갈 수 있게 된다. 파일 이름을 아무리 길게 지어도 소용이 없다.
---
--- 그래서 버킷을 공개로 두고(=<img> 는 계속 열린다) 정책은 내린다. 순서가
--- 중요하다 — 공개로 만든 다음에 내려야 중간에 사진이 안 보이는 순간이 없다.
-update storage.buckets set public = true where id = 'photos';
-drop policy if exists "photos public read" on storage.objects;
-
 -- ───────── 게시 종료일이 비어 있는 옛 초대장 채우기 ─────────
 -- expires_at 칸이 생기기 전에 만들어진 초대장은 이 값이 비어 있다. 비어 있으면
 -- "무기한"으로 보기 때문에 행사가 아무리 지나도 정기 청소가 손대지 못하고,
@@ -97,3 +84,25 @@ as $$
     set value = app_stats.value + excluded.value,
         updated_at = now();
 $$;
+
+-- ───────── 사진 목록 조회 막기 (맨 마지막에 두는 이유가 있다) ─────────
+--
+-- storage 스키마는 Supabase 가 관리하는 것이라, 프로젝트 설정에 따라 여기서
+-- 손대는 것이 거부될 수 있다. 그런데 SQL 편집기는 한 구문이 실패하면 거기서
+-- 멈추므로, 이 부분이 중간에 있으면 뒤에 있는 것들(초대장 백필·세는 표)까지
+-- 통째로 실행되지 않는다. 그래서 맨 끝에 둔다 — 여기서 막히더라도 앞의 것은
+-- 이미 다 적용된 뒤다.
+--
+-- 막히면 SQL 대신 대시보드에서 하면 된다:
+--   Storage → photos → Policies → "photos public read" 삭제
+--   Storage → photos → Settings → Public bucket 켜짐 확인
+--
+-- 무엇을 하는 것인가: 초대장 화면의 <img> 는 공개 버킷 주소로 사진을 직접
+-- 받아가므로 storage.objects 에 select 정책이 없어도 사진은 보인다. 그런데
+-- 정책이 열려 있으면 목록 조회(/object/list)까지 함께 열려서, 브라우저에 들어
+-- 있는 anon 키만으로 파일 이름을 통째로 훑어 받아갈 수 있다. 파일 이름을
+-- 아무리 길게 지어도 소용이 없다.
+--
+-- 순서가 중요하다 — 공개로 만든 다음에 정책을 내려야 사진이 안 보이는 순간이 없다.
+update storage.buckets set public = true where id = 'photos';
+drop policy if exists "photos public read" on storage.objects;
