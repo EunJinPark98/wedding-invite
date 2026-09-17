@@ -513,21 +513,54 @@ export async function purgeExpiredInvitations(): Promise<{
   const now = new Date().toISOString();
 
   if (useSupabase) {
-    // 만료된 행을 지우면서 data를 함께 돌려받아 사진 경로를 확보
-    const { data, error } = await supabase()
-      .from("invitations")
-      .delete()
-      .not("expires_at", "is", null)
-      .lte("expires_at", now)
-      .select("slug, data");
-    if (error) throw new Error(error.message);
-    const rows = data ?? [];
-    await bumpDeleted(STAT_DELETED_EXPIRED, rows.length);
-    const urls = rows.flatMap((r) =>
-      photoUrlsOf(r.data as InvitationData | null)
+    /*
+     * 지울 것을 먼저 끝까지 모으고, 그 다음에 지운다.
+     *
+     * 지우면서 한 번에 돌려받으면(delete().select()) 돌아오는 행이 잘릴 수
+     * 있다. 그러면 못 받은 행의 사진이 저장소에 그대로 남고, 지운 수도 모자라게
+     * 센다. 지우는 것 자체는 다 되므로 눈에 잘 안 띈다.
+     */
+    const doomed: { slug: string; data: InvitationData | null }[] = [];
+    const pageSize = 1000;
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase()
+        .from("invitations")
+        .select("slug, data")
+        .not("expires_at", "is", null)
+        .lte("expires_at", now)
+        .order("slug")
+        .range(from, from + pageSize - 1);
+      if (error) throw new Error(error.message);
+      const page = data ?? [];
+      for (const r of page) {
+        doomed.push({ slug: r.slug, data: r.data as InvitationData | null });
+      }
+      if (page.length < pageSize) break;
+    }
+    if (doomed.length === 0) return { deleted: 0, images: 0 };
+
+    // 슬러그를 적어서 지운다. 한 번에 너무 많이 적으면 주소가 길어져 막히므로
+    // 나눠 보낸다.
+    let deleted = 0;
+    for (let i = 0; i < doomed.length; i += 100) {
+      const slice = doomed.slice(i, i + 100);
+      const { data, error } = await supabase()
+        .from("invitations")
+        .delete()
+        .in(
+          "slug",
+          slice.map((d) => d.slug)
+        )
+        .select("slug");
+      if (error) throw new Error(error.message);
+      deleted += data?.length ?? slice.length;
+    }
+
+    await bumpDeleted(STAT_DELETED_EXPIRED, deleted);
+    const images = await deleteImages(
+      doomed.flatMap((d) => photoUrlsOf(d.data))
     );
-    const images = await deleteImages(urls);
-    return { deleted: rows.length, images };
+    return { deleted, images };
   }
 
   const db = await readLocal();
