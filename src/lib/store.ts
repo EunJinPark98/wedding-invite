@@ -394,8 +394,14 @@ export async function readDeletedCounts(): Promise<{
       expired: get(STAT_DELETED_EXPIRED),
       byUser: get(STAT_DELETED_BY_USER),
       lastPurgeAt,
+      /*
+       * 기록이 아예 없는 것은 "멈췄다"가 아니다. 표를 막 만든 직후가 그렇다 —
+       * 그동안 청소는 잘 돌고 있었어도 적어 둘 곳이 없었을 뿐이다. 그때까지
+       * 빨간 경고를 띄우면 멀쩡한데 고장난 줄 알게 된다.
+       * 적어 둔 기록이 있는데 그게 오래된 경우에만 멈춘 것으로 본다.
+       */
       purgeStale:
-        !Number.isFinite(at) ||
+        Number.isFinite(at) &&
         Date.now() - at > PURGE_STALE_HOURS * 60 * 60 * 1000,
       ready: true,
     };
