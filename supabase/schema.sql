@@ -31,9 +31,69 @@ insert into storage.buckets (id, name, public)
   values ('photos', 'photos', true)
   on conflict (id) do nothing;
 
--- 조회만 열어 둔다 — 초대장 화면의 <img> 가 사진을 직접 불러오기 때문이다.
--- 업로드는 서버(/api/upload)가, 삭제는 초대장 정리 작업이 각각
--- SUPABASE_SERVICE_ROLE_KEY 로 수행하므로 정책을 열어 둘 필요가 없다.
-create policy "photos public read"
-  on storage.objects for select
-  using (bucket_id = 'photos');
+-- 초대장 화면의 <img> 는 공개 버킷 주소로 사진을 직접 불러온다. 공개 버킷은
+-- 그 주소로 바로 받아가므로 storage.objects 에 select 정책을 열어 둘 필요가 없다.
+--
+-- 예전에는 "photos public read" 라는 select 정책을 열어 두었는데, 그러면 사진이
+-- 보이게 되는 것 말고도 목록 조회(/object/list)까지 함께 열린다. 목록을 부를 때
+-- 쓰는 anon 키는 브라우저 코드에 들어 있는 공개 값이라, 파일 이름을 몰라도
+-- 통째로 훑어 받아갈 수 있게 된다. 파일 이름을 아무리 길게 지어도 소용이 없다.
+--
+-- 그래서 버킷을 공개로 두고(=<img> 는 계속 열린다) 정책은 내린다. 순서가
+-- 중요하다 — 공개로 만든 다음에 내려야 중간에 사진이 안 보이는 순간이 없다.
+update storage.buckets set public = true where id = 'photos';
+drop policy if exists "photos public read" on storage.objects;
+
+-- ───────── 게시 종료일이 비어 있는 옛 초대장 채우기 ─────────
+-- expires_at 칸이 생기기 전에 만들어진 초대장은 이 값이 비어 있다. 비어 있으면
+-- "무기한"으로 보기 때문에 행사가 아무리 지나도 정기 청소가 손대지 못하고,
+-- 이름·연락처·사진이 계속 남는다 — 개인정보처리방침에 적은 자동 삭제가
+-- 그 초대장들에는 지켜지지 않는다.
+--
+-- 행사 날짜로 게시 종료일을 채워 넣어, 다음 청소부터 정상 처리되게 한다.
+-- 값이 이미 있는 행과 날짜를 알 수 없는 행은 건드리지 않는다.
+-- (앱의 expiryFromEventDate 와 같은 규칙 — 행사 다음 날 0시, 한국 시간)
+
+-- 날짜 모양이 아니거나 2026-02-31 처럼 없는 날이면 null 을 돌려준다.
+-- 그냥 형변환하면 그런 행 하나 때문에 전체가 멈춘다.
+create or replace function public.safe_date(t text)
+returns date language plpgsql immutable as $$
+begin
+  return t::date;
+exception when others then
+  return null;
+end;
+$$;
+
+update public.invitations
+set expires_at =
+  ((public.safe_date(data->>'weddingDate') + 1)::timestamp
+    at time zone 'Asia/Seoul')
+where expires_at is null
+  and public.safe_date(data->>'weddingDate') is not null;
+
+-- ───────── 지워진 초대장 수 ─────────
+-- 초대장을 지우면 행이 사라지므로, 나중에 "지금까지 몇 개가 지워졌는지"를
+-- 세어 볼 방법이 없다. 그래서 지울 때마다 여기에 더해 둔다.
+-- 숫자만 남기고 이름·사진 같은 개인정보는 담지 않는다.
+create table if not exists public.app_stats (
+  key text primary key,
+  value bigint not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+-- invitations 와 같은 이유로 서버만 건드린다
+alter table public.app_stats enable row level security;
+
+-- 여러 곳에서 동시에 지워도 수가 어긋나지 않도록 더하기를 DB 안에서 한다.
+-- (읽어서 +1 하고 쓰면 동시에 지울 때 한쪽이 묻힌다)
+create or replace function public.bump_stat(k text, n bigint)
+returns void
+language sql
+as $$
+  insert into public.app_stats (key, value, updated_at)
+  values (k, n, now())
+  on conflict (key) do update
+    set value = app_stats.value + excluded.value,
+        updated_at = now();
+$$;

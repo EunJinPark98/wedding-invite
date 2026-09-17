@@ -304,6 +304,113 @@ function photoUrlsOf(data: InvitationData | null | undefined): string[] {
   ].filter(Boolean);
 }
 
+/* ───────── 지워진 초대장 수 세기 ─────────
+ *
+ * 초대장을 지우면 행이 사라져서, 나중에 "지금까지 몇 개가 지워졌는지"를
+ * 세어 볼 방법이 없다. 그래서 지울 때마다 app_stats 에 더해 둔다
+ * (supabase/schema.sql 참고). 숫자만 남기고 개인정보는 담지 않는다.
+ *
+ * 세는 것은 어디까지나 곁다리라, 여기서 실패해도 삭제 자체는 막지 않는다.
+ * 수가 하나 덜 세어지는 것보다 초대장이 안 지워지는 쪽이 훨씬 나쁘다.
+ */
+const STAT_DELETED_EXPIRED = "invitations_deleted_expired";
+const STAT_DELETED_BY_USER = "invitations_deleted_by_user";
+const STAT_LAST_PURGE = "last_purge_at";
+/**
+ * 이만큼 소식이 없으면 청소가 멈춘 것으로 본다.
+ * 하루 한 번 도니까 하루는 정상이고, 이틀이면 한 번은 거른 것이다.
+ */
+const PURGE_STALE_HOURS = 48;
+
+async function bumpDeleted(key: string, n: number): Promise<void> {
+  if (!useSupabase || n <= 0) return;
+  try {
+    const { error } = await supabase().rpc("bump_stat", { k: key, n });
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    console.error("[stats] 지워진 수 기록 실패:", e);
+  }
+}
+
+/**
+ * 정기 청소가 방금 돌았다고 남긴다.
+ *
+ * 청소는 아무도 안 보는 새벽에 도는 데다, CRON_SECRET 이 빠져 있거나 스케줄이
+ * 꺼져 있으면 아무 일도 안 일어난 채 조용히 멈춘다. 그러면 "행사 다음 날
+ * 자동 삭제"라는 약속이 지켜지지 않는데도 알 방법이 없다. 그래서 돌 때마다
+ * 시각을 남기고 운영 현황에서 보여 준다.
+ */
+export async function markPurgeRan(): Promise<void> {
+  if (!useSupabase) return;
+  try {
+    const { error } = await supabase()
+      .from("app_stats")
+      .upsert(
+        { key: STAT_LAST_PURGE, value: 0, updated_at: new Date().toISOString() },
+        { onConflict: "key" }
+      );
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    // 기록에 실패해도 청소 자체는 이미 끝났다
+    console.error("[stats] 청소 시각 기록 실패:", e);
+  }
+}
+
+/**
+ * 지금까지 지워진 초대장 수 (운영 현황용).
+ *
+ * ready 는 세는 표가 준비돼 있는지다. schema.sql 을 아직 실행하지 않았으면
+ * false 로 오는데, 그래야 화면에서 "아직 아무것도 안 지워졌다(0)"와
+ * "셀 준비가 안 됐다"를 구분해 보여 줄 수 있다.
+ */
+export async function readDeletedCounts(): Promise<{
+  expired: number;
+  byUser: number;
+  lastPurgeAt: string | null;
+  /** 청소가 멈춘 것으로 보이는지 (표가 준비된 경우에만 의미가 있다) */
+  purgeStale: boolean;
+  ready: boolean;
+}> {
+  if (!useSupabase)
+    return {
+      expired: 0,
+      byUser: 0,
+      lastPurgeAt: null,
+      purgeStale: false,
+      ready: false,
+    };
+  try {
+    const { data, error } = await supabase()
+      .from("app_stats")
+      .select("key, value, updated_at")
+      .in("key", [STAT_DELETED_EXPIRED, STAT_DELETED_BY_USER, STAT_LAST_PURGE]);
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    const get = (k: string) => Number(rows.find((r) => r.key === k)?.value ?? 0);
+    const lastPurgeAt =
+      rows.find((r) => r.key === STAT_LAST_PURGE)?.updated_at ?? null;
+    const at = lastPurgeAt ? Date.parse(lastPurgeAt) : NaN;
+    return {
+      expired: get(STAT_DELETED_EXPIRED),
+      byUser: get(STAT_DELETED_BY_USER),
+      lastPurgeAt,
+      purgeStale:
+        !Number.isFinite(at) ||
+        Date.now() - at > PURGE_STALE_HOURS * 60 * 60 * 1000,
+      ready: true,
+    };
+  } catch (e) {
+    console.error("[stats] 지워진 수 읽기 실패:", e);
+    return {
+      expired: 0,
+      byUser: 0,
+      lastPurgeAt: null,
+      purgeStale: false,
+      ready: false,
+    };
+  }
+}
+
 // 삭제 (소유자 검증 포함) — 복원 불가. 업로드한 사진도 저장소에서 함께 지운다.
 export async function deleteInvitation(
   slug: string,
@@ -323,6 +430,7 @@ export async function deleteInvitation(
       .select("slug");
     if (error) throw new Error(error.message);
     if ((data?.length ?? 0) === 0) return false;
+    await bumpDeleted(STAT_DELETED_BY_USER, data?.length ?? 0);
     // 행 삭제가 확정된 뒤에 사진 정리 (실패해도 삭제 자체는 성공 처리)
     await deleteImages(photoUrlsOf(existing?.data));
     return true;
@@ -350,6 +458,7 @@ export async function deleteInvitationsOfUser(userId: string): Promise<number> {
       .select("slug, data");
     if (error) throw new Error(error.message);
     const rows = data ?? [];
+    await bumpDeleted(STAT_DELETED_BY_USER, rows.length);
     await deleteImages(
       rows.flatMap((r) => photoUrlsOf(r.data as InvitationData | null))
     );
@@ -404,20 +513,54 @@ export async function purgeExpiredInvitations(): Promise<{
   const now = new Date().toISOString();
 
   if (useSupabase) {
-    // 만료된 행을 지우면서 data를 함께 돌려받아 사진 경로를 확보
-    const { data, error } = await supabase()
-      .from("invitations")
-      .delete()
-      .not("expires_at", "is", null)
-      .lte("expires_at", now)
-      .select("slug, data");
-    if (error) throw new Error(error.message);
-    const rows = data ?? [];
-    const urls = rows.flatMap((r) =>
-      photoUrlsOf(r.data as InvitationData | null)
+    /*
+     * 지울 것을 먼저 끝까지 모으고, 그 다음에 지운다.
+     *
+     * 지우면서 한 번에 돌려받으면(delete().select()) 돌아오는 행이 잘릴 수
+     * 있다. 그러면 못 받은 행의 사진이 저장소에 그대로 남고, 지운 수도 모자라게
+     * 센다. 지우는 것 자체는 다 되므로 눈에 잘 안 띈다.
+     */
+    const doomed: { slug: string; data: InvitationData | null }[] = [];
+    const pageSize = 1000;
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await supabase()
+        .from("invitations")
+        .select("slug, data")
+        .not("expires_at", "is", null)
+        .lte("expires_at", now)
+        .order("slug")
+        .range(from, from + pageSize - 1);
+      if (error) throw new Error(error.message);
+      const page = data ?? [];
+      for (const r of page) {
+        doomed.push({ slug: r.slug, data: r.data as InvitationData | null });
+      }
+      if (page.length < pageSize) break;
+    }
+    if (doomed.length === 0) return { deleted: 0, images: 0 };
+
+    // 슬러그를 적어서 지운다. 한 번에 너무 많이 적으면 주소가 길어져 막히므로
+    // 나눠 보낸다.
+    let deleted = 0;
+    for (let i = 0; i < doomed.length; i += 100) {
+      const slice = doomed.slice(i, i + 100);
+      const { data, error } = await supabase()
+        .from("invitations")
+        .delete()
+        .in(
+          "slug",
+          slice.map((d) => d.slug)
+        )
+        .select("slug");
+      if (error) throw new Error(error.message);
+      deleted += data?.length ?? slice.length;
+    }
+
+    await bumpDeleted(STAT_DELETED_EXPIRED, deleted);
+    const images = await deleteImages(
+      doomed.flatMap((d) => photoUrlsOf(d.data))
     );
-    const images = await deleteImages(urls);
-    return { deleted: rows.length, images };
+    return { deleted, images };
   }
 
   const db = await readLocal();

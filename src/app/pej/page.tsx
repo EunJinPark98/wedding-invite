@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { isExpired, listAllInvitations } from "@/lib/store";
+import {
+  isExpired,
+  listAllInvitations,
+  readDeletedCounts,
+} from "@/lib/store";
 import { getTheme } from "@/lib/templates";
 import { getCategoryMeta } from "@/lib/categories";
 import { authEnabled, getUser } from "@/lib/supabase/server";
@@ -35,16 +39,20 @@ function Stat({
   label,
   value,
   sub,
+  note,
 }: {
   label: string;
   value: number;
   sub?: string;
+  /** 한 줄 더 — 있을 때만 (예: 마지막 청소 시각) */
+  note?: string;
 }) {
   return (
     <div className="rounded-2xl border border-gold-100 bg-white px-4 py-4 text-center">
       <p className="text-xs text-gray-400">{label}</p>
       <p className="mt-1 text-2xl font-semibold text-gray-800">{value}</p>
       {sub && <p className="mt-0.5 text-[11px] text-gray-400">{sub}</p>}
+      {note && <p className="mt-0.5 text-[10px] text-gray-300">{note}</p>}
     </div>
   );
 }
@@ -207,9 +215,10 @@ export default async function OverviewPage({
   // 초대장을 하나라도 만든 계정만 보기
   const madeOnly = sp.made === "1";
 
-  const [accounts, invitations] = await Promise.all([
+  const [accounts, invitations, deleted] = await Promise.all([
     listAccounts(),
     listAllInvitations(),
+    readDeletedCounts(),
   ]);
 
   // 계정별로 초대장을 묶는다
@@ -230,6 +239,10 @@ export default async function OverviewPage({
   // 게시 종료일이 아예 없는 것 — 정기 청소가 손대지 못해 계속 남는다
   const noExpiry = invitations.filter((i) => !i.expiresAt).length;
   const endedNoExpiry = ended.filter((i) => !i.expiresAt).length;
+  // 지금까지 지워진 초대장 (행이 사라지므로 지울 때마다 세어 둔 값을 읽는다)
+  const goneTotal = deleted.expired + deleted.byUser;
+  // 청소가 멈췄는지 판단은 store 가 한다 (여기서 시각을 재면 화면이 순수하지 않다)
+  const purgeStale = deleted.ready && deleted.purgeStale;
   const byCategory = CATEGORIES.map((c) => ({
     ...c,
     count: invitations.filter(
@@ -317,16 +330,58 @@ export default async function OverviewPage({
           />
           <Stat
             label="게시 종료"
-            value={ended.length}
+            value={goneTotal}
             sub={
-              endedNoExpiry > 0
-                ? `무기한 ${endedNoExpiry}개`
-                : "자동 삭제 대기"
+              deleted.ready
+                ? `기간 만료 ${deleted.expired} · 직접 삭제 ${deleted.byUser}`
+                : "세는 중 아님"
+            }
+            note={
+              deleted.ready && deleted.lastPurgeAt
+                ? `마지막 청소 ${fmt(deleted.lastPurgeAt)}`
+                : undefined
             }
           />
         </div>
 
-        {/* 게시 종료일이 없는 초대장 — 왜 "게시 종료"에 안 잡히는지 알려 준다 */}
+        {/* 청소가 멈춰 있으면 제일 먼저 알려 준다 — 약속한 자동 삭제가 안 된다 */}
+        {purgeStale && (
+          <p className="mt-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs leading-5 text-red-600">
+            <strong>정기 청소가 돌지 않고 있어요.</strong>{" "}
+            {deleted.lastPurgeAt
+              ? `마지막으로 돈 때가 ${fmt(deleted.lastPurgeAt)} 입니다.`
+              : "아직 한 번도 돈 기록이 없습니다."}{" "}
+            기간이 끝난 초대장이 지워지지 않고 있다는 뜻이라, 개인정보처리방침에
+            적은 자동 삭제가 지켜지지 않습니다. Vercel 에 CRON_SECRET 이 있는지와
+            Cron 이 켜져 있는지 확인해 주세요.
+          </p>
+        )}
+
+        {/* 세는 표가 아직 없으면 "아직 0" 과 구분해 알려 준다 */}
+        {!deleted.ready && (
+          <p className="mt-2.5 rounded-2xl border border-red-100 bg-red-50/60 px-4 py-3 text-xs leading-5 text-red-500">
+            지워진 초대장을 세는 표가 아직 없어요. Supabase SQL Editor 에서{" "}
+            <code className="rounded bg-white px-1">supabase/schema.sql</code>{" "}
+            를 한 번 실행해 주세요. 그전까지 위 숫자는 0으로 보입니다.
+          </p>
+        )}
+
+        {/* 아직 안 지워졌지만 기간이 끝난 것 — 오늘 밤 청소에 지워진다 */}
+        {ended.length > 0 && (
+          <p className="mt-2.5 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs leading-5 text-gray-500">
+            기간이 끝났는데 아직 안 지워진 초대장이{" "}
+            <strong className="text-gray-800">{ended.length}개</strong>{" "}
+            있어요. 오늘 밤 정리 작업에서 지워집니다.
+            {endedNoExpiry > 0 && (
+              <>
+                {" "}이 가운데 <strong className="text-gray-800">{endedNoExpiry}개</strong>
+                는 게시 종료일이 없어 자동으로는 지워지지 않습니다.
+              </>
+            )}
+          </p>
+        )}
+
+        {/* 게시 종료일이 없는 초대장 — 자동 삭제가 손대지 못한다 */}
         {noExpiry > 0 && (
           <p className="mt-2.5 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs leading-5 text-gray-500">
             게시 종료일이 없는 초대장이{" "}

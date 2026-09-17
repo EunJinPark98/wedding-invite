@@ -57,8 +57,14 @@ export async function listAccounts(): Promise<Account[]> {
 
   const out: Account[] = [];
   const perPage = 200;
-  // 끝없이 도는 일이 없도록 상한을 둔다 (200 × 25 = 5,000명)
-  for (let page = 1; page <= 25; page++) {
+  /*
+   * 끝없이 도는 일이 없도록 상한은 두되, 넉넉히 둔다 (200 × 500 = 100,000명).
+   * 전에는 5,000명에서 멈췄는데, 넘어가면 운영 현황의 숫자가 조용히 모자라게
+   * 나올 뿐 아무도 모른다. 그래도 상한에 닿으면 로그를 남겨 둔다.
+   */
+  const maxPages = 500;
+  let page = 1;
+  for (; page <= maxPages; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
     if (error) throw new Error(error.message);
     const users = data?.users ?? [];
@@ -77,6 +83,11 @@ export async function listAccounts(): Promise<Account[]> {
       });
     }
     if (users.length < perPage) break;
+  }
+  if (page > maxPages) {
+    console.error(
+      `[admin] 계정이 ${maxPages * perPage}명을 넘어 목록이 잘렸습니다. 운영 현황의 숫자가 실제보다 적습니다.`
+    );
   }
   return out.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
