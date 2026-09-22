@@ -1132,9 +1132,9 @@ export default function EditorClient({
   const [trim, setTrim] = useState<{ files: File[]; room: number } | null>(null);
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
-  // 임시저장 버튼을 누른 직후에만 잠깐 뜨는 확인 문구
-  // 방금 저장했을 때 띄우는 안내. 언제까지 이어서 쓸 수 있는지 적어야 해서
-  // 저장한 순간(밀리초)을 담아 둔다. null 이면 안내를 띄우지 않는다.
+  // 임시저장 버튼을 누른 직후에만 잠깐 뜨는 확인 문구.
+  // 언제까지 이어서 쓸 수 있는지 적어야 해서 저장한 순간(밀리초)을 담아 둔다.
+  // null 이면 안내를 띄우지 않는다.
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const dateSectionRef = useRef<HTMLDivElement>(null);
   // 지난 행사일인지는 상태로 들고 있지 않고 값에서 바로 본다.

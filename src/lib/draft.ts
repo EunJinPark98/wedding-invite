@@ -54,7 +54,6 @@ export function clearDraft(): void {
   }
 }
 
-/** "3분 전" 처럼 언제 적어 둔 것인지 */
 /**
  * 언제까지 이어서 쓸 수 있는지 ("9/22").
  *
@@ -70,6 +69,7 @@ export function draftExpiryLabel(savedAt: number): string {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
+/** "3분 전" 처럼 언제 적어 둔 것인지 */
 export function savedAgo(savedAt: number): string {
   const min = Math.floor((Date.now() - savedAt) / 60000);
   if (min < 1) return "방금";
