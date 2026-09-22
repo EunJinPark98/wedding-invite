@@ -19,6 +19,7 @@ import { bgmFor } from "@/lib/bgm";
 import { usePhotoFallback } from "./usePhotoFallback";
 import {
   clearDraft,
+  draftExpiryLabel,
   readDraft,
   saveDraft,
   savedAgo,
@@ -1132,7 +1133,9 @@ export default function EditorClient({
   const [resultExpires, setResultExpires] = useState<string | null>(null); // 발급된 만료일
   const [photoWarn, setPhotoWarn] = useState(false); // 대표 사진 미등록 경고
   // 임시저장 버튼을 누른 직후에만 잠깐 뜨는 확인 문구
-  const [savedNote, setSavedNote] = useState(false);
+  // 방금 저장했을 때 띄우는 안내. 언제까지 이어서 쓸 수 있는지 적어야 해서
+  // 저장한 순간(밀리초)을 담아 둔다. null 이면 안내를 띄우지 않는다.
+  const [savedAt, setSavedAt] = useState<number | null>(null);
   const dateSectionRef = useRef<HTMLDivElement>(null);
   // 지난 행사일인지는 상태로 들고 있지 않고 값에서 바로 본다.
   // 브라우저마다 날짜 칸의 min 을 지키지 않는 경우가 있어(아이폰에서 지난 날이
@@ -1171,8 +1174,9 @@ export default function EditorClient({
   // 적는 동안 알아서 담기지만, 눌러서 확인하고 싶은 사람을 위해 버튼도 둔다.
   function handleSaveDraft() {
     saveDraft({ category, template, data });
-    setSavedNote(true);
-    setTimeout(() => setSavedNote(false), 3000);
+    const now = Date.now();
+    setSavedAt(now);
+    setTimeout(() => setSavedAt(null), 3000);
   }
 
   function openConfirm() {
@@ -2245,9 +2249,9 @@ export default function EditorClient({
         </div>
         {/* 버튼 아래 안내. 지난 날짜는 여기 적지 않는다 — 날짜 칸이 이미
             빨갛게 알리고 있고, 눌러도 그 칸으로 데려간다. */}
-        {savedNote ? (
+        {savedAt !== null ? (
           <p className="text-center text-sm font-medium text-gold-500">
-            저장했어요. 나중에 들어오시면 이어서 쓸 수 있어요.
+            저장완료. {draftExpiryLabel(savedAt)}까지 이어서 쓸 수 있어요.
           </p>
         ) : photoWarn && needMainPhoto ? (
           <p className="text-center text-sm font-medium text-red-500">

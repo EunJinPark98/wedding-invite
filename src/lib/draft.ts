@@ -55,6 +55,21 @@ export function clearDraft(): void {
 }
 
 /** "3분 전" 처럼 언제 적어 둔 것인지 */
+/**
+ * 언제까지 이어서 쓸 수 있는지 ("9/22").
+ *
+ * 보관 기간(DRAFT_MAX_AGE_MS)을 여기서 더해 날짜로 바꾼다. "일주일 동안"
+ * 이라고 적어 두면 언제까지인지 각자 세어 봐야 하지만, 날짜로 보여 주면
+ * 바로 안다. 기간을 바꾸면 이 날짜도 저절로 따라간다.
+ *
+ * 보는 사람 기기의 날짜로 적는다 — 만료 시각 자체는 어디서 보든 같은
+ * 순간이고, 그 순간이 그 사람 달력으로 며칠인지를 알려 주는 것이 맞다.
+ */
+export function draftExpiryLabel(savedAt: number): string {
+  const d = new Date(savedAt + DRAFT_MAX_AGE_MS);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
 export function savedAgo(savedAt: number): string {
   const min = Math.floor((Date.now() - savedAt) / 60000);
   if (min < 1) return "방금";
