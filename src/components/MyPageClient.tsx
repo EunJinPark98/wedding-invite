@@ -340,7 +340,7 @@ export default function MyPageClient({
                       title={
                         labels.showPerson2
                           ? `${inv.groomName} ♥ ${inv.brideName} 결혼합니다`
-                          : `${inv.groomName}의 ${labels.countdownLabel}에 초대합니다`
+                          : `${inv.groomName}님의 ${labels.countdownLabel}에 초대합니다`
                       }
                       description={
                         inv.weddingDate

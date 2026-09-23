@@ -2341,7 +2341,7 @@ export default function EditorClient({
               title={
                 labels.showPerson2
                   ? `${data.groomName} ♥ ${data.brideName} 결혼합니다`
-                  : `${data.groomName}의 ${labels.countdownLabel}에 초대합니다`
+                  : `${data.groomName}님의 ${labels.countdownLabel}에 초대합니다`
               }
               description={
                 data.weddingDate
