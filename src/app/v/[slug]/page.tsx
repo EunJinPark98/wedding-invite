@@ -17,7 +17,7 @@ export async function generateMetadata({
   const labels = labelsOf(inv.data);
   const title = labels.showPerson2
     ? `${groomName} ♥ ${brideName} 결혼합니다`
-    : `${groomName}의 ${labels.countdownLabel}에 초대합니다`;
+    : `${groomName}님의 ${labels.countdownLabel}에 초대합니다`;
   // 카톡 미리보기 카드에 예식일·장소까지 보이도록
   const when = [weddingDate, venueName].filter(Boolean).join(" · ");
   const description =
