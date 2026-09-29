@@ -417,6 +417,115 @@ export async function readDeletedCounts(): Promise<{
   }
 }
 
+/* ───────── 방문 수 ─────────
+ *
+ * 날짜별 방문자·조회 수만 쌓는다 (supabase/schema.sql 참고). 누가 왔는지는
+ * 담지 않는다 — IP 도 쿠키도 식별자도 없고 숫자만 올라간다.
+ */
+export type VisitKind = "service" | "invitation";
+
+/** 방문 한 번을 센다. 실패해도 화면에는 영향이 없어야 하므로 던지지 않는다. */
+export async function bumpVisit(
+  day: string,
+  kind: VisitKind,
+  firstToday: boolean
+): Promise<void> {
+  if (!useSupabase) return;
+  try {
+    const { error } = await supabase().rpc("bump_visit", {
+      d: day,
+      k: kind,
+      first_today: firstToday,
+    });
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    console.error("[visit] 방문 수 기록 실패:", e);
+  }
+}
+
+/**
+ * 최근 방문 수 (운영 현황용).
+ *
+ * 오늘 / 7일 / 30일로 묶어서 돌려준다. 묶는 데 "지금 몇 시인지"가 필요한데,
+ * 화면을 그리는 도중에 시계를 보면 그릴 때마다 답이 달라진다. 그래서 여기서
+ * 다 계산해 숫자만 넘긴다.
+ *
+ * ready 는 세는 표가 준비돼 있는지다. schema.sql 을 아직 실행하지 않았으면
+ * false 로 오는데, 그래야 "아직 아무도 안 왔다(0)"와 "셀 준비가 안 됐다"를
+ * 구분해 보여 줄 수 있다.
+ */
+export interface VisitSum {
+  visitors: number;
+  views: number;
+}
+
+export async function readVisitStats(): Promise<{
+  today: VisitSum;
+  last7: VisitSum;
+  last30: VisitSum;
+  /** 최근 7일을 화면 종류로 나눈 것 */
+  last7Service: VisitSum;
+  last7Invitation: VisitSum;
+  ready: boolean;
+}> {
+  const zero = (): VisitSum => ({ visitors: 0, views: 0 });
+  const empty = {
+    today: zero(),
+    last7: zero(),
+    last30: zero(),
+    last7Service: zero(),
+    last7Invitation: zero(),
+    ready: false,
+  };
+  if (!useSupabase) return empty;
+
+  try {
+    const dayOf = (back: number) =>
+      new Date(Date.now() - back * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10);
+    const since30 = dayOf(29);
+    const since7 = dayOf(6);
+    const today = dayOf(0);
+
+    // 하루 두 줄(service/invitation)이라 30일치라도 60줄을 넘지 않는다
+    const { data, error } = await supabase()
+      .from("visit_stats")
+      .select("day, kind, visitors, views")
+      .gte("day", since30);
+    if (error) throw new Error(error.message);
+
+    const out = {
+      today: zero(),
+      last7: zero(),
+      last30: zero(),
+      last7Service: zero(),
+      last7Invitation: zero(),
+      ready: true,
+    };
+    const add = (t: VisitSum, v: number, w: number) => {
+      t.visitors += v;
+      t.views += w;
+    };
+    for (const r of data ?? []) {
+      const day = String(r.day).slice(0, 10);
+      const v = Number(r.visitors ?? 0);
+      const w = Number(r.views ?? 0);
+      add(out.last30, v, w);
+      if (day >= today) add(out.today, v, w);
+      if (day >= since7) {
+        add(out.last7, v, w);
+        if (r.kind === "invitation") add(out.last7Invitation, v, w);
+        else add(out.last7Service, v, w);
+      }
+    }
+    return out;
+  } catch (e) {
+    console.error("[visit] 방문 수 읽기 실패:", e);
+    return empty;
+  }
+}
+
 // 삭제 (소유자 검증 포함) — 복원 불가. 업로드한 사진도 저장소에서 함께 지운다.
 export async function deleteInvitation(
   slug: string,
