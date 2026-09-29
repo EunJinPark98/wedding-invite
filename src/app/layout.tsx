@@ -12,6 +12,7 @@ import {
   Dancing_Script,
 } from "next/font/google";
 import "./globals.css";
+import VisitCounter from "@/components/VisitCounter";
 
 // 한글 폰트: subsets 미지정 + preload:false (한글 글리프 누락 방지)
 const myeongjo = Nanum_Myeongjo({
@@ -196,6 +197,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <VisitCounter />
       </body>
     </html>
   );

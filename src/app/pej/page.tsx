@@ -4,6 +4,7 @@ import {
   isExpired,
   listAllInvitations,
   readDeletedCounts,
+  readVisitStats,
 } from "@/lib/store";
 import { getTheme } from "@/lib/templates";
 import { getCategoryMeta } from "@/lib/categories";
@@ -215,10 +216,11 @@ export default async function OverviewPage({
   // 초대장을 하나라도 만든 계정만 보기
   const madeOnly = sp.made === "1";
 
-  const [accounts, invitations, deleted] = await Promise.all([
+  const [accounts, invitations, deleted, visits] = await Promise.all([
     listAccounts(),
     listAllInvitations(),
     readDeletedCounts(),
+    readVisitStats(),
   ]);
 
   // 계정별로 초대장을 묶는다
@@ -343,6 +345,39 @@ export default async function OverviewPage({
             }
           />
         </div>
+
+        {/* 방문 수 */}
+        {visits.ready ? (
+          <div className="mt-2.5 rounded-2xl border border-gold-100 bg-white px-4 py-3">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              {[
+                { label: "오늘 방문자", v: visits.today },
+                { label: "최근 7일", v: visits.last7 },
+                { label: "최근 30일", v: visits.last30 },
+              ].map((c) => (
+                <div key={c.label}>
+                  <p className="text-[11px] text-gray-400">{c.label}</p>
+                  <p className="mt-0.5 text-xl font-semibold text-gray-800">
+                    {c.v.visitors}
+                  </p>
+                  <p className="text-[10px] text-gray-300">
+                    {c.v.views}번 열림
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 border-t border-gray-100 pt-2 text-[11px] text-gray-400">
+              최근 7일 — 만들러 온 방문 {visits.last7Service.visitors} · 하객이 초대장 열람{" "}
+              {visits.last7Invitation.visitors}
+            </p>
+          </div>
+        ) : (
+          <p className="mt-2.5 rounded-2xl border border-gold-100 bg-white px-4 py-3 text-xs leading-5 text-gray-500">
+            방문자 수를 세는 표가 아직 없어요. Supabase SQL Editor 에서{" "}
+            <code className="rounded bg-gray-50 px-1">supabase/schema.sql</code>{" "}
+            을 한 번 실행하면 그때부터 쌓입니다.
+          </p>
+        )}
 
         {/* 청소가 멈춰 있으면 제일 먼저 알려 준다 — 약속한 자동 삭제가 안 된다 */}
         {purgeStale && (

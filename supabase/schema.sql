@@ -85,6 +85,40 @@ as $$
         updated_at = now();
 $$;
 
+
+-- ───────── 방문자 수 ─────────
+-- 날짜별로 몇 명이 왔고 몇 번 열렸는지만 쌓는다. 누가 왔는지는 담지 않는다 —
+-- IP 도, 쿠키도, 식별자도 남기지 않고 오직 숫자만 올린다.
+--
+-- "같은 사람인지"는 그 사람 브라우저가 스스로 판단한다. 브라우저에 오늘
+-- 날짜만 적어 두고, 날짜가 바뀐 첫 방문에만 방문자를 +1 한다. 서버는 그
+-- 판단 결과(처음인지 아닌지)만 받는다.
+--
+--   kind: 'service'    = 메인·에디터·마이페이지 등 서비스 화면
+--         'invitation' = 하객이 받은 초대장 화면(/v/...)
+create table if not exists public.visit_stats (
+  day date not null,
+  kind text not null,
+  visitors bigint not null default 0,
+  views bigint not null default 0,
+  primary key (day, kind)
+);
+
+-- 다른 표와 같은 이유로 서버만 건드린다
+alter table public.visit_stats enable row level security;
+
+-- 여러 명이 동시에 들어와도 수가 어긋나지 않도록 더하기를 DB 안에서 한다
+create or replace function public.bump_visit(d date, k text, first_today boolean)
+returns void
+language sql
+as $$
+  insert into public.visit_stats (day, kind, visitors, views)
+  values (d, k, case when first_today then 1 else 0 end, 1)
+  on conflict (day, kind) do update
+    set visitors = visit_stats.visitors + excluded.visitors,
+        views = visit_stats.views + excluded.views;
+$$;
+
 -- ───────── 사진 목록 조회 막기 (맨 마지막에 두는 이유가 있다) ─────────
 --
 -- storage 스키마는 Supabase 가 관리하는 것이라, 프로젝트 설정에 따라 여기서
